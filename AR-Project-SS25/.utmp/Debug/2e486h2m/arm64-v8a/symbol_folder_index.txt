@@ -1,0 +1,1 @@
+E:\Github\uni-ar-project-25\AR-Project-SS25\Library\PramData\AndroidApplicationController\Cache\com.unity.template.ar_mobile\gradle-project\unityLibrary\build\intermediates\cxx\Debug\2e486h2m\obj\arm64-v8a

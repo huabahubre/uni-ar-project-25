@@ -66,7 +66,7 @@ public class PlayerData
 public class PlayerStyle
 {
     public Color color;
-    public Material material;
+    public Sprite icon;
 }
 
 #endregion
