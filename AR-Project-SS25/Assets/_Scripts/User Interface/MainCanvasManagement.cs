@@ -9,24 +9,23 @@ using UnityEngine.UI;
 public class MainCanvasManagement : Singleton<MainCanvasManagement>
 {
     
-    [ShowInInspector, ReadOnly, BoxGroup("CanvasPageControllerIX")] protected List<CanvasPage> CanvasPages;
+    [ShowInInspector, ReadOnly, BoxGroup("MainCanvasManagement")] protected List<CanvasPage> CanvasPages;
 
 
-    [FoldoutGroup("References")] public GameObject GlobalMessagePanel;
-    [FoldoutGroup("References")] public TextMeshProUGUI GlobalMessageText;
-    [FoldoutGroup("References")] public Image GlobalMessageIcon;
-    [FoldoutGroup("References")] public Image GlobalMessageIconBg;
-    [FoldoutGroup("References")] public Image GlobalMessageBg;
-    
-    [FoldoutGroup("References")] public Sprite MessageIcon_Info;
-    [FoldoutGroup("References")] public Sprite MessageIcon_Warning;
-    [FoldoutGroup("References")] public Sprite MessageIcon_Error;
-    [FoldoutGroup("References")] public Sprite MessageIcon_Success;
-    
-    [FoldoutGroup("References")] public Color MessageColor_Info;
-    [FoldoutGroup("References")] public Color MessageColor_Warning;
-    [FoldoutGroup("References")] public Color MessageColor_Error;
-    [FoldoutGroup("References")] public Color MessageColor_Success;
+    // TODO: This is for later, when we have a global message panel
+    // [FoldoutGroup("References")] public GameObject GlobalMessagePanel;
+    // [FoldoutGroup("References")] public TextMeshProUGUI GlobalMessageText;
+    // [FoldoutGroup("References")] public Image GlobalMessageIcon;
+    // [FoldoutGroup("References")] public Image GlobalMessageIconBg;
+    // [FoldoutGroup("References")] public Image GlobalMessageBg;
+    // [FoldoutGroup("References")] public Sprite MessageIcon_Info;
+    // [FoldoutGroup("References")] public Sprite MessageIcon_Warning;
+    // [FoldoutGroup("References")] public Sprite MessageIcon_Error;
+    // [FoldoutGroup("References")] public Sprite MessageIcon_Success;
+    // [FoldoutGroup("References")] public Color MessageColor_Info;
+    // [FoldoutGroup("References")] public Color MessageColor_Warning;
+    // [FoldoutGroup("References")] public Color MessageColor_Error;
+    // [FoldoutGroup("References")] public Color MessageColor_Success;
     
 
     public enum MessageType
@@ -50,6 +49,7 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
         // GlobalMessagePanelAnim.SetBool("Active", false);
         
         Initialize();
+        ShowPage("Menu");
     }
 
 
@@ -197,68 +197,68 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
     
     #region Global Message
 
-    [Button]
-    public void ShowMessage(string message,  MessageType messageType = MessageType.INFO, int duration = 5)
-    {
-        if (GlobalMessagePanel == null || GlobalMessageText == null)
-        {
-            Debug.LogWarning("GlobalMessagePanel or GlobalMessageText is not assigned.");
-            return;
-        }
-
-        // Color
-        Color ogColor = Color.black;
-        
-        switch (messageType)
-        {
-            case MessageType.INFO:
-                GlobalMessageIcon.sprite = MessageIcon_Info;
-
-                ogColor = MessageColor_Info;
-                GlobalMessageIconBg.color = MessageColor_Info;
-                GlobalMessageBg.color = MessageColor_Info;
-                break;
-            case MessageType.WARNING:
-                GlobalMessageIcon.sprite = MessageIcon_Warning;
-                ogColor = MessageColor_Warning;
-                GlobalMessageIconBg.color = MessageColor_Warning;
-                GlobalMessageBg.color = MessageColor_Warning;
-                break;
-            case MessageType.ERROR:
-                GlobalMessageIcon.sprite = MessageIcon_Error;
-                ogColor = MessageColor_Error;
-                break;
-            
-            case MessageType.SUCCESS:
-                GlobalMessageIcon.sprite = MessageIcon_Success;
-                ogColor = MessageColor_Success;
-                break;
-        }
-        
-        
-        // Setting Color
-        GlobalMessageIconBg.color = ogColor;
-        Color fadedOgColor = ogColor;
-        fadedOgColor.a = 0.5f;
-        GlobalMessageBg.color = fadedOgColor;
-
-        GlobalMessagePanel.SetActive(true);
-        GlobalMessageText.text = message;
-
-        // If a message is already being displayed, stop it and restart
-        if (messageCoroutine != null)
-        {
-            StopCoroutine(messageCoroutine);
-        }
-
-        messageCoroutine = StartCoroutine(HideMessageAfterDelay(duration));
-    }
-
-    private IEnumerator HideMessageAfterDelay(int delay)
-    {
-        yield return new WaitForSeconds(delay);
-        GlobalMessagePanel.SetActive(false);
-    }
+    // [Button]
+    // public void ShowMessage(string message,  MessageType messageType = MessageType.INFO, int duration = 5)
+    // {
+    //     if (GlobalMessagePanel == null || GlobalMessageText == null)
+    //     {
+    //         Debug.LogWarning("GlobalMessagePanel or GlobalMessageText is not assigned.");
+    //         return;
+    //     }
+    //
+    //     // Color
+    //     // Color ogColor = Color.black;
+    //     
+    //     // switch (messageType)
+    //     // {
+    //     //     case MessageType.INFO:
+    //     //         GlobalMessageIcon.sprite = MessageIcon_Info;
+    //     //
+    //     //         ogColor = MessageColor_Info;
+    //     //         GlobalMessageIconBg.color = MessageColor_Info;
+    //     //         GlobalMessageBg.color = MessageColor_Info;
+    //     //         break;
+    //     //     case MessageType.WARNING:
+    //     //         GlobalMessageIcon.sprite = MessageIcon_Warning;
+    //     //         ogColor = MessageColor_Warning;
+    //     //         GlobalMessageIconBg.color = MessageColor_Warning;
+    //     //         GlobalMessageBg.color = MessageColor_Warning;
+    //     //         break;
+    //     //     case MessageType.ERROR:
+    //     //         GlobalMessageIcon.sprite = MessageIcon_Error;
+    //     //         ogColor = MessageColor_Error;
+    //     //         break;
+    //     //     
+    //     //     case MessageType.SUCCESS:
+    //     //         GlobalMessageIcon.sprite = MessageIcon_Success;
+    //     //         ogColor = MessageColor_Success;
+    //     //         break;
+    //     // }
+    //     
+    //     
+    //     // Setting Color
+    //     // GlobalMessageIconBg.color = ogColor;
+    //     // Color fadedOgColor = ogColor;
+    //     // fadedOgColor.a = 0.5f;
+    //     // GlobalMessageBg.color = fadedOgColor;
+    //
+    //     GlobalMessagePanel.SetActive(true);
+    //     GlobalMessageText.text = message;
+    //
+    //     // If a message is already being displayed, stop it and restart
+    //     if (messageCoroutine != null)
+    //     {
+    //         StopCoroutine(messageCoroutine);
+    //     }
+    //
+    //     messageCoroutine = StartCoroutine(HideMessageAfterDelay(duration));
+    // }
+    //
+    // private IEnumerator HideMessageAfterDelay(int delay)
+    // {
+    //     yield return new WaitForSeconds(delay);
+    //     GlobalMessagePanel.SetActive(false);
+    // }
 
     #endregion
     

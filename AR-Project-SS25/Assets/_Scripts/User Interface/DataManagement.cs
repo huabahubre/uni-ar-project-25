@@ -7,8 +7,8 @@ public class DataManagement : Singleton<DataManagement>
 {
     void Start()
     {
-        // Load tutorial
-        isTutorialActive = PlayerPrefs.GetInt("IsTutorialActive", 1) == 1;
+        // Load game as tutorial
+        // isTutorialActive = PlayerPrefs.GetInt("IsTutorialActive", 1) == 1;
     }
     
     
@@ -30,26 +30,24 @@ public class DataManagement : Singleton<DataManagement>
     
     #region Tutorial
     
-    [BoxGroup("Tutorial")]
-    public bool isTutorialActive;
-    
-    [Button]
-    public void DisableTutorial()
-    {
-        isTutorialActive = false;
-        PlayerPrefs.SetInt("IsTutorialActive", 0);
-        PlayerPrefs.Save();
-    }
-    
-    
-    [Button]
-    public void EnableTutorial()
-    {
-        isTutorialActive = true;
-        PlayerPrefs.SetInt("IsTutorialActive", 1);
-        PlayerPrefs.Save();
-    }
-    
+    // [FoldoutGroup("Tutorial")]
+    // public bool isTutorialActive;
+    //
+    // public void DisableTutorial()
+    // {
+    //     isTutorialActive = false;
+    //     PlayerPrefs.SetInt("IsTutorialActive", 0);
+    //     PlayerPrefs.Save();
+    // }
+    //
+    //
+    // public void EnableTutorial()
+    // {
+    //     isTutorialActive = true;
+    //     PlayerPrefs.SetInt("IsTutorialActive", 1);
+    //     PlayerPrefs.Save();
+    // }
+    //
     #endregion
 
 }

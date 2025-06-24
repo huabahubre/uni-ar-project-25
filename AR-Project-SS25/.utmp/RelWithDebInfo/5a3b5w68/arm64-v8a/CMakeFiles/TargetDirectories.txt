@@ -1,0 +1,5 @@
+E:/Github/uni-ar-project-25/AR-Project-SS25/.utmp/RelWithDebInfo/5a3b5w68/arm64-v8a/CMakeFiles/edit_cache.dir
+E:/Github/uni-ar-project-25/AR-Project-SS25/.utmp/RelWithDebInfo/5a3b5w68/arm64-v8a/CMakeFiles/rebuild_cache.dir
+E:/Github/uni-ar-project-25/AR-Project-SS25/.utmp/RelWithDebInfo/5a3b5w68/arm64-v8a/GameActivity/CMakeFiles/game.dir
+E:/Github/uni-ar-project-25/AR-Project-SS25/.utmp/RelWithDebInfo/5a3b5w68/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+E:/Github/uni-ar-project-25/AR-Project-SS25/.utmp/RelWithDebInfo/5a3b5w68/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
