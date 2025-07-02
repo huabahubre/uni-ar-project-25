@@ -48,7 +48,11 @@ MonoBehaviour:
     playerName: 
     style:
       color: {r: 0, g: 0, b: 0, a: 0}
-      material: {fileID: 0}
+      icon: {fileID: 0}
   spellDataList:
-  - {fileID: 11400000, guid: 5d58381166c6c9f4ea6658528357dcfa, type: 2}
-  isTutorialActive: 0
+  - {fileID: 11400000, guid: 811ddcce85b7b0f42b88f46ad2b1d6d2, type: 2}
+  - {fileID: 11400000, guid: c374096304895724b89295c21b36a589, type: 2}
+  - {fileID: 11400000, guid: 70cec6325b86b6446bdcf1c82f8ee6e3, type: 2}
+  - {fileID: 11400000, guid: c06aa2b1a92f17e4988c27e15f39f544, type: 2}
+  - {fileID: 11400000, guid: 7abda0842eea5474d8442c634c8a2d04, type: 2}
+  isWin: 1
