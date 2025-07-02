@@ -8,20 +8,34 @@ public class CanvasPage_Pause : CanvasPage
     [BoxGroup("References"), Header("Buttons")]
     public Button Button_Resume;
     
-    [BoxGroup("References")]
-    public Button Button_Menu;
     
     [BoxGroup("References")]
     public Button Button_Settings;
+    
+    [BoxGroup("References")]
+    public Button Button_GiveUp;
+    
+    
+    
+    [BoxGroup("References"), Header("Give Up")]
+    public GameObject Panel_GiveUp;
     
     
     public override void Initialize()
     {
         Button_Resume.onClick.AddListener(OnResumeButtonClick);
-        Button_Menu.onClick.AddListener(OnMenuButtonClick);
         Button_Settings.onClick.AddListener(OnSettingsButtonClick);
+        Button_GiveUp.onClick.AddListener(OnGiveUpButtonClick);
         
         base.Initialize();
+    }
+
+
+    public override void OnShow()
+    {
+        Panel_GiveUp.SetActive(false);
+        
+        base.OnShow();
     }
 
 
@@ -35,11 +49,25 @@ public class CanvasPage_Pause : CanvasPage
         MainCanvasManagement.Instance.ShowPage("Settings");
     }
 
-    void OnMenuButtonClick()
+    
+    #region Give Up
+    
+    void OnGiveUpButtonClick()
     {
-        MainCanvasManagement.Instance.ShowPage("Menu");
+        Panel_GiveUp.SetActive(true);
     }
 
+
+    public void ConfirmGiveUp()
+    {
+        Debug.Log("Player confirmed GiveUp!");
+        
+        DataManagement.Instance.isWin = false;
+        MainCanvasManagement.Instance.ShowPage("GameOver");
+    }
+    
+    
+    #endregion
     
     void OnExitButtonClick()
     {
