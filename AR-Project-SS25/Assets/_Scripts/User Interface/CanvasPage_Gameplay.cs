@@ -1,3 +1,4 @@
+using System.Collections;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -8,6 +9,17 @@ public class CanvasPage_Gameplay : CanvasPage
     
     [BoxGroup("References"), Header("Buttons")]
     public Button Button_Pause;
+    
+    [BoxGroup("References")]
+    public Button Button_Cast;
+
+    
+    [BoxGroup("References"), Header("Panels")]
+    public GameObject Panel_YourTurn;
+
+    [BoxGroup("References")]
+    public GameObject Panel_OpponentTurn;
+    
     
     [BoxGroup("References"), Header("Player Info")]
     public TextMeshProUGUI Text_PlayerName;
@@ -38,16 +50,39 @@ public class CanvasPage_Gameplay : CanvasPage
     public override void Initialize()
     {
         Button_Pause.onClick.AddListener(OnPauseButtonClick);
+        Button_Cast.onClick.AddListener(OnCastSpell);
         
         base.Initialize();
     }
-    
-    
+
+
+    public override void OnShow()
+    {
+        Panel_YourTurn.SetActive(true);
+        Panel_OpponentTurn.SetActive(false);
+        
+        base.OnShow();
+    }
+
 
     void OnPauseButtonClick()
     {
         MainCanvasManagement.Instance.ShowPage("Pause");
     }
+    
+
+
+    void OnCastSpell()
+    {
+        Panel_YourTurn.SetActive(false);
+        Panel_OpponentTurn.SetActive(true);
+
+        StartCoroutine(WaitOpponentTurn());
+    }
+    
+    
+    
+    
     
     
     //TODO: Remove this when functionality is ready
@@ -56,5 +91,14 @@ public class CanvasPage_Gameplay : CanvasPage
         DataManagement.Instance.isWin = true;
         MainCanvasManagement.Instance.ShowPage("GameOver");
     }
+
+    IEnumerator WaitOpponentTurn()
+    {
+        yield return new WaitForSeconds(3f);
+        
+        Panel_YourTurn.SetActive(true);
+        Panel_OpponentTurn.SetActive(false);
+    }
+    
     
 }
