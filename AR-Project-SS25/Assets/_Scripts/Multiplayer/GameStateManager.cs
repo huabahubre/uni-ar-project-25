@@ -56,7 +56,7 @@ public class GameStateManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        CheckValues();
+        // CheckValues();
         player1HP.OnValueChanged += OnPlayer1HealthChanged;
         player2HP.OnValueChanged += OnPlayer2HealthChanged;
         //NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected; TODO: test later by using a build
@@ -99,13 +99,13 @@ public class GameStateManager : NetworkBehaviour
     private void AssignFirstPlayerServer()
     {
         Debug.Log("Player ids: " + string.Join(", ", NetworkManager.Singleton.ConnectedClientsIds));
-        Debug.Log("Assigning first player: IsOwner: " + IsOwner + ", playerCount: " + NetworkManager.Singleton.ConnectedClientsIds.Count);
-        if (IsOwner && activePlayerClientId.Value == 0 && NetworkManager.Singleton.ConnectedClientsIds.Count > 0)
+        Debug.Log("Assigning first player: IsServer: " + IsServer + ", playerCount: " + NetworkManager.Singleton.ConnectedClientsIds.Count);
+        if (IsServer && activePlayerClientId.Value == 0 && NetworkManager.Singleton.ConnectedClientsIds.Count > 0)
         {
             activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
             Debug.Log($"Assigned Player 1 to clientId: {activePlayerClientId.Value}");
         }
-        else if (IsOwner)
+        else if (IsServer && activePlayerClientId.Value == 0)
         {
             Invoke(nameof(AssignFirstPlayerServer), 2f); // Retry if not yet connected
         }
@@ -126,13 +126,13 @@ public class GameStateManager : NetworkBehaviour
         ulong requestingClientId = rpcParams.Receive.SenderClientId;
         Debug.Log($"RPC EndTurnRequestServerRpc: {requestingClientId}");
 
-        if (requestingClientId == activePlayerClientId.Value)
+        if (requestingClientId != activePlayerClientId.Value)
         {
-            Debug.LogWarning($"Client {requestingClientId} tried to act out of turn.");
+            Debug.LogWarning($"Client {requestingClientId} tried to act out of turn. It is {activePlayerClientId.Value}s turn.");
             return;
         }
 
-        if (IsOwner)
+        if (IsServer)
         {
             UpdateHealth(damage, requestingClientId);
             UpdateTurn();

@@ -7,16 +7,17 @@ using TMPro;
 public class TestButton : MonoBehaviour
 {
     [SerializeField] int damage = 10;
-    public Button endTurnButton;
-    public TMP_Text turnStatusText; // or use `public Text turnStatusText;`
-    public TMP_Text healthStatus; // or use `public Text turnStatusText;`
+    [SerializeField] private Button endTurnButton;
+    [SerializeField] private TMP_Text turnStatusText;
+    [SerializeField] private TMP_Text healthStatusPlayer1;
+    [SerializeField] private TMP_Text healthStatusPlayer2;
 
     void Start()
     {
         if (GameStateManager.Instance != null && GameStateManager.Instance.IsSpawned)
         {
             SetupListeners();
-            UpdateUI(GameStateManager.Instance.activePlayerClientId.Value);
+            UpdateButtonUI(GameStateManager.Instance.activePlayerClientId.Value);
         }
         else
         {
@@ -29,19 +30,29 @@ public class TestButton : MonoBehaviour
     {
         GameStateManager.Instance.activePlayerClientId.OnValueChanged += (_, newActiveClientId) =>
         {
-            UpdateUI(newActiveClientId);
+            UpdateButtonUI(newActiveClientId);
         };
         
-        GameStateManager.Instance.enemyHealth.OnValueChanged += (_, newHealth) =>
+        GameStateManager.Instance.player1HP.OnValueChanged += (_, newHealth) =>
         {
-            if (healthStatus != null)
-            {
-                healthStatus.text = "Enemy Health: " + newHealth;
-            }
+            UpdateHealthUI(newHealth, healthStatusPlayer1);
+        };
+        GameStateManager.Instance.player2HP.OnValueChanged += (_, newHealth) =>
+        {
+            UpdateHealthUI(newHealth, healthStatusPlayer2);
         };
     }
 
-    void UpdateUI(ulong newActiveClientId)
+    void UpdateHealthUI(int newHealth, TMP_Text healthStatusText)
+    {
+        if (healthStatusText != null)
+        {
+            string player = healthStatusText == healthStatusPlayer1 ? "Player 1" : "Player 2";
+            healthStatusText.text = player + ": " + newHealth;
+        }
+    }
+    
+    void UpdateButtonUI(ulong newActiveClientId)
     {
         bool isMyTurn = NetworkManager.Singleton.LocalClientId == newActiveClientId;
 
@@ -54,20 +65,15 @@ public class TestButton : MonoBehaviour
         }
     }
 
-    // public void OnEndTurnClicked()
-    // {
-    //     if (GameStateManager.Instance != null)
-    //     {
-    //         Debug.Log("Could execute EndTurnRequestServerRpc with damage: " + damage);
-    //         GameStateManager.Instance.EndTurnRequestServerRpc(damage);
-    //     }
-    //
-    //     endTurnButton.interactable = false; // Prevent spam click until turn updates
-    // }
-    
     public void OnEndTurnClicked()
     {
-        GameStateManager.Instance.Health = 50;
+        if (GameStateManager.Instance != null)
+        {
+            Debug.Log("Trying EndTurnRequestServerRpc with damage: " + damage);
+            GameStateManager.Instance.EndTurnRequestServerRpc(damage);
+        }
+    
+        endTurnButton.interactable = false; // Prevent spam click until turn updates
     }
     
 }

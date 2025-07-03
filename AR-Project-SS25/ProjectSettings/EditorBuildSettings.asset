@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/_Scenes/MultiplayerUi.unity
     guid: 04f27731d4e581645aa71c7724e7c47d
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/juli.unity
     guid: 1808a0a812151b047b83c974e4ba9bb4
   - enabled: 0
