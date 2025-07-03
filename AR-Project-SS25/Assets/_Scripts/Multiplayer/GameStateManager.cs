@@ -12,11 +12,34 @@ public class GameStateManager : NetworkBehaviour
     public NetworkVariable<int> player2HP = new NetworkVariable<int>(100, 
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
-    public NetworkVariable<bool> isServerTurn = new NetworkVariable<bool>(
-        true, 
+    public NetworkVariable<ulong> activePlayerClientId = new NetworkVariable<ulong>(
+        0, 
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
-    public ulong player1ClientId;
+    
+    [SerializeField] public NetworkVariable<int> enemyHealth = new NetworkVariable<int>(100);
+
+    public int Health
+    {
+        get => enemyHealth.Value;
+        set
+        {
+            if (IsServer)
+            {
+                enemyHealth.Value = value;
+            }
+            else
+            {
+                UpdateHealthServerRpc(value);
+            }
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void UpdateHealthServerRpc(int value)
+    {
+        enemyHealth.Value = value;
+    }
 
     void Awake()
     {
@@ -33,53 +56,122 @@ public class GameStateManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        CheckValues();
         player1HP.OnValueChanged += OnPlayer1HealthChanged;
         player2HP.OnValueChanged += OnPlayer2HealthChanged;
-        isServerTurn.OnValueChanged += OnIsServerTurnChanged;
-        if (IsServer)
+        //NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected; TODO: test later by using a build
+        AssignFirstPlayerServer();
+    }
+
+    private void CheckValues()
+    {
+        base.OnNetworkSpawn();
+
+        Debug.Log($"--- GameStateManager OnNetworkSpawn ---");
+        Debug.Log($"NetworkBehaviour.IsServer: {IsServer}"); // Will likely be False for host, False for client
+        Debug.Log($"NetworkBehaviour.IsOwner: {IsOwner}");   // Will likely be True for host, False for client
+        Debug.Log($"NetworkBehaviour.IsSpawned: {IsSpawned}"); // Will be True for both
+
+        Debug.Log($"NetworkManager.Singleton.IsServer: {NetworkManager.Singleton.IsServer}"); // Will likely be False for host, False for client *at this exact point*
+        Debug.Log($"NetworkManager.Singleton.IsHost: {NetworkManager.Singleton.IsHost}");     // Will be True for host, False for client
+        Debug.Log($"NetworkManager.Singleton.IsClient: {NetworkManager.Singleton.IsClient}");   // Will be True for host, True for client
+        Debug.Log($"NetworkManager.Singleton.LocalClientId: {NetworkManager.Singleton.LocalClientId}");
+
+        // For GameStateManager logic:
+        if (NetworkManager.Singleton.IsHost)
         {
-            isServerTurn.Value = true;
-            player1ClientId = NetworkManager.Singleton.LocalClientId;
+            // This code runs only on the host (editor instance)
+            // It will handle server-authoritative logic for the game state.
+            Debug.Log("GameStateManager: Running as Host (Server + Client). This is the authoritative instance.");
+            // Example: Initialize game rounds, manage global timers, etc.
+        }
+        else if (NetworkManager.Singleton.IsClient)
+        {
+            // This code runs on dedicated clients, and also on the client-side of the host
+            // (but the IsHost check handles the authoritative part for the host)
+            Debug.Log("GameStateManager: Running as Client. Observing game state.");
+            // Example: Update UI based on NetworkVariables, react to RPCs.
+        }
+        
+        Invoke(nameof(CheckValues), 1f);
+    }
+    
+    private void AssignFirstPlayerServer()
+    {
+        Debug.Log("Player ids: " + string.Join(", ", NetworkManager.Singleton.ConnectedClientsIds));
+        Debug.Log("Assigning first player: IsOwner: " + IsOwner + ", playerCount: " + NetworkManager.Singleton.ConnectedClientsIds.Count);
+        if (IsOwner && activePlayerClientId.Value == 0 && NetworkManager.Singleton.ConnectedClientsIds.Count > 0)
+        {
+            activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
+            Debug.Log($"Assigned Player 1 to clientId: {activePlayerClientId.Value}");
+        }
+        else if (IsOwner)
+        {
+            Invoke(nameof(AssignFirstPlayerServer), 2f); // Retry if not yet connected
+        }
+    }
+    
+    private void OnClientConnected(ulong clientId)
+    {
+        if (activePlayerClientId.Value == 0) // not yet set
+        {
+            activePlayerClientId.Value = clientId;
+            Debug.Log($"Assigned Active player to clientId: {clientId}");
         }
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)] // From client to the server
     public void EndTurnRequestServerRpc(int damage, ServerRpcParams rpcParams = default)
     {
         ulong requestingClientId = rpcParams.Receive.SenderClientId;
+        Debug.Log($"RPC EndTurnRequestServerRpc: {requestingClientId}");
 
-        bool isCurrentPlayer = isServerTurn.Value
-            ? requestingClientId == player1ClientId
-            : requestingClientId != player1ClientId;
-
-        if (!isCurrentPlayer)
+        if (requestingClientId == activePlayerClientId.Value)
         {
             Debug.LogWarning($"Client {requestingClientId} tried to act out of turn.");
             return;
         }
 
-        UpdateHealth(damage, isServerTurn.Value);
-        UpdateTurn();
-        CheckWinCondition();
+        if (IsOwner)
+        {
+            UpdateHealth(damage, requestingClientId);
+            UpdateTurn();
+            CheckWinCondition();
+        }
     }
 
-    private void UpdateHealth(int damage, bool isServer)
+    private void UpdateHealth(int damage, ulong requestingClientId)
     {
-        if (isServer)
+        bool playerOneAttacks = NetworkManager.Singleton.ConnectedClientsIds[0] == requestingClientId;
+        if (playerOneAttacks)
         {
             // Player 1 is attacking → damage Player 2
+            string x = $"Player {player2HP.Value} health reduced by {damage}";
             player2HP.Value = Mathf.Max(0, player2HP.Value - damage);
+            Debug.Log($"{x}. New health {player2HP.Value}");
         }
         else
         {
             // Player 2 is attacking → damage Player 1
+            string x = $"Player {player1HP.Value} health reduced by {damage}";
             player1HP.Value = Mathf.Max(0, player1HP.Value - damage);
+            Debug.Log($"{x}. New health {player1HP.Value}");
         }
     }
     
     private void UpdateTurn()
     {
-        isServerTurn.Value = !isServerTurn.Value;
+        // Switch active player
+        if (activePlayerClientId.Value == NetworkManager.Singleton.ConnectedClientsIds[0])
+        {
+            activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[1];
+            Debug.Log($"Turn changed to Player 2 (ClientId: {activePlayerClientId.Value})");
+        }
+        else
+        {
+            activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
+            Debug.Log($"Turn changed to Player 1 (ClientId: {activePlayerClientId.Value})");
+        }
     }
     
     private void CheckWinCondition()
@@ -88,8 +180,8 @@ public class GameStateManager : NetworkBehaviour
             Debug.Log("Player 2 wins!");
             // Update UI, etc.
         else if (player2HP.Value <= 0)
-            // Update UI, etc.
             Debug.Log("Player 1 wins!");
+            // Update UI, etc.
     }
 
     
@@ -106,6 +198,12 @@ public class GameStateManager : NetworkBehaviour
     private void OnIsServerTurnChanged(bool oldValue, bool newValue)
     {
         // Update UI, etc.
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    public void testServerRpc()
+    {
+        player1HP.Value = 1;
     }
 
 
