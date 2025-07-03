@@ -55,4 +55,25 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 70cec6325b86b6446bdcf1c82f8ee6e3, type: 2}
   - {fileID: 11400000, guid: c06aa2b1a92f17e4988c27e15f39f544, type: 2}
   - {fileID: 11400000, guid: 7abda0842eea5474d8442c634c8a2d04, type: 2}
+  ElementVisualDataList:
+  - Element: 0
+    CrystalPrefab: {fileID: 9122188728079581740, guid: 21d177d2fa7fa6a4980f529d6992986f,
+      type: 3}
+    Color: {r: 1, g: 0.19182372, b: 0.23732534, a: 1}
+  - Element: 1
+    CrystalPrefab: {fileID: 4299548644858568044, guid: 76a5ccee120edf744934ac694becce2a,
+      type: 3}
+    Color: {r: 0, g: 0.50570065, b: 0.8490566, a: 1}
+  - Element: 2
+    CrystalPrefab: {fileID: 1015484812233466274, guid: 1e072026f72c5ae4eb77ce74ce99df07,
+      type: 3}
+    Color: {r: 0.61006284, g: 0.40313628, b: 0, a: 1}
+  - Element: 3
+    CrystalPrefab: {fileID: 6681078219983434123, guid: ccb5c00fff2913a49af46bcfa86d7316,
+      type: 3}
+    Color: {r: 0.5691823, g: 1, b: 0.9672148, a: 1}
+  craftingGridPrefab: {fileID: 5556165510305102684, guid: 8fe9e100405b4d54cbc88b9a5283e843,
+    type: 3}
+  healthVisualPrefab: {fileID: 1122254143622394125, guid: 72f674f78ac64114d8de0e2fcc525b93,
+    type: 3}
   isWin: 1

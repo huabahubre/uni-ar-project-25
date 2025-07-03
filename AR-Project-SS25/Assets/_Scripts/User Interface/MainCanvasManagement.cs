@@ -49,7 +49,8 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
         // GlobalMessagePanelAnim.SetBool("Active", false);
         
         Initialize();
-        ShowPage("Menu");
+        // ShowPage("Menu");
+        HideAllPages();
     }
 
 
