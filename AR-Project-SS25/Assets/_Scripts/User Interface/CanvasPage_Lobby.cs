@@ -1,8 +1,10 @@
 using Sirenix.OdinInspector;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Services.Lobbies.Models;
 
 public class CanvasPage_Lobby : CanvasPage
 {
@@ -48,13 +50,13 @@ public class CanvasPage_Lobby : CanvasPage
 
     
     
-    public void OnJoinedLobby(ISession session)
+    public void OnJoinedLobby(Lobby lobby)
     {
         Panel_Actions.SetActive(false);
         Panel_ActiveLobby.SetActive(true);
-        
+    
         // Set StartButton based on Host status
-        Button_StartGame.gameObject.SetActive(session.IsHost);
+        Button_StartGame.gameObject.SetActive(lobby.HostId == AuthenticationService.Instance.PlayerId);
     }
 
 
