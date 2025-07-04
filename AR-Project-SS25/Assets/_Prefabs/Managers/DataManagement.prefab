@@ -55,6 +55,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 70cec6325b86b6446bdcf1c82f8ee6e3, type: 2}
   - {fileID: 11400000, guid: c06aa2b1a92f17e4988c27e15f39f544, type: 2}
   - {fileID: 11400000, guid: 7abda0842eea5474d8442c634c8a2d04, type: 2}
+  craftingRecipes:
+  - {fileID: 11400000, guid: 75968ce1a7be8604dbf0745dc922f92f, type: 2}
+  - {fileID: 11400000, guid: 66088b1651f92a442b065f88c8eb94e4, type: 2}
+  - {fileID: 11400000, guid: 07c599547339c4f4cbd2e96cb5f26bb2, type: 2}
+  - {fileID: 11400000, guid: 085a144de00d007498b3dcc1b93c90d1, type: 2}
+  - {fileID: 11400000, guid: 11006c896444f134fad9204001be7755, type: 2}
   ElementVisualDataList:
   - Element: 0
     CrystalPrefab: {fileID: 9122188728079581740, guid: 21d177d2fa7fa6a4980f529d6992986f,

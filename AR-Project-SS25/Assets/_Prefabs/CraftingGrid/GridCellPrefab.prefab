@@ -132,3 +132,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc66e6dc4353be64aa60cdcefdb9ab4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cellType: 0
+  detectionBoxSize: {x: 0.37, y: 0.2, z: 0.47}
+  assignedMarker: {fileID: 0}

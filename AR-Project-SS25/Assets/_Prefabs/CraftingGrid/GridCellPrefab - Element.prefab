@@ -45,6 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc66e6dc4353be64aa60cdcefdb9ab4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cellType: 1
+  detectionBoxSize: {x: 0.35, y: 0.2, z: 0.48}
+  assignedMarker: {fileID: 0}
 --- !u!1 &3680837344033788810
 GameObject:
   m_ObjectHideFlags: 0

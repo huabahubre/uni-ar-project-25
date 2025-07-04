@@ -27,6 +27,11 @@ public class DataManagement : Singleton<DataManagement>
     
     
     [BoxGroup("Scriptable Objects")]
+    public List<CraftingRecipe> craftingRecipes;
+
+    
+    
+    [BoxGroup("Scriptable Objects")]
     public List<ElementVisualData> ElementVisualDataList;
 
     public ElementVisualData GetElementVisualData(ElementType elementType)
