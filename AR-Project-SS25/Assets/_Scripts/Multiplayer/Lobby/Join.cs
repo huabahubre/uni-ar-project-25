@@ -17,8 +17,10 @@ public class JoinLobbyUI : MonoBehaviour
             return;
         }
         
-        displayCode.text = "Joined lobby: " + code;
-        await LobbyService.Instance.JoinLobbyByCodeAsync(code);
+        displayCode.text = code;
+        var lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code);
         NetworkManager.Singleton.StartClient();
+        
+        FindObjectOfType<CanvasPage_Lobby>()?.OnJoinedLobby(lobby);
     }
 }

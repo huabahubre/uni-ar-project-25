@@ -8,6 +8,7 @@ using TMPro;
 public class HostLobbyUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text lobbyCodeText;
+    [SerializeField] private TMP_Text sessionNameText;
 
     private async void Awake()
     {
@@ -20,10 +21,12 @@ public class HostLobbyUI : MonoBehaviour
         NetworkManager.Singleton.StartHost();
 
         var lobby = await LobbyService.Instance.CreateLobbyAsync(
-            "My Lobby",
+            sessionNameText.text,
             2
         );
 
         lobbyCodeText.text = lobby.LobbyCode;
+        
+        FindObjectOfType<CanvasPage_Lobby>()?.OnJoinedLobby(lobby);
     }
 }
