@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
+  m_Name: testlib
+  m_EditorClassIdentifier: 
+  m_GuidLow: 5700503714984793880
+  m_GuidHigh: 9903818120531758983
+  m_DataStore:
+    m_Storage: []
+  m_Images:
+  - m_SerializedGuid:
+      m_GuidLow: 5043938333876326469
+      m_GuidHigh: 9772319926747736725
+    m_SerializedTextureGuid:
+      m_GuidLow: 12215117294237307479
+      m_GuidHigh: 11374762607607915995
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: QRCode
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5640406934544539884
+      m_GuidHigh: 2739607432188772238
+    m_SerializedTextureGuid:
+      m_GuidLow: 13012090966113484535
+      m_GuidHigh: 17476942607694265946
+    m_Size: {x: 0.05, y: 0.05}
+    m_SpecifySize: 1
+    m_Name: QRCode_0
+    m_Texture: {fileID: 2800000, guid: ec437ef73bcab4945a7e8173b4928af2, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5505692852446383232
+      m_GuidHigh: 13536246423634525842
+    m_SerializedTextureGuid:
+      m_GuidLow: 8508567150651396458
+      m_GuidHigh: 2891762490003518168
+    m_Size: {x: 0.05, y: 0.05}
+    m_SpecifySize: 1
+    m_Name: QRCode_1
+    m_Texture: {fileID: 2800000, guid: 4222516a80be7614d87275d7a99a2128, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5462985197192703407
+      m_GuidHigh: 17934196841377473699
+    m_SerializedTextureGuid:
+      m_GuidLow: 9972264320496766534
+      m_GuidHigh: 11453226347274064425
+    m_Size: {x: 0.05, y: 0.05}
+    m_SpecifySize: 1
+    m_Name: QRCode_2
+    m_Texture: {fileID: 2800000, guid: 6d830e4699908a6429526a59ae08f29e, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5223531511062898699
+      m_GuidHigh: 11696310615397923507
+    m_SerializedTextureGuid:
+      m_GuidLow: 2748461954249228150
+      m_GuidHigh: 16004595080604620072
+    m_Size: {x: 0.05, y: 0.05}
+    m_SpecifySize: 1
+    m_Name: QRCode_3
+    m_Texture: {fileID: 2800000, guid: ddb37f767f952624281567096ebe1bde, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5137587670698947368
+      m_GuidHigh: 17989322373259887771
+    m_SerializedTextureGuid:
+      m_GuidLow: 3563511107678789727
+      m_GuidHigh: 12874810816786495256
+    m_Size: {x: 0.05, y: 0.05}
+    m_SpecifySize: 1
+    m_Name: QRCode_4
+    m_Texture: {fileID: 2800000, guid: de5a605f227831741877ea643984acb2, type: 3}

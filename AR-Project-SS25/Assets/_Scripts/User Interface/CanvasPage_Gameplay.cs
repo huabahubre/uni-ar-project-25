@@ -101,4 +101,26 @@ public class CanvasPage_Gameplay : CanvasPage
     }
     
     
+    
+    public void UpdateLocalPlayerInfo(int health)
+    {
+        Slider_PlayerHealth.value = health;
+    }
+
+    
+    public void UpdateLocalPlayerInfo(string playerName, int health, int energy, Sprite icon)
+    {
+        Text_PlayerName.text = playerName;
+        Slider_PlayerHealth.value = health;
+        Slider_PlayerEnergy.value = energy;
+        Image_PlayerIcon.sprite = icon;
+    }
+
+    public void UpdateRemotePlayerInfo(string playerName, int health, Sprite icon)
+    {
+        Text_EnemyName.text = playerName;
+        Slider_EnemyHealth.value = health;
+        Image_EnemyIcon.sprite = icon;
+    }
+
 }

@@ -5,17 +5,33 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/SampleScene.unity
     guid: 4755b35b590504809a7525fd2109c2e2
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/MultiplayerUi.unity
     guid: 04f27731d4e581645aa71c7724e7c47d
+  - enabled: 0
+    path: Assets/_Scenes/juli.unity
+    guid: 1808a0a812151b047b83c974e4ba9bb4
+  - enabled: 0
+    path: Assets/_Scenes/MultiplayerJuli.unity
+    guid: 421706543e927de49913b3813825ade5
+  - enabled: 0
+    path: Assets/NGO_Minimal_Setup/NGO_Setup.unity
+    guid: 6a7146d12ec032d4abc9e875d6ac346a
+  - enabled: 0
+    path: Assets/_Scenes/MultiplayerUiCustom.unity
+    guid: f53a51c267eba6b45a702d7cf2a0cbea
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6ee72d15cf39dd748a13eac57397b9af,
       type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 0465d33c6aee55f44b0237db8b0e0259,
       type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: bb857d373a5768c4ebfe27469764cb51,
+      type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 837e028f89aec884f969816cb85223c1,
+      type: 3}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: c199e683398494f32b4cde18e73ab731,
       type: 2}
     com.unity.xr.magicleap.magic_leap_settings: {fileID: 11400000, guid: 0b53a025a635a4393ba0b49822242280,

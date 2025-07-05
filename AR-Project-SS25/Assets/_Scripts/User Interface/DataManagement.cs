@@ -25,6 +25,30 @@ public class DataManagement : Singleton<DataManagement>
     [BoxGroup("Scriptable Objects")]
     public List<SpellData> spellDataList;
     
+    
+    [BoxGroup("Scriptable Objects")]
+    public List<CraftingRecipe> craftingRecipes;
+
+    
+    
+    [BoxGroup("Scriptable Objects")]
+    public List<ElementVisualData> ElementVisualDataList;
+
+    public ElementVisualData GetElementVisualData(ElementType elementType)
+    {
+        foreach (var data in ElementVisualDataList)
+        {
+            if (data.Element == elementType)
+            {
+                return data;
+            }
+        }
+
+        Debug.LogError($"No visual data found for element type: {elementType}");
+        return null;
+    }
+    
+    
     #endregion
     
     
@@ -51,6 +75,19 @@ public class DataManagement : Singleton<DataManagement>
     #endregion
 
     
+    #region Prefabs
+    
+    [BoxGroup("Prefabs"), Header("Grid")]
+    public CraftingGrid craftingGridPrefab;
+    
+    [BoxGroup("Prefabs")]
+    public HealthVisualPrefab healthVisualPrefab;
+    
+    
+    
+    
+    #endregion
+    
     
     
     // TODO: These are hardcoded values
@@ -76,5 +113,14 @@ public class PlayerStyle
 }
 
 #endregion
+
+
+[Serializable]
+public class ElementVisualData
+{
+    public ElementType Element;
+    public GameObject CrystalPrefab;
+    public Color Color;
+}
 
 

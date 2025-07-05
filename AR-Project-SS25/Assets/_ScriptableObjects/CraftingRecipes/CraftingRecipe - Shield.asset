@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbd41313dda940c4b90e26f76233130d, type: 3}
+  m_Name: CraftingRecipe - Shield
+  m_EditorClassIdentifier: 
+  spellType: 1
+  r0c0: 1
+  r0c1: 1
+  r0c2: 1
+  r1c0: 0
+  r1c1: 0
+  r1c2: 0
+  r2c0: 0
+  r2c1: 0
+  r2c2: 0
