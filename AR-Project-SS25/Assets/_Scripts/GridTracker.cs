@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using TMPro;
+using System.Linq;
 
 public class GridTracker : MonoBehaviour
 {
@@ -69,12 +70,15 @@ public class GridTracker : MonoBehaviour
             //spawnedCubes[newImage.trackableId] = cube;
             counter++;
             
-            debugText.text = "Found new image. Count: " + counter + ", Id: " + newImage.trackableId.ToString();
+            string imageName = newImage.name;
+            Debug.Log(imageName);
+            
+            markerVisibility[imageName] = true;
         }
 
         foreach (var trackedImage in eventArgs.updated)
         {
-            string _name = trackedImage.referenceImage.name;
+            string _name = trackedImage.name;
 
             if (markerVisibility.ContainsKey(_name))
             {
@@ -84,25 +88,33 @@ public class GridTracker : MonoBehaviour
 
         foreach (var removedImage in eventArgs.removed)
         {
-            if (spawnedCubes.TryGetValue(removedImage.Key, out var cube))   
-            {
-                Destroy(cube);
-                spawnedCubes.Remove(removedImage.Key);
-                --counter;
-                
-                debugText.text = "Lost image: " + removedImage.Key.ToString();
-            }
+            markerVisibility[removedImage.Value.name] = false;
         }
     }
     
     void LogVisibleMarkers()
     {
         string text = "Visible Markers:\n";
+        int count = 0;
         foreach (var kvp in markerVisibility)
         {
             if (kvp.Value)
-                text += kvp.Key + "\n";
+                ++count; //text += kvp.Key + "\n";
         }
-        debugText.text = text;
+        debugText.text = text + count + "\n" + CountTrackedImages();
+    }
+    
+    int CountTrackedImages()
+    {
+        int count = 0;
+        foreach (var im in trackedImageManager.trackables)
+        {
+            if (im.trackingState == TrackingState.Tracking)
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 }

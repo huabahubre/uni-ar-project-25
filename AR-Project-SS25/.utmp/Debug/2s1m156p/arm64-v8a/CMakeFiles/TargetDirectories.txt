@@ -1,0 +1,5 @@
+C:/Uni/AR/uni-ar-project-25/AR-Project-SS25/.utmp/Debug/2s1m156p/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Uni/AR/uni-ar-project-25/AR-Project-SS25/.utmp/Debug/2s1m156p/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Uni/AR/uni-ar-project-25/AR-Project-SS25/.utmp/Debug/2s1m156p/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/Uni/AR/uni-ar-project-25/AR-Project-SS25/.utmp/Debug/2s1m156p/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/Uni/AR/uni-ar-project-25/AR-Project-SS25/.utmp/Debug/2s1m156p/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
