@@ -7,8 +7,8 @@ public class DataManagement : Singleton<DataManagement>
 {
     void Start()
     {
-        // Load tutorial
-        isTutorialActive = PlayerPrefs.GetInt("IsTutorialActive", 1) == 1;
+        // Load game as tutorial
+        // isTutorialActive = PlayerPrefs.GetInt("IsTutorialActive", 1) == 1;
     }
     
     
@@ -25,32 +25,73 @@ public class DataManagement : Singleton<DataManagement>
     [BoxGroup("Scriptable Objects")]
     public List<SpellData> spellDataList;
     
+    
+    [BoxGroup("Scriptable Objects")]
+    public List<CraftingRecipe> craftingRecipes;
+
+    
+    
+    [BoxGroup("Scriptable Objects")]
+    public List<ElementVisualData> ElementVisualDataList;
+
+    public ElementVisualData GetElementVisualData(ElementType elementType)
+    {
+        foreach (var data in ElementVisualDataList)
+        {
+            if (data.Element == elementType)
+            {
+                return data;
+            }
+        }
+
+        Debug.LogError($"No visual data found for element type: {elementType}");
+        return null;
+    }
+    
+    
     #endregion
     
     
     #region Tutorial
     
-    [BoxGroup("Tutorial")]
-    public bool isTutorialActive;
+    // [FoldoutGroup("Tutorial")]
+    // public bool isTutorialActive;
+    //
+    // public void DisableTutorial()
+    // {
+    //     isTutorialActive = false;
+    //     PlayerPrefs.SetInt("IsTutorialActive", 0);
+    //     PlayerPrefs.Save();
+    // }
+    //
+    //
+    // public void EnableTutorial()
+    // {
+    //     isTutorialActive = true;
+    //     PlayerPrefs.SetInt("IsTutorialActive", 1);
+    //     PlayerPrefs.Save();
+    // }
+    //
+    #endregion
+
     
-    [Button]
-    public void DisableTutorial()
-    {
-        isTutorialActive = false;
-        PlayerPrefs.SetInt("IsTutorialActive", 0);
-        PlayerPrefs.Save();
-    }
+    #region Prefabs
+    
+    [BoxGroup("Prefabs"), Header("Grid")]
+    public CraftingGrid craftingGridPrefab;
+    
+    [BoxGroup("Prefabs")]
+    public HealthVisualPrefab healthVisualPrefab;
     
     
-    [Button]
-    public void EnableTutorial()
-    {
-        isTutorialActive = true;
-        PlayerPrefs.SetInt("IsTutorialActive", 1);
-        PlayerPrefs.Save();
-    }
+    
     
     #endregion
+    
+    
+    
+    // TODO: These are hardcoded values
+    [BoxGroup("DEVELOPER")] public bool isWin = true;
 
 }
 
@@ -68,9 +109,18 @@ public class PlayerData
 public class PlayerStyle
 {
     public Color color;
-    public Material material;
+    public Sprite icon;
 }
 
 #endregion
+
+
+[Serializable]
+public class ElementVisualData
+{
+    public ElementType Element;
+    public GameObject CrystalPrefab;
+    public Color Color;
+}
 
 
