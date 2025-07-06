@@ -20,7 +20,7 @@ public class GamePlayLoop : MonoBehaviour
         }
         
         // Todo: calculate damage and apply it to the player
-        int damage = 15; // for now hardcoded
+        int damage = SpellDamage.InvokeSpell(spellType, elementType); 
         GameStateManager.Instance.EndTurnRequestServerRpc(damage);
     }
 }
