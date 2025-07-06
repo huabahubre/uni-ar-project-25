@@ -23,6 +23,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/_Scenes/MultiplayerUiCustom.unity
     guid: f53a51c267eba6b45a702d7cf2a0cbea
+  - enabled: 1
+    path: Assets/_Scenes/MultiplayerUiCustomAndIngame.unity
+    guid: fae1456512913c74a807d33f5927c509
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6ee72d15cf39dd748a13eac57397b9af,
       type: 2}

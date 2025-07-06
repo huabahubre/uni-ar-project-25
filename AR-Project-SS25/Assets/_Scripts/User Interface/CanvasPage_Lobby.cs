@@ -23,9 +23,6 @@ public class CanvasPage_Lobby : CanvasPage
 
     [BoxGroup("References")]
     public GameObject Panel_ActiveLobby;
-
-    [BoxGroup("GameObjects")]
-    [SerializeField] private List<GameObject> managerObjects = new List<GameObject>();
     
 
     
@@ -66,11 +63,6 @@ public class CanvasPage_Lobby : CanvasPage
 
     public void OnStartGame()
     {
-        Debug.Log("Starting game...");
-        MainCanvasManagement.Instance.ShowPage("Gameplay");
-        foreach (var manager in managerObjects)
-        {
-            manager.SetActive(true);
-        }
+        SyncStartGame.Instance.gameStarted = true;
     }
 }

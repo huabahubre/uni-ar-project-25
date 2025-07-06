@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class GamePlayLoop : MonoBehaviour
 {
-    // Update is called once per frame
     void Update()
     {
         var craftingResult = GridManagement.Instance.CheckCraftingResult();
