@@ -17,32 +17,11 @@ public class GameStateManager : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
     
-    [SerializeField] public NetworkVariable<int> enemyHealth = new NetworkVariable<int>(100);
-
-    public int Health
-    {
-        get => enemyHealth.Value;
-        set
-        {
-            if (IsServer)
-            {
-                enemyHealth.Value = value;
-            }
-            else
-            {
-                UpdateHealthServerRpc(value);
-            }
-        }
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    public void UpdateHealthServerRpc(int value)
-    {
-        enemyHealth.Value = value;
-    }
+    // TODO: create shield network variable with type and health
 
     void Awake()
     {
+        Debug.Log("Initializing GameStateManager");
         if (Instance == null)
         {
             Instance = this;
@@ -56,45 +35,20 @@ public class GameStateManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        Debug.Log("GameStateManager OnNetworkSpawn called");
         // CheckValues();
         player1HP.OnValueChanged += OnPlayer1HealthChanged;
         player2HP.OnValueChanged += OnPlayer2HealthChanged;
         //NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected; TODO: test later by using a build
         AssignFirstPlayerServer();
     }
-
-    private void CheckValues()
+    
+    public bool IsCurrentPlayersTurn()
     {
-        base.OnNetworkSpawn();
-
-        Debug.Log($"--- GameStateManager OnNetworkSpawn ---");
-        Debug.Log($"NetworkBehaviour.IsServer: {IsServer}"); // Will likely be False for host, False for client
-        Debug.Log($"NetworkBehaviour.IsOwner: {IsOwner}");   // Will likely be True for host, False for client
-        Debug.Log($"NetworkBehaviour.IsSpawned: {IsSpawned}"); // Will be True for both
-
-        Debug.Log($"NetworkManager.Singleton.IsServer: {NetworkManager.Singleton.IsServer}"); // Will likely be False for host, False for client *at this exact point*
-        Debug.Log($"NetworkManager.Singleton.IsHost: {NetworkManager.Singleton.IsHost}");     // Will be True for host, False for client
-        Debug.Log($"NetworkManager.Singleton.IsClient: {NetworkManager.Singleton.IsClient}");   // Will be True for host, True for client
-        Debug.Log($"NetworkManager.Singleton.LocalClientId: {NetworkManager.Singleton.LocalClientId}");
-
-        // For GameStateManager logic:
-        if (NetworkManager.Singleton.IsHost)
-        {
-            // This code runs only on the host (editor instance)
-            // It will handle server-authoritative logic for the game state.
-            Debug.Log("GameStateManager: Running as Host (Server + Client). This is the authoritative instance.");
-            // Example: Initialize game rounds, manage global timers, etc.
-        }
-        else if (NetworkManager.Singleton.IsClient)
-        {
-            // This code runs on dedicated clients, and also on the client-side of the host
-            // (but the IsHost check handles the authoritative part for the host)
-            Debug.Log("GameStateManager: Running as Client. Observing game state.");
-            // Example: Update UI based on NetworkVariables, react to RPCs.
-        }
-        
-        Invoke(nameof(CheckValues), 1f);
+        return activePlayerClientId.Value == NetworkManager.Singleton.LocalClientId;
     }
+    
+    #region OnNetworkSpawn
     
     private void AssignFirstPlayerServer()
     {
@@ -119,7 +73,11 @@ public class GameStateManager : NetworkBehaviour
             Debug.Log($"Assigned Active player to clientId: {clientId}");
         }
     }
+    
+    #endregion
 
+    #region NetworkVariable Updates
+    
     [ServerRpc(RequireOwnership = false)] // From client to the server
     public void EndTurnRequestServerRpc(int damage, ServerRpcParams rpcParams = default)
     {
@@ -183,7 +141,10 @@ public class GameStateManager : NetworkBehaviour
             Debug.Log("Player 1 wins!");
             // Update UI, etc.
     }
-
+    
+    #endregion
+    
+    #region NetworkVariable Subscriptions
     
     private void OnPlayer1HealthChanged(int oldValue, int newValue)
     {
@@ -200,11 +161,42 @@ public class GameStateManager : NetworkBehaviour
         // Update UI, etc.
     }
     
-    [ServerRpc(RequireOwnership = false)]
-    public void testServerRpc()
+    #endregion
+    
+    #region Debug checks
+
+    private void CheckValues()
     {
-        player1HP.Value = 1;
+        base.OnNetworkSpawn();
+
+        Debug.Log($"--- GameStateManager OnNetworkSpawn ---");
+        Debug.Log($"NetworkBehaviour.IsServer: {IsServer}"); // Will likely be False for host, False for client
+        Debug.Log($"NetworkBehaviour.IsOwner: {IsOwner}");   // Will likely be True for host, False for client
+        Debug.Log($"NetworkBehaviour.IsSpawned: {IsSpawned}"); // Will be True for both
+
+        Debug.Log($"NetworkManager.Singleton.IsServer: {NetworkManager.Singleton.IsServer}"); // Will likely be False for host, False for client *at this exact point*
+        Debug.Log($"NetworkManager.Singleton.IsHost: {NetworkManager.Singleton.IsHost}");     // Will be True for host, False for client
+        Debug.Log($"NetworkManager.Singleton.IsClient: {NetworkManager.Singleton.IsClient}");   // Will be True for host, True for client
+        Debug.Log($"NetworkManager.Singleton.LocalClientId: {NetworkManager.Singleton.LocalClientId}");
+
+        // For GameStateManager logic:
+        if (NetworkManager.Singleton.IsHost)
+        {
+            // This code runs only on the host (editor instance)
+            // It will handle server-authoritative logic for the game state.
+            Debug.Log("GameStateManager: Running as Host (Server + Client). This is the authoritative instance.");
+            // Example: Initialize game rounds, manage global timers, etc.
+        }
+        else if (NetworkManager.Singleton.IsClient)
+        {
+            // This code runs on dedicated clients, and also on the client-side of the host
+            // (but the IsHost check handles the authoritative part for the host)
+            Debug.Log("GameStateManager: Running as Client. Observing game state.");
+            // Example: Update UI based on NetworkVariables, react to RPCs.
+        }
+        
+        Invoke(nameof(CheckValues), 1f);
     }
 
-
+    #endregion
 }
