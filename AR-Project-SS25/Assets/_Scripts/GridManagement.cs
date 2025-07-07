@@ -6,16 +6,11 @@ using UnityEngine;
 
 public class GridManagement : Singleton<GridManagement>
 {
-    
-    [BoxGroup("ONLY FOR DEBUGGING!")]
-    public Transform trackedMarkerObject;
-
-    [BoxGroup("ONLY FOR DEBUGGING!")] public List<TrackedMarkerInfo> trackedMarkers;
+    public Transform playfieldTrackedMarker;
+    public List<TrackedMarkerInfo> trackedMarkers;
 
 
     [BoxGroup("References")] public Camera mainCamera;
-    [BoxGroup("References")] public HealthVisualPrefab playerHealthVisual;
-    [BoxGroup("References")] public HealthVisualPrefab enemyHealthVisual;
     
     
     
@@ -26,15 +21,9 @@ public class GridManagement : Singleton<GridManagement>
     private void Start()
     {
         SpawnLocalPlayer();
-        // RepeatedCheckCraftingResult();
+        RefreshTrackedMarkersFromScene();
     }
-    
-    private void RepeatedCheckCraftingResult()
-    {
-        Debug.Log("CraftingResultRepeatedCheck started.");
-        CheckCraftingResult();
-        Invoke(nameof(RepeatedCheckCraftingResult), 2f);
-    }
+
 
     #region Spawn Grid
     
@@ -44,7 +33,7 @@ public class GridManagement : Singleton<GridManagement>
         // TODO: ONLY FOR DEBUGGING
         if(trackedMarkerObject == null)
         {
-            trackedMarkerObject = this.trackedMarkerObject;
+            trackedMarkerObject = this.playfieldTrackedMarker;
         }
         // if (trackedMarkerObject == null)
         // {
@@ -57,16 +46,16 @@ public class GridManagement : Singleton<GridManagement>
 
         // Instantiate Player Visual
         Vector3 playerPos = markerPosition + markerRotation * playerVisualOffset;
-        playerHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, playerPos, markerRotation);
-        playerHealthVisual.name = "PlayerHealthVisual";
-        playerHealthVisual.Init(true, ElementType.Fire);
+        HealthVisualPrefab playerVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, playerPos, markerRotation);
+        playerVisual.name = "PlayerHealthVisual";
+        playerVisual.Init(true, ElementType.Fire);
 
         // Instantiate Enemy Visual (opposite position)
         Vector3 enemyOffset = -playerVisualOffset;
         Vector3 enemyPos = markerPosition + markerRotation * enemyOffset;
-        enemyHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, enemyPos, markerRotation);
-        enemyHealthVisual.name = "EnemyHealthVisual";
-        enemyHealthVisual.Init(false, ElementType.Water);
+        HealthVisualPrefab enemyVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, enemyPos, markerRotation);
+        enemyVisual.name = "EnemyHealthVisual";
+        enemyVisual.Init(false, ElementType.Water);
         
 
         // Instantiate Player Grid
@@ -81,7 +70,6 @@ public class GridManagement : Singleton<GridManagement>
 
 
     #endregion
-    
     
     #region Check for Recipe
     
@@ -147,4 +135,42 @@ public class GridManagement : Singleton<GridManagement>
     #endregion
     
     
+    
+    /// <summary>
+    /// Fetches all active TrackedMarkerInfo components in the scene and populates the trackedMarkers list.
+    /// </summary>
+    [Button("Refresh All Markers")]
+    public void RefreshTrackedMarkersFromScene()
+    {
+        trackedMarkers = new List<TrackedMarkerInfo>(FindObjectsOfType<TrackedMarkerInfo>(includeInactive: false));
+        Debug.Log($"🔄 Refreshed tracked markers list. Found {trackedMarkers.Count} active markers.");
+    }
+    
+    /// <summary>
+    /// Adds a TrackedMarkerInfo to the list if not already present.
+    /// </summary>
+    public void RegisterMarker(TrackedMarkerInfo marker)
+    {
+        if (marker == null) return;
+
+        if (!trackedMarkers.Contains(marker))
+        {
+            trackedMarkers.Add(marker);
+            Debug.Log($"🟢 Registered marker: {marker.name}");
+        }
+    }
+
+    /// <summary>
+    /// Removes a TrackedMarkerInfo from the list if it exists.
+    /// </summary>
+    public void UnregisterMarker(TrackedMarkerInfo marker)
+    {
+        if (marker == null) return;
+
+        if (trackedMarkers.Contains(marker))
+        {
+            trackedMarkers.Remove(marker);
+            Debug.Log($"🔴 Unregistered marker: {marker.name}");
+        }
+    }
 }
