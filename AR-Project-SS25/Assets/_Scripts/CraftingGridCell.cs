@@ -13,6 +13,7 @@ public class CraftingGridCell : MonoBehaviour
     [ShowInInspector, ReadOnly] public TrackedMarkerInfo assignedMarker;
 
     public Toggle worldToggle;
+    public SpriteRenderer spriteRenderer;
 
     private bool isWorldToggleOn = false;
 
@@ -51,6 +52,11 @@ public class CraftingGridCell : MonoBehaviour
                 assignedMarker = found;
                 OnAssignedMarkerChanged();
             }
+
+            // Set Color of spriteRenderer to fully opaque if marker is assigned
+            Color color = spriteRenderer.color;
+            color.a = 1f;
+            spriteRenderer.color = color;
         }
         else
         {
@@ -60,6 +66,11 @@ public class CraftingGridCell : MonoBehaviour
                 assignedMarker = null;
                 OnAssignedMarkerChanged();
             }
+            
+            // Set Color of spriteRenderer to fully opaque if marker is assigned
+            Color color = spriteRenderer.color;
+            color.a = 0.1f;
+            spriteRenderer.color = color;
         }
     }
 

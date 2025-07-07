@@ -49,6 +49,7 @@ MonoBehaviour:
   baseDetectionBoxSize: {x: 1.6, y: 0.5, z: 2}
   assignedMarker: {fileID: 0}
   worldToggle: {fileID: 0}
+  spriteRenderer: {fileID: 7006654656835031271}
 --- !u!1 &3680837344033788810
 GameObject:
   m_ObjectHideFlags: 0
