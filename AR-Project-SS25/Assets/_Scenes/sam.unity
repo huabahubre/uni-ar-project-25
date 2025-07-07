@@ -9769,6 +9769,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5124932351770806923, guid: 0b21fc990f542c84c99586abe751d9d4,
+        type: 3}
+      propertyPath: actionCardPrefab
+      value: 
+      objectReference: {fileID: 8951500695699765690, guid: ec6daf2d43f471c43b13b7f384c7c799,
+        type: 3}
     - target: {fileID: 8755671323436853707, guid: 0b21fc990f542c84c99586abe751d9d4,
         type: 3}
       propertyPath: m_Name
@@ -10320,6 +10326,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MainCanvasManagement
+      objectReference: {fileID: 0}
+    - target: {fileID: 963626848730654138, guid: 5bdefeb2921212c439219cce30f08809,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1365099701269879773, guid: 5bdefeb2921212c439219cce30f08809,
         type: 3}

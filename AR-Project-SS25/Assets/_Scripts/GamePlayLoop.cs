@@ -1,10 +1,15 @@
+using System;
 using UnityEngine;
 
 public class GamePlayLoop : MonoBehaviour
 {
-    void Update()
+    private void Start()
     {
-        var craftingResult = GridManagement.Instance.CheckCraftingResult();
+        GridManagement.Instance.onValidCraftingRecipeFound += OnValidRecipeFound;
+    }
+    
+    void OnValidRecipeFound(Tuple<SpellType?, ElementType?> craftingResult)
+    {
         if (craftingResult?.Item1 == null)
         {
             SpellManager.Instance.SetSpellPreviewActive(false);
@@ -13,6 +18,7 @@ public class GamePlayLoop : MonoBehaviour
         
         var spellType = craftingResult.Item1.Value;
         var elementType = craftingResult.Item2 ?? ElementType.None;
+        
         // Spawn Spell or Preview Icon (If only preview icon, then it is not player's turn)
         if (!SpellManager.Instance.SpawnSpell(spellType, elementType))
         {
@@ -23,4 +29,5 @@ public class GamePlayLoop : MonoBehaviour
         int damage = 15; // for now hardcoded
         GameStateManager.Instance.EndTurnRequestServerRpc(damage);
     }
+    
 }

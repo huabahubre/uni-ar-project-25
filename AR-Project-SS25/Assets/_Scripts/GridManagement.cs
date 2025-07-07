@@ -13,11 +13,19 @@ public class GridManagement : Singleton<GridManagement>
     [BoxGroup("References")] public Camera mainCamera;
     
     
+    [BoxGroup("References")] public HealthVisualPrefab playerHealthVisual;
+    [BoxGroup("References")] public HealthVisualPrefab enemyHealthVisual;
+
     
     [BoxGroup("Settings")] public Vector3 playerVisualOffset = new Vector3(0, 0, 0);
     [BoxGroup("Settings")] public Vector3 gridOffset = new Vector3(0, 0, 0);
 
 
+    
+    public Action<Tuple<SpellType?, ElementType?>> onValidCraftingRecipeFound;
+    public Action onRecipeInvalid;
+    
+    
     private void Start()
     {
         SpawnLocalPlayer();
@@ -46,16 +54,16 @@ public class GridManagement : Singleton<GridManagement>
 
         // Instantiate Player Visual
         Vector3 playerPos = markerPosition + markerRotation * playerVisualOffset;
-        HealthVisualPrefab playerVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, playerPos, markerRotation);
-        playerVisual.name = "PlayerHealthVisual";
-        playerVisual.Init(true, ElementType.Fire);
+        playerHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, playerPos, markerRotation);
+        playerHealthVisual.name = "PlayerHealthVisual";
+        playerHealthVisual.Init(true, ElementType.Fire);
 
         // Instantiate Enemy Visual (opposite position)
         Vector3 enemyOffset = -playerVisualOffset;
         Vector3 enemyPos = markerPosition + markerRotation * enemyOffset;
-        HealthVisualPrefab enemyVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, enemyPos, markerRotation);
-        enemyVisual.name = "EnemyHealthVisual";
-        enemyVisual.Init(false, ElementType.Water);
+        enemyHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, enemyPos, markerRotation);
+        enemyHealthVisual.name = "EnemyHealthVisual";
+        enemyHealthVisual.Init(false, ElementType.Water);
         
 
         // Instantiate Player Grid
@@ -73,9 +81,9 @@ public class GridManagement : Singleton<GridManagement>
     
     #region Check for Recipe
     
-    
+      
     [Button]
-    public Tuple<SpellType?, ElementType?> CheckCraftingResult()
+    public void CheckCraftingResult()
     {
         var elementCell = CraftingGrid.Instance.GetElementCell();
         var elementMarker = elementCell?.assignedMarker;
@@ -86,11 +94,12 @@ public class GridManagement : Singleton<GridManagement>
 
         // Debug.Log($"Element Marker: <b>{elementText}</b>");
         
-        // if (elementMarker == null || elementMarker.markerType != MarkerType.Element)
-        // {
-        //     Debug.Log("❌ No valid element marker placed. Crafting requires an element card.");
-        //     return;
-        // }
+        if (elementMarker == null || elementMarker.markerType != MarkerType.Element)
+        {
+            Debug.Log("❌ No valid element marker placed. Crafting requires an element card.");
+            onRecipeInvalid?.Invoke();
+            return;
+        }
 
         bool[] actionGrid = CraftingGrid.Instance.GetCurrentActionGridState();
 
@@ -99,7 +108,7 @@ public class GridManagement : Singleton<GridManagement>
             $"{BoolToX(actionGrid[3])} {BoolToX(actionGrid[4])} {BoolToX(actionGrid[5])}\n" +
             $"{BoolToX(actionGrid[6])} {BoolToX(actionGrid[7])} {BoolToX(actionGrid[8])}";
 
-        // Debug.Log($"Action Grid State:\n{gridVisual}");
+        Debug.Log($"Action Grid State:\n{gridVisual}");
 
         var recipe = CraftingGrid.Instance.GetValidRecipe();
 
@@ -107,22 +116,16 @@ public class GridManagement : Singleton<GridManagement>
             && elementMarker != null 
             && elementMarker.markerType == MarkerType.Element)
         {
-            // Debug.Log($"✅ Valid recipe found!\n" +
-                      // $"Spell Type: <b>{recipe.spellType}</b>\n" +
-                      // $"Element Used: <b>{elementText}</b>");
-            return new Tuple<SpellType?, ElementType?>(recipe.spellType, elementMarker.elementType);
-        }
-        else if (recipe != null)
-        {
-            // Debug.Log($"✅ Valid preview found!\n" +
-                      // $"Spell Type: <b>{recipe.spellType}</b>\n" +
-                      // $"Element Used: No Element");
-            return new Tuple<SpellType?, ElementType?>(recipe.spellType, null);
+            Debug.Log($"✅ Valid recipe found!\n" +
+                      $"Spell Type: <b>{recipe.spellType}</b>\n" +
+                      $"Element Used: <b>{elementText}</b>");
+                      
+            onValidCraftingRecipeFound?.Invoke(new Tuple<SpellType?, ElementType?>(recipe.spellType, elementMarker.elementType));
         }
         else
         {
-            // Debug.Log("❌ No matching recipe for current grid layout.");
-            return new Tuple<SpellType?, ElementType?>(null, null);
+            Debug.Log("❌ No matching recipe for current grid layout.");
+            onRecipeInvalid?.Invoke();
         }
     }
 
