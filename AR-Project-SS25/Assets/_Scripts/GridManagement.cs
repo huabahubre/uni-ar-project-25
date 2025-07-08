@@ -6,35 +6,32 @@ using UnityEngine;
 
 public class GridManagement : Singleton<GridManagement>
 {
-    
-    [BoxGroup("ONLY FOR DEBUGGING!")]
-    public Transform trackedMarkerObject;
-
-    [BoxGroup("ONLY FOR DEBUGGING!")] public List<TrackedMarkerInfo> trackedMarkers;
+    public Transform playfieldTrackedMarker;
+    public List<TrackedMarkerInfo> trackedMarkers;
 
 
     [BoxGroup("References")] public Camera mainCamera;
+    
+    
     [BoxGroup("References")] public HealthVisualPrefab playerHealthVisual;
     [BoxGroup("References")] public HealthVisualPrefab enemyHealthVisual;
-    
-    
+
     
     [BoxGroup("Settings")] public Vector3 playerVisualOffset = new Vector3(0, 0, 0);
     [BoxGroup("Settings")] public Vector3 gridOffset = new Vector3(0, 0, 0);
 
 
+    
+    public Action<Tuple<SpellType?, ElementType?>> onValidCraftingRecipeFound;
+    public Action onRecipeInvalid;
+    
+    
     private void Start()
     {
         SpawnLocalPlayer();
-        // RepeatedCheckCraftingResult();
+        RefreshTrackedMarkersFromScene();
     }
-    
-    private void RepeatedCheckCraftingResult()
-    {
-        Debug.Log("CraftingResultRepeatedCheck started.");
-        CheckCraftingResult();
-        Invoke(nameof(RepeatedCheckCraftingResult), 2f);
-    }
+
 
     #region Spawn Grid
     
@@ -44,7 +41,7 @@ public class GridManagement : Singleton<GridManagement>
         // TODO: ONLY FOR DEBUGGING
         if(trackedMarkerObject == null)
         {
-            trackedMarkerObject = this.trackedMarkerObject;
+            trackedMarkerObject = this.playfieldTrackedMarker;
         }
         // if (trackedMarkerObject == null)
         // {
@@ -82,12 +79,11 @@ public class GridManagement : Singleton<GridManagement>
 
     #endregion
     
-    
     #region Check for Recipe
     
-    
+      
     [Button]
-    public Tuple<SpellType?, ElementType?> CheckCraftingResult()
+    public void CheckCraftingResult()
     {
         var elementCell = CraftingGrid.Instance.GetElementCell();
         var elementMarker = elementCell?.assignedMarker;
@@ -98,11 +94,12 @@ public class GridManagement : Singleton<GridManagement>
 
         // Debug.Log($"Element Marker: <b>{elementText}</b>");
         
-        // if (elementMarker == null || elementMarker.markerType != MarkerType.Element)
-        // {
-        //     Debug.Log("❌ No valid element marker placed. Crafting requires an element card.");
-        //     return;
-        // }
+        if (elementMarker == null || elementMarker.markerType != MarkerType.Element)
+        {
+            Debug.Log("❌ No valid element marker placed. Crafting requires an element card.");
+            onRecipeInvalid?.Invoke();
+            return;
+        }
 
         bool[] actionGrid = CraftingGrid.Instance.GetCurrentActionGridState();
 
@@ -111,7 +108,7 @@ public class GridManagement : Singleton<GridManagement>
             $"{BoolToX(actionGrid[3])} {BoolToX(actionGrid[4])} {BoolToX(actionGrid[5])}\n" +
             $"{BoolToX(actionGrid[6])} {BoolToX(actionGrid[7])} {BoolToX(actionGrid[8])}";
 
-        // Debug.Log($"Action Grid State:\n{gridVisual}");
+        Debug.Log($"Action Grid State:\n{gridVisual}");
 
         var recipe = CraftingGrid.Instance.GetValidRecipe();
 
@@ -119,22 +116,16 @@ public class GridManagement : Singleton<GridManagement>
             && elementMarker != null 
             && elementMarker.markerType == MarkerType.Element)
         {
-            // Debug.Log($"✅ Valid recipe found!\n" +
-                      // $"Spell Type: <b>{recipe.spellType}</b>\n" +
-                      // $"Element Used: <b>{elementText}</b>");
-            return new Tuple<SpellType?, ElementType?>(recipe.spellType, elementMarker.elementType);
-        }
-        else if (recipe != null)
-        {
-            // Debug.Log($"✅ Valid preview found!\n" +
-                      // $"Spell Type: <b>{recipe.spellType}</b>\n" +
-                      // $"Element Used: No Element");
-            return new Tuple<SpellType?, ElementType?>(recipe.spellType, null);
+            Debug.Log($"✅ Valid recipe found!\n" +
+                      $"Spell Type: <b>{recipe.spellType}</b>\n" +
+                      $"Element Used: <b>{elementText}</b>");
+                      
+            onValidCraftingRecipeFound?.Invoke(new Tuple<SpellType?, ElementType?>(recipe.spellType, elementMarker.elementType));
         }
         else
         {
-            // Debug.Log("❌ No matching recipe for current grid layout.");
-            return new Tuple<SpellType?, ElementType?>(null, null);
+            Debug.Log("❌ No matching recipe for current grid layout.");
+            onRecipeInvalid?.Invoke();
         }
     }
 
@@ -147,4 +138,42 @@ public class GridManagement : Singleton<GridManagement>
     #endregion
     
     
+    
+    /// <summary>
+    /// Fetches all active TrackedMarkerInfo components in the scene and populates the trackedMarkers list.
+    /// </summary>
+    [Button("Refresh All Markers")]
+    public void RefreshTrackedMarkersFromScene()
+    {
+        trackedMarkers = new List<TrackedMarkerInfo>(FindObjectsOfType<TrackedMarkerInfo>(includeInactive: false));
+        Debug.Log($"🔄 Refreshed tracked markers list. Found {trackedMarkers.Count} active markers.");
+    }
+    
+    /// <summary>
+    /// Adds a TrackedMarkerInfo to the list if not already present.
+    /// </summary>
+    public void RegisterMarker(TrackedMarkerInfo marker)
+    {
+        if (marker == null) return;
+
+        if (!trackedMarkers.Contains(marker))
+        {
+            trackedMarkers.Add(marker);
+            Debug.Log($"🟢 Registered marker: {marker.name}");
+        }
+    }
+
+    /// <summary>
+    /// Removes a TrackedMarkerInfo from the list if it exists.
+    /// </summary>
+    public void UnregisterMarker(TrackedMarkerInfo marker)
+    {
+        if (marker == null) return;
+
+        if (trackedMarkers.Contains(marker))
+        {
+            trackedMarkers.Remove(marker);
+            Debug.Log($"🔴 Unregistered marker: {marker.name}");
+        }
+    }
 }

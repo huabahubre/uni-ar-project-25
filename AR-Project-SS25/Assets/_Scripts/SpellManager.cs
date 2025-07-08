@@ -13,6 +13,7 @@ public class SpellManager : MonoBehaviour
     [SerializeField] private GameObject spellPreview;
     private SpellType _currentSpellType;
     private ElementType _currentElementType;
+    private GameObject[] _currentShieldObject = new GameObject[2];
 
     private void Awake()
     {
@@ -41,6 +42,8 @@ public class SpellManager : MonoBehaviour
 
     public bool SpawnSpell(SpellType spellType, ElementType elementType)
     {
+        // !!! THIS WILL ONLY SPAWN VFX AND PREVIEW ICONS !!!
+        // DAMANGE IS HANDLED BY SpellDamage.cs
         bool isPlayerTurn = GameStateManager.Instance.IsCurrentPlayersTurn();
     
         // Prevent duplicate spell preview when not player's turn
@@ -93,7 +96,7 @@ public class SpellManager : MonoBehaviour
         spellPreview.SetActive(true);
     }
 
-    private void SpawnSpellAttack(SpellType spellType, ElementType elementType)
+    private void SpawnSpellAttack(SpellType spellType, ElementType elementType, int duration = 5)
     {
         var spellData = DataManagement.Instance.spellDataList.Find(data => data.Recipe == spellType);
         var visualData = spellData.GetPrefabTuple(elementType);
@@ -118,21 +121,25 @@ public class SpellManager : MonoBehaviour
                 radius = 1.0f;
                 break;
             case SpellType.Shield:
-                (spawnPosition, spawnRotation) = GetShieldSpawn(currentPlayerId);
-                targetPosition = GridManagement.Instance.playerHealthVisual.transform.position;
-                break;
+                return; // Will be handled by GameStateManager
             default:
                 (spawnPosition, spawnRotation) = GetDefaultSpellSpawn(currentPlayerId);
                 targetPosition = GridManagement.Instance.enemyHealthVisual.transform.position;
                 break;
         }
         
+        _ = InstantiateSpellPrefab(duration, visualData, spawnPosition, spawnRotation, targetPosition, radius);
+    }
+
+    private static GameObject InstantiateSpellPrefab(int duration, SpellVisualData visualData, Vector3 spawnPosition,
+        Quaternion spawnRotation, Vector3 targetPosition, float radius)
+    {
         var spellInstance = Instantiate(visualData.VisualPrefab, spawnPosition, spawnRotation);
 
         var vfxData = new VfxData(
             spawnPosition,
             targetPosition,
-            5f,
+            duration,
             radius
         );
 
@@ -144,8 +151,10 @@ public class SpellManager : MonoBehaviour
         {
             Debug.LogWarning("Spawned VFX prefab does not have a BaseVfx component attached.");
         }
+
+        return spellInstance;
     }
-    
+
     private (Vector3, Quaternion) GetGroundPoundSpawn(int currentPlayerId)
     {
         int enemyId = (currentPlayerId == 0) ? 1 : 0; // TODO: do we need this or maybe when spawning crystal?
@@ -171,5 +180,30 @@ public class SpellManager : MonoBehaviour
         Vector3 spawnPosition = centerMarker.position; // TODO: maybe needs to be closer or further away from crystal
         Quaternion spawnRotation = Quaternion.LookRotation(direction);
         return (spawnPosition, spawnRotation);
+    }
+    
+    public void RemoveShield(int playerId)
+    {
+        if (_currentShieldObject[playerId] != null)
+        {
+            Destroy(_currentShieldObject[playerId]);
+            _currentShieldObject[playerId] = null;
+        }
+        else
+        {
+            Debug.LogWarning($"No shield object to remove for player {playerId}");
+        }
+    }
+    
+    public void SetShield(int playerId, ElementType elementType)
+    {
+        var spawn = GetShieldSpawn(playerId);
+        var spawnPosition = spawn.Item1;
+        var spawnRotation = spawn.Item2;
+        var targetPosition = GridManagement.Instance.playerHealthVisual.transform.position;
+        var spellData = DataManagement.Instance.spellDataList.Find(data => data.Recipe == SpellType.Shield);
+        var visualData = spellData.GetPrefabTuple(elementType);
+        var shieldObject = InstantiateSpellPrefab(-1, visualData, spawnPosition, spawnRotation, targetPosition, 0.5f);
+        _currentShieldObject[playerId] = shieldObject;
     }
 }
