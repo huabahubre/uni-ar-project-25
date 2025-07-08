@@ -2,12 +2,15 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using System.Collections.Generic;
+using TMPro;
 
 public class GridPlacer : MonoBehaviour
 {
     public GameObject gridPrefab; // Assign a 3x3 grid prefab in the inspector
     private ARTrackedImageManager trackedImageManager;
     private GameObject spawnedGrid;
+    
+    public TextMeshProUGUI debugText;
     
     void Awake()
     {
@@ -47,15 +50,21 @@ public class GridPlacer : MonoBehaviour
     void PlaceGrid(ARTrackedImage trackedImage)
     {
         if (gridPrefab == null) return;
+        
+        float offset = 5f; // Adjust the offset as needed
+        Vector3 offsetPosition = trackedImage.transform.position + Vector3.back * offset; 
 
         if (spawnedGrid == null)
         {
-            spawnedGrid = Instantiate(gridPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
+            spawnedGrid = Instantiate(gridPrefab, offsetPosition, trackedImage.transform.rotation);
             spawnedGrid.transform.SetParent(trackedImage.transform);
+            debugText.text = "Grid spawned at: " + spawnedGrid.transform.position.ToString("F2");
+            //spawnedGrid.transform.position = offsetPosition;
         }
         else
         {
-            spawnedGrid.transform.position = trackedImage.transform.position;
+            Debug.Log("Grid already spawned, updating position.");
+            spawnedGrid.transform.position = offsetPosition;
             spawnedGrid.transform.rotation = trackedImage.transform.rotation;
             spawnedGrid.SetActive(true);
         }
