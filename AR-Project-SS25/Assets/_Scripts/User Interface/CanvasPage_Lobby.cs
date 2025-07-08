@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Unity.Services.Authentication;
@@ -62,7 +63,6 @@ public class CanvasPage_Lobby : CanvasPage
 
     public void OnStartGame()
     {
-        Debug.Log("Starting game...");
-        MainCanvasManagement.Instance.ShowPage("Gameplay");
+        SyncStartGame.Instance.gameStarted = true;
     }
 }

@@ -16,15 +16,19 @@ MonoBehaviour:
   Effect: 1
   Recipe: 3
   PrefabTupleList:
-  - Element: 0
-    VisualPrefab: {fileID: 0}
+  - Element: 4
+    VisualPrefab: {fileID: 4060967071236614201, guid: 3d164b7d14e44244589693d586e6a368,
+      type: 3}
     Icon: {fileID: 21300000, guid: 495b165e4f96ef14fb23cd71fa625a47, type: 3}
   - Element: 1
-    VisualPrefab: {fileID: 0}
+    VisualPrefab: {fileID: 2427901435903505602, guid: 8a915dbbc4b23bf4f931629039cfbf6f,
+      type: 3}
     Icon: {fileID: 21300000, guid: 0d1dc8ade7e63d14da6ea8a209621906, type: 3}
   - Element: 2
-    VisualPrefab: {fileID: 0}
+    VisualPrefab: {fileID: 96566848741554304, guid: 743d81eb82b906a46a44ee2e8c3f4eaf,
+      type: 3}
     Icon: {fileID: 21300000, guid: ff42a689ad961fd4b9da0a00643acce7, type: 3}
   - Element: 3
-    VisualPrefab: {fileID: 0}
+    VisualPrefab: {fileID: 8719263370430895187, guid: 7d34a61c458188a47ba85f8bcac01f94,
+      type: 3}
     Icon: {fileID: 21300000, guid: 6becf50c5d862904cacebdac87f15502, type: 3}
