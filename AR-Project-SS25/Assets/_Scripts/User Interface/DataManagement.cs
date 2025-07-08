@@ -83,6 +83,9 @@ public class DataManagement : Singleton<DataManagement>
     [BoxGroup("Prefabs")]
     public HealthVisualPrefab healthVisualPrefab;
     
+    [BoxGroup("Prefabs")]
+    public TrackedMarkerInfo actionCardPrefab;
+
     
     
     

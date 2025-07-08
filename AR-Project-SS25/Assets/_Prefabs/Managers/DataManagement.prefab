@@ -82,4 +82,6 @@ MonoBehaviour:
     type: 3}
   healthVisualPrefab: {fileID: 1122254143622394125, guid: 72f674f78ac64114d8de0e2fcc525b93,
     type: 3}
+  actionCardPrefab: {fileID: 2141198107225391550, guid: adb10b0826ff8594587660cc3020ef8e,
+    type: 3}
   isWin: 1

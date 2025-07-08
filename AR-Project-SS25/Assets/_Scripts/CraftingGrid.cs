@@ -19,10 +19,10 @@ public class CraftingGrid : Singleton<CraftingGrid>
         if (currentMarkers == null || currentMarkers.Length == 0)
             return;
 
-        foreach (var cell in GetAllCells())
-        {
-            cell.CheckForMarkerNearby(currentMarkers);
-        }
+        // foreach (var cell in GetAllCells())
+        // {
+        //     cell.CheckForMarkerNearby(currentMarkers);
+        // }
     }
 
     public CraftingGridCell GetElementCell()
