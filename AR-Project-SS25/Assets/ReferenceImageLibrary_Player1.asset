@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
+  m_Name: ReferenceImageLibrary_Player1
+  m_EditorClassIdentifier: 
+  m_GuidLow: 4680316177584168955
+  m_GuidHigh: 14895204950885899955
+  m_DataStore:
+    m_Storage: []
+  m_Images:
+  - m_SerializedGuid:
+      m_GuidLow: 5032834552050500919
+      m_GuidHigh: 10280496974802052522
+    m_SerializedTextureGuid:
+      m_GuidLow: 1478341192768597678
+      m_GuidHigh: 2181126948735696888
+    m_Size: {x: 1, y: 1}
+    m_SpecifySize: 1
+    m_Name: ar_marker_action
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4698212335089311903
+      m_GuidHigh: 12488459131476561852
+    m_SerializedTextureGuid:
+      m_GuidLow: 2658382500755537218
+      m_GuidHigh: 10814802777549654267
+    m_Size: {x: 1, y: 1}
+    m_SpecifySize: 1
+    m_Name: ar_marker_playfield
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4869952845135532424
+      m_GuidHigh: 17788084478599494288
+    m_SerializedTextureGuid:
+      m_GuidLow: 16583596406134713057
+      m_GuidHigh: 11314146785678958667
+    m_Size: {x: 1, y: 1}
+    m_SpecifySize: 1
+    m_Name: ar_marker_air
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4993800398714245783
+      m_GuidHigh: 11891971409877264019
+    m_SerializedTextureGuid:
+      m_GuidLow: 4626408117576963558
+      m_GuidHigh: 16709570386014084584
+    m_Size: {x: 1, y: 1}
+    m_SpecifySize: 1
+    m_Name: ar_marker_earth
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5357543029499015830
+      m_GuidHigh: 17395515272782656920
+    m_SerializedTextureGuid:
+      m_GuidLow: 15543152566929552434
+      m_GuidHigh: 15314942719743300154
+    m_Size: {x: 1, y: 1}
+    m_SpecifySize: 1
+    m_Name: ar_marker_fire
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5386671787387662813
+      m_GuidHigh: 14885660557960902826
+    m_SerializedTextureGuid:
+      m_GuidLow: 14953080499101015487
+      m_GuidHigh: 11128917143784139256
+    m_Size: {x: 1, y: 1}
+    m_SpecifySize: 1
+    m_Name: ar_marker_water
+    m_Texture: {fileID: 0}
