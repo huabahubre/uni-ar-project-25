@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -52,6 +53,10 @@ public class CanvasPage_Gameplay : CanvasPage
         Button_Pause.onClick.AddListener(OnPauseButtonClick);
         Button_Cast.onClick.AddListener(OnCastSpell);
         
+        // Subscribe to events
+        GridManagement.Instance.onValidCraftingRecipeFound += OnValidRecipeFound;
+        GridManagement.Instance.onRecipeInvalid += OnInvalidRecipe;
+        
         base.Initialize();
     }
 
@@ -79,12 +84,26 @@ public class CanvasPage_Gameplay : CanvasPage
 
         StartCoroutine(WaitOpponentTurn());
     }
-    
-    
-    
-    
-    
-    
+
+
+
+    public void OnValidRecipeFound(Tuple<SpellType?, ElementType?> recipe)
+    {
+        // Handle valid crafting recipe found
+        // Debug.Log($"Valid recipe found: {recipe.Item1}, {recipe.Item2}");
+        
+        Button_Cast.interactable = true;
+    }
+
+    public void OnInvalidRecipe()
+    {
+        // Handle invalid crafting recipe
+        // Debug.Log("Invalid recipe.");
+        Button_Cast.interactable = false;
+    }
+
+
+
     //TODO: Remove this when functionality is ready
     public void OnManualWin()
     {

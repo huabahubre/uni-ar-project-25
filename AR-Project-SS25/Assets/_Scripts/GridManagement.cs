@@ -28,7 +28,7 @@ public class GridManagement : Singleton<GridManagement>
     
     private void Start()
     {
-        SpawnLocalPlayer();
+        // SpawnLocalPlayer();
         RefreshTrackedMarkersFromScene();
     }
 

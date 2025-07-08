@@ -1,85 +1,143 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
 public class MultipleImagesTrackingManager : MonoBehaviour
 {
+    
+    public TextMeshProUGUI textMeshProUGUI;
+    private readonly HashSet<string> currentlyTrackedImages = new HashSet<string>();
+
+
+    
+    
     [SerializeField]
-    private List<TrackedObjectMapping> trackedObjects; // Custom struct to define name->object
-
+    private List<TrackedObjectMapping> spawnTrackedPrefabs;
+    
     private ARTrackedImageManager _trackedImageManager;
+    
+    private Dictionary<string, GameObject> _trackedObjectDict;
+    private Dictionary<string, ARTrackedImage> _trackedImageData = new();
 
-    // Internal dictionary: marker name -> scene object
-    private Dictionary<string, DynTrackedMarkerParent> _trackedObjectDict = new Dictionary<string, DynTrackedMarkerParent>();
+    public Dictionary<string, ARTrackedImage> GetTrackedImages() => _trackedImageData;
+    public GameObject GetVisualForImage(string name) => _trackedObjectDict.ContainsKey(name) ? _trackedObjectDict[name] : null;
 
 
     private void Awake()
     {
         _trackedImageManager = GetComponent<ARTrackedImageManager>();
-
-        foreach (var item in trackedObjects)
-        {
-            if (item.targetObject != null && !string.IsNullOrEmpty(item.imageName))
-            {
-                // _trackedObjectDict[item.imageName] = item.targetObject;
-                // item.targetObject.SetVisible(false); // Start all as hidden
-                item.targetObject.gameObject.SetActive(false);
-                _trackedObjectDict.Add(item.imageName, item.targetObject);
-            }
-        }
-    }
-
-    private void OnEnable()
-    {
+        if (_trackedImageManager == null) return;
+        
+        // Setup Tracked Object Dictionary
+        _trackedObjectDict = new Dictionary<string, GameObject>();
+        
+        // Spawn scene objects
+        SpawnSceneTrackedObjects();
+            
+        // _trackedImageManager.trackablesChanged.AddListener(OnTrackedImagesChanged);
         _trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
     }
 
+
     private void OnDisable()
     {
+        // _trackedImageManager.trackablesChanged.RemoveListener(OnTrackedImagesChanged);
         _trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
     }
+
+
+
     
-    
-    
-    void Update()
+    void SpawnSceneTrackedObjects()
     {
-        // foreach (var kvp in _trackedObjectDict)
-        // {
-        //     string imageName = kvp.Key;
-        //     var trackedImage = kvp.Value;
-        //
-        //     if (_trackedObjectDict.TryGetValue(imageName, out var obj))
-        //     {
-        //         var dyn = obj.GetComponent<DynTrackedMarkerParent>();
-        //         if (dyn != null)
-        //         {
-        //             dyn.UpdateTransform(trackedImage.transform);
-        //         }
-        //     }
-        // }
+        foreach (var entry in spawnTrackedPrefabs)
+        {
+            var newARPrefab = Instantiate(entry.prefab, Vector3.zero, Quaternion.identity);
+            newARPrefab.name = "TrackedImageObject-" + entry.imageName;
+            newARPrefab.gameObject.SetActive(false);
+            // newARPrefab.SetVisible(false);
+            _trackedObjectDict.Add(newARPrefab.name, newARPrefab);
+        }
     }
-
     
 
-    private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
+    private void OnTrackedImagesChanged(ARTrackablesChangedEventArgs<ARTrackedImage> args)
     {
+        return;
+        
+        // Added
         foreach (var trackedImage in args.added)
         {
             UpdateTrackedImages(trackedImage);
         }
 
+        // Updated
         foreach (var trackedImage in args.updated)
         {
             UpdateTrackedImages(trackedImage);
         }
 
+        // Removed
         foreach (var trackedImage in args.removed)
         {
-            UpdateTrackedImages(trackedImage);
+            UpdateTrackedImages(trackedImage.Value);
         }
     }
+    
+    void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
+    {
+        foreach (var trackedImage in eventArgs.added)
+        {
+            if (trackedImage.trackingState == TrackingState.Tracking)
+            {
+                currentlyTrackedImages.Add(trackedImage.referenceImage.name);
+                _trackedImageData[trackedImage.referenceImage.name] = trackedImage;
+            }
+            else
+            {
+                _trackedImageData.Remove(trackedImage.referenceImage.name);
+            }
+
+            Debug.Log($"[AR] Added image: {trackedImage.referenceImage.name}");
+            
+            UpdateTrackedImages(trackedImage);
+        }
+
+        foreach (var trackedImage in eventArgs.updated)
+        {
+            Debug.Log($"[AR] Updated image: {trackedImage.referenceImage.name}, tracking: {trackedImage.trackingState}");
+
+            if (trackedImage.trackingState == TrackingState.Tracking)
+            {
+                currentlyTrackedImages.Add(trackedImage.referenceImage.name);
+                _trackedImageData[trackedImage.referenceImage.name] = trackedImage;
+            }
+            else
+            {
+                currentlyTrackedImages.Remove(trackedImage.referenceImage.name);
+                _trackedImageData.Remove(trackedImage.referenceImage.name);
+            }
+            
+            
+            UpdateTrackedImages(trackedImage);
+        }
+
+        foreach (var trackedImage in eventArgs.removed)
+        {
+            currentlyTrackedImages.Remove(trackedImage.referenceImage.name);
+            _trackedImageData.Remove(trackedImage.referenceImage.name);
+
+            Debug.Log($"[AR] Removed image: {trackedImage.referenceImage.name}");
+            
+            UpdateTrackedImages(trackedImage);
+        }
+
+        UpdateUIText();
+    }
+    
 
     private void UpdateTrackedImages(ARTrackedImage trackedImage)
     {
@@ -109,12 +167,57 @@ public class MultipleImagesTrackingManager : MonoBehaviour
         _trackedObjectDict[trackedImage.referenceImage.name].transform.rotation = trackedImage.transform.rotation;
     }
 
+    
+    
+    
+    private void UpdateUIText()
+    {
+        if (textMeshProUGUI == null) return;
+
+        if (_trackedImageData.Count == 0)
+        {
+            textMeshProUGUI.text = "No markers tracked.";
+            return;
+        }
+
+        string output = "Tracked markers:\n";
+
+        foreach (var kvp in _trackedImageData)
+        {
+            var name = kvp.Key;
+            var image = kvp.Value;
+
+            Vector3 trackedPos = image.transform.position;
+            Vector3 trackedRot = image.transform.eulerAngles;
+
+            output += $"- {name}\n";
+            output += $"  Pos: {trackedPos:F2}\n";
+            output += $"  Rot: {trackedRot:F1}\n";
+
+            if (_trackedObjectDict.TryGetValue(name, out var visualObj))
+            {
+                Vector3 visualPos = visualObj.transform.position;
+                Vector3 visualRot = visualObj.transform.eulerAngles;
+
+                output += $"  Visual Pos: {visualPos:F2}\n";
+                output += $"  Visual Rot: {visualRot:F1}\n";
+
+                Debug.Log($"[AR] {name} -> Marker Pos: {trackedPos}, Visual Pos: {visualPos}");
+                Debug.Log($"[AR] {name} -> Marker Rot: {trackedRot}, Visual Rot: {visualRot}");
+            }
+        }
+
+        textMeshProUGUI.text = output;
+    }
+
+
 
 
     [Serializable]
     public struct TrackedObjectMapping
     {
         public string imageName;
-        public DynTrackedMarkerParent targetObject;
+        public GameObject prefab;
+        // public GameObject targetScript;
     }
 }
