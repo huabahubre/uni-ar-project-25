@@ -58,6 +58,9 @@ public class CanvasPage_Lobby : CanvasPage
     
         // Set StartButton based on Host status
         Button_StartGame.gameObject.SetActive(lobby.HostId == AuthenticationService.Instance.PlayerId);
+        
+        
+        MainCanvasManagement.Instance.StopLoading();
     }
 
 

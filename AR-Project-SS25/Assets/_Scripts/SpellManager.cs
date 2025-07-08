@@ -11,6 +11,7 @@ public class SpellManager : MonoBehaviour
     [SerializeField] private Transform centerMarker;
     [SerializeField] private Transform[] lifeCrystals;
     [SerializeField] private GameObject spellPreview;
+    
     private SpellType _currentSpellType;
     private ElementType _currentElementType;
 

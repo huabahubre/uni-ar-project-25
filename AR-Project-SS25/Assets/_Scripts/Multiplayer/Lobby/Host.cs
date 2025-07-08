@@ -19,7 +19,10 @@ public class HostLobbyUI : MonoBehaviour
     public async void OnHostButtonClicked()
     {
         NetworkManager.Singleton.StartHost();
-
+        
+        // Start loading
+        MainCanvasManagement.Instance.StartLoading("Hosting Lobby...");
+        
         var lobby = await LobbyService.Instance.CreateLobbyAsync(
             sessionNameText.text,
             2
