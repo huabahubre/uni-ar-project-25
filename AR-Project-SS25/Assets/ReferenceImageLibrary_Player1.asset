@@ -23,7 +23,7 @@ MonoBehaviour:
     m_SerializedTextureGuid:
       m_GuidLow: 1478341192768597678
       m_GuidHigh: 2181126948735696888
-    m_Size: {x: 0.1, y: 0.1}
+    m_Size: {x: 0.081, y: 0.081}
     m_SpecifySize: 1
     m_Name: ar_marker_action
     m_Texture: {fileID: 0}
@@ -33,17 +33,17 @@ MonoBehaviour:
     m_SerializedTextureGuid:
       m_GuidLow: 2658382500755537218
       m_GuidHigh: 10814802777549654267
-    m_Size: {x: 0.1, y: 0.1}
+    m_Size: {x: 0.121, y: 0.121}
     m_SpecifySize: 1
     m_Name: ar_marker_playfield
-    m_Texture: {fileID: 0}
+    m_Texture: {fileID: 2800000, guid: baa5fd4278cc24e4fb48c1afd3e51596, type: 3}
   - m_SerializedGuid:
       m_GuidLow: 4869952845135532424
       m_GuidHigh: 17788084478599494288
     m_SerializedTextureGuid:
       m_GuidLow: 16583596406134713057
       m_GuidHigh: 11314146785678958667
-    m_Size: {x: 0.1, y: 0.1}
+    m_Size: {x: 0.081, y: 0.081}
     m_SpecifySize: 1
     m_Name: ar_marker_air
     m_Texture: {fileID: 0}
@@ -53,7 +53,7 @@ MonoBehaviour:
     m_SerializedTextureGuid:
       m_GuidLow: 4626408117576963558
       m_GuidHigh: 16709570386014084584
-    m_Size: {x: 0.1, y: 0.1}
+    m_Size: {x: 0.081, y: 0.081}
     m_SpecifySize: 1
     m_Name: ar_marker_earth
     m_Texture: {fileID: 0}
@@ -63,7 +63,7 @@ MonoBehaviour:
     m_SerializedTextureGuid:
       m_GuidLow: 15543152566929552434
       m_GuidHigh: 15314942719743300154
-    m_Size: {x: 0.1, y: 0.1}
+    m_Size: {x: 0.081, y: 0.081}
     m_SpecifySize: 1
     m_Name: ar_marker_fire
     m_Texture: {fileID: 0}
@@ -73,7 +73,7 @@ MonoBehaviour:
     m_SerializedTextureGuid:
       m_GuidLow: 14953080499101015487
       m_GuidHigh: 11128917143784139256
-    m_Size: {x: 0.1, y: 0.1}
+    m_Size: {x: 0.081, y: 0.081}
     m_SpecifySize: 1
     m_Name: ar_marker_water
     m_Texture: {fileID: 0}

@@ -7368,7 +7368,7 @@ Transform:
   m_GameObject: {fileID: 1144130976}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.36, y: 0, z: -3.15}
+  m_LocalPosition: {x: -4.321, y: 0, z: -3.168}
   m_LocalScale: {x: 0.32236, y: 0.0032236, z: 0.32236}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8027,7 +8027,7 @@ Transform:
   m_GameObject: {fileID: 1307242103}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.547, y: 0, z: -3.155}
+  m_LocalPosition: {x: -5.54, y: 0, z: -3.183}
   m_LocalScale: {x: 0.32236, y: 0.0032236, z: 0.32236}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13343,6 +13343,16 @@ PrefabInstance:
       propertyPath: SpawnWithObservers
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3396895624294641008, guid: c7d52e7088ea14f4a98d5435194a1eb5,
+        type: 3}
+      propertyPath: SceneMigrationSynchronization
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3396895624294641008, guid: c7d52e7088ea14f4a98d5435194a1eb5,
+        type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 2951197718
+      objectReference: {fileID: 0}
     - target: {fileID: 4188791374940692895, guid: c7d52e7088ea14f4a98d5435194a1eb5,
         type: 3}
       propertyPath: m_Name
@@ -13677,7 +13687,7 @@ PrefabInstance:
     - target: {fileID: 7972323213218967840, guid: 372812244335c844d8e2f44cbdd6aa7c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13889,6 +13899,16 @@ PrefabInstance:
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1805172925
+      objectReference: {fileID: 0}
+    - target: {fileID: 5841271838901443938, guid: c3164e02b9712ce4290b68f6ed76c2a0,
+        type: 3}
+      propertyPath: SceneMigrationSynchronization
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5841271838901443938, guid: c3164e02b9712ce4290b68f6ed76c2a0,
+        type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 3146067046
       objectReference: {fileID: 0}
     - target: {fileID: 9198976657842247477, guid: c3164e02b9712ce4290b68f6ed76c2a0,
         type: 3}

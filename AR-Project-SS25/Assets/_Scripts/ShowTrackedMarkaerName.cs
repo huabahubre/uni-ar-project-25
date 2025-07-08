@@ -10,9 +10,9 @@ public class ShowTrackedMarkerName : MonoBehaviour
 
     private ARTrackedImageManager trackedImageManager;
 
-    // Keeps track of currently tracked image names
     private readonly HashSet<string> currentlyTrackedImages = new HashSet<string>();
 
+    // Keeps track of currently tracked image names
     void Awake()
     {
         trackedImageManager = GetComponent<ARTrackedImageManager>();

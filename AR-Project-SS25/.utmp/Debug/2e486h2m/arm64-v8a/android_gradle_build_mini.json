@@ -1,7 +1,7 @@
 {
   "buildFiles": [
-    "E:\\Github\\uni-ar-project-25\\AR-Project-SS25\\Library\\PramData\\AndroidApplicationController\\Cache\\com.unity.template.ar_mobile\\gradle-project\\unityLibrary\\src\\main\\cpp\\CMakeLists.txt",
-    "E:\\Github\\uni-ar-project-25\\AR-Project-SS25\\Library\\PramData\\AndroidApplicationController\\Cache\\com.unity.template.ar_mobile\\gradle-project\\unityLibrary\\src\\main\\cpp\\GameActivity\\CMakeLists.txt"
+    "E:\\Github\\uni-ar-project-25\\AR-Project-SS25\\Library\\Bee\\Android\\Prj\\IL2CPP\\Gradle\\unityLibrary\\src\\main\\cpp\\CMakeLists.txt",
+    "E:\\Github\\uni-ar-project-25\\AR-Project-SS25\\Library\\Bee\\Android\\Prj\\IL2CPP\\Gradle\\unityLibrary\\src\\main\\cpp\\GameActivity\\CMakeLists.txt"
   ],
   "cleanCommandsComponents": [
     [
@@ -21,7 +21,7 @@
     "game::@d02bb112ea9f9c2ed29f": {
       "artifactName": "game",
       "abi": "arm64-v8a",
-      "output": "E:\\Github\\uni-ar-project-25\\AR-Project-SS25\\Library\\PramData\\AndroidApplicationController\\Cache\\com.unity.template.ar_mobile\\gradle-project\\unityLibrary\\build\\intermediates\\cxx\\Debug\\2e486h2m\\obj\\arm64-v8a\\libgame.so",
+      "output": "E:\\Github\\uni-ar-project-25\\AR-Project-SS25\\Library\\Bee\\Android\\Prj\\IL2CPP\\Gradle\\unityLibrary\\build\\intermediates\\cxx\\Debug\\2e486h2m\\obj\\arm64-v8a\\libgame.so",
       "runtimeFiles": []
     }
   }

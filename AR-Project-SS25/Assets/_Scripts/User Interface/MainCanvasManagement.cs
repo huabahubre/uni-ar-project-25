@@ -12,6 +12,13 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
     [ShowInInspector, ReadOnly, BoxGroup("MainCanvasManagement")] protected List<CanvasPage> CanvasPages;
 
 
+    [ShowInInspector, BoxGroup("References")]
+    public GameObject loadingScreen;
+    
+    [ShowInInspector, BoxGroup("References")]
+    public TextMeshProUGUI loadingMessageText;
+    
+
     // TODO: This is for later, when we have a global message panel
     // [FoldoutGroup("References")] public GameObject GlobalMessagePanel;
     // [FoldoutGroup("References")] public TextMeshProUGUI GlobalMessageText;
@@ -42,6 +49,7 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
     {
         base.Awake();
         RefreshCanvasPageList();
+        StopLoading();
     }
 
     void Start()
@@ -263,5 +271,30 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
 
     #endregion
     
+    
+    #region Loading Screen
+
+
+    public void StartLoading(string loadingMessage = null)
+    {
+        if(loadingMessage != null)
+        {
+            loadingMessageText.text = loadingMessage;
+        }
+        else
+        {
+            loadingMessageText.text = "";
+        }
+
+        loadingScreen.SetActive(true);
+    }
+
+    public void StopLoading()
+    {
+        loadingMessageText.text = "";
+        loadingScreen.SetActive(false);
+    }
+    
+    #endregion
     
 }

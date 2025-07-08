@@ -16,16 +16,23 @@ public class DynTrackedMarkerParent : MonoBehaviour
     private Quaternion targetRotation;
 
     [Header("Smooth Follow Settings")]
-    public float positionLerpSpeed = 5f;
-    public float rotationLerpSpeed = 5f;
+    public float positionLerpSpeed = 2f;
+    public float rotationLerpSpeed = 2f;
+
+
+    private void Start()
+    {
+        SetVisible(true);
+    }
+
 
     private void Update()
     {
         if (!isVisible) return;
 
         // Smoothly interpolate toward the tracked marker's position/rotation
-        // transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * positionLerpSpeed);
-        // transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
+        transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * positionLerpSpeed);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
     }
 
     public void OnTracked()
@@ -44,14 +51,6 @@ public class DynTrackedMarkerParent : MonoBehaviour
         
         isVisible = false;
         SetVisible(false);
-    }
-
-    public void UpdateTransform(Transform markerTransform)
-    {
-        if (!isVisible) return;
-
-        // Set target for smooth interpolation
-        UpdateTargetPosition(markerTransform.position, markerTransform.rotation);
     }
 
     public void UpdateTargetPosition(Vector3 targetPosition, Quaternion targetRotation)

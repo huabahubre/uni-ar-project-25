@@ -18,6 +18,10 @@ public class JoinLobbyUI : MonoBehaviour
         }
         
         displayCode.text = code;
+        
+        // Start loading
+        MainCanvasManagement.Instance.StartLoading("Joining Lobby...");
+        
         var lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code);
         NetworkManager.Singleton.StartClient();
         

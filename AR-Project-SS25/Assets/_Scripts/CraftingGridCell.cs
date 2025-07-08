@@ -11,12 +11,15 @@ public class CraftingGridCell : MonoBehaviour
     public Vector3 baseDetectionBoxSize = new Vector3(0.05f, 0.05f, 0.05f);
 
     [ShowInInspector, ReadOnly] public TrackedMarkerInfo assignedMarker;
+    [ShowInInspector, ReadOnly] public TrackedMarkerInfo previousMarker;
 
     public Toggle worldToggle;
     public SpriteRenderer spriteRenderer;
 
     private bool isWorldToggleOn = false;
+    private float reassignmentCooldown = 0f;
 
+    
     private void Start()
     {
         if (worldToggle != null)
@@ -42,37 +45,35 @@ public class CraftingGridCell : MonoBehaviour
     {
         if (!Application.isPlaying) return;
 
+        if (reassignmentCooldown > 0f)
+        {
+            reassignmentCooldown -= Time.deltaTime;
+            return;
+        }
+
         TrackedMarkerInfo[] allMarkers = FindObjectsOfType<TrackedMarkerInfo>();
 
         if (assignedMarker == null)
         {
             TrackedMarkerInfo found = FindMatchingMarkerInBox(allMarkers);
-            if (found != null)
+
+            if (found != null && found != previousMarker)
             {
                 assignedMarker = found;
                 OnAssignedMarkerChanged();
             }
-
-            // Set Color of spriteRenderer to fully opaque if marker is assigned
-            Color color = spriteRenderer.color;
-            color.a = 1f;
-            spriteRenderer.color = color;
         }
         else
         {
-            // Only check if current marker is still inside
             if (!IsInsideBox(assignedMarker.transform.position))
             {
                 assignedMarker = null;
                 OnAssignedMarkerChanged();
             }
-            
-            // Set Color of spriteRenderer to fully opaque if marker is assigned
-            Color color = spriteRenderer.color;
-            color.a = 0.1f;
-            spriteRenderer.color = color;
         }
     }
+
+
 
     private TrackedMarkerInfo FindMatchingMarkerInBox(TrackedMarkerInfo[] allMarkers)
     {
@@ -81,6 +82,8 @@ public class CraftingGridCell : MonoBehaviour
 
         foreach (var marker in allMarkers)
         {
+            if (marker == null || marker.gameObject == null) continue;
+            if (marker.GetInstanceID() == 0) continue; // 💡 Completely destroyed (defensive check)
             if (marker.markerType != cellType) continue;
             if (!IsInsideBox(marker.transform.position)) continue;
 
@@ -95,6 +98,8 @@ public class CraftingGridCell : MonoBehaviour
         return closest;
     }
 
+
+
     private bool IsInsideBox(Vector3 worldPoint)
     {
         Vector3 halfSize = Vector3.Scale(baseDetectionBoxSize, transform.lossyScale) * 0.5f;
@@ -106,17 +111,25 @@ public class CraftingGridCell : MonoBehaviour
 
     private void OnAssignedMarkerChanged()
     {
-        if (assignedMarker != null)
+        if (assignedMarker && assignedMarker.gameObject != null)
         {
             Debug.Log($"🟢 Marker assigned to cell '{name}': {assignedMarker.name}");
+            
+            // Set Color of spriteRenderer
+            Color color = spriteRenderer.color;
+            color.a = 0.1f;
+            spriteRenderer.color = color;
         }
         else
         {
             Debug.Log($"🔴 Marker removed from cell '{name}'");
+            
+            // Set Color of spriteRenderer
+            Color color = spriteRenderer.color;
+            color.a = 1f;
+            spriteRenderer.color = color;
         }
         
-        
-            
         // Checking for crafting result
         GridManagement.Instance.CheckCraftingResult();
     }
@@ -145,9 +158,11 @@ public class CraftingGridCell : MonoBehaviour
         {
             Destroy(assignedMarker.gameObject);
             assignedMarker = null;
+            reassignmentCooldown = 0.1f; // Wait 1/10th second to let Unity clean up
             OnAssignedMarkerChanged();
         }
     }
+
 
     private void OnDrawGizmos()
     {
