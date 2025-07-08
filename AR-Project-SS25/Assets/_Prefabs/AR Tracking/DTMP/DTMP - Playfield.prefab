@@ -10,6 +10,21 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2086918944762537020, guid: 267a23b0d7e87a94c916be221be528d4,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2086918944762537020, guid: 267a23b0d7e87a94c916be221be528d4,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2086918944762537020, guid: 267a23b0d7e87a94c916be221be528d4,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2086918944762537020, guid: 267a23b0d7e87a94c916be221be528d4,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -66,17 +81,17 @@ PrefabInstance:
     - target: {fileID: 7264117665415032589, guid: 267a23b0d7e87a94c916be221be528d4,
         type: 3}
       propertyPath: positionLerpSpeed
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7264117665415032589, guid: 267a23b0d7e87a94c916be221be528d4,
         type: 3}
       propertyPath: rotationLerpSpeed
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7264117665415032589, guid: 267a23b0d7e87a94c916be221be528d4,
         type: 3}
       propertyPath: contents.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7264117665415032589, guid: 267a23b0d7e87a94c916be221be528d4,
         type: 3}
@@ -110,6 +125,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PlayerCraftingGrid
+      objectReference: {fileID: 0}
+    - target: {fileID: 6851618983532961041, guid: 8fe9e100405b4d54cbc88b9a5283e843,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6851618983532961041, guid: 8fe9e100405b4d54cbc88b9a5283e843,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6851618983532961041, guid: 8fe9e100405b4d54cbc88b9a5283e843,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6851618983532961041, guid: 8fe9e100405b4d54cbc88b9a5283e843,
         type: 3}

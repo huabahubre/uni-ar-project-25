@@ -24,8 +24,8 @@ public class DynTrackedMarkerParent : MonoBehaviour
         if (!isVisible) return;
 
         // Smoothly interpolate toward the tracked marker's position/rotation
-        transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * positionLerpSpeed);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
+        // transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * positionLerpSpeed);
+        // transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
     }
 
     public void OnTracked()
@@ -67,8 +67,5 @@ public class DynTrackedMarkerParent : MonoBehaviour
             if (go != null)
                 go.SetActive(visible);
         }
-
-        if (visible) onShow?.Invoke();
-        else onHide?.Invoke();
     }
 }

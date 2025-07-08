@@ -1,4 +1,4 @@
-# Install script for directory: E:/Github/uni-ar-project-25/AR-Project-SS25/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp
+# Install script for directory: E:/Github/uni-ar-project-25/AR-Project-SS25/Library/PramData/AndroidApplicationController/Cache/com.unity.template.ar_mobile/gradle-project/unityLibrary/src/main/cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

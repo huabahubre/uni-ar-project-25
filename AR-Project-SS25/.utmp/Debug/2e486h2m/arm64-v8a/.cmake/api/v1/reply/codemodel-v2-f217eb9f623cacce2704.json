@@ -66,7 +66,7 @@
 				{
 					"directoryIndex" : 1,
 					"id" : "game::@d02bb112ea9f9c2ed29f",
-					"jsonFile" : "target-game-Debug-5e891c8261486732c62a.json",
+					"jsonFile" : "target-game-Debug-f264434d8fc0424e8e4c.json",
 					"name" : "game",
 					"projectIndex" : 1
 				}
@@ -77,7 +77,7 @@
 	"paths" : 
 	{
 		"build" : "E:/Github/uni-ar-project-25/AR-Project-SS25/.utmp/Debug/2e486h2m/arm64-v8a",
-		"source" : "E:/Github/uni-ar-project-25/AR-Project-SS25/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp"
+		"source" : "E:/Github/uni-ar-project-25/AR-Project-SS25/Library/PramData/AndroidApplicationController/Cache/com.unity.template.ar_mobile/gradle-project/unityLibrary/src/main/cpp"
 	},
 	"version" : 
 	{
