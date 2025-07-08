@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -17,4 +18,16 @@ public class TrackedMarkerInfo : MonoBehaviour
 
     [Tooltip("Optional identifier to link to crafting recipes (e.g. QR code ID or name)")]
     public string markerId;
+
+
+    // private void OnEnable()
+    // {
+    //     GridManagement.Instance.RegisterMarker(this);
+    // }
+    //
+    // private void OnDisable()
+    // {
+    //     GridManagement.Instance.UnregisterMarker(this);
+    // }
+
 }
