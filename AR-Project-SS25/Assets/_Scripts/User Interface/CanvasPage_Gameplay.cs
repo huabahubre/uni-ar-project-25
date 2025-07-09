@@ -69,8 +69,8 @@ public class CanvasPage_Gameplay : CanvasPage
         Button_Cast.onClick.AddListener(OnCastSpell);
         
         // Subscribe to events
-        GridManagement.Instance.onValidCraftingRecipeFound += OnValidRecipeFound;
-        GridManagement.Instance.onRecipeInvalid += OnInvalidRecipe;
+        PlayfieldManagement.Instance.onValidCraftingRecipeFound += OnValidRecipeFound;
+        PlayfieldManagement.Instance.onRecipeInvalid += OnInvalidRecipe;
         GameStateManager.Instance.onFinishedTurn += OnFinishedTurn;
         
         base.Initialize();

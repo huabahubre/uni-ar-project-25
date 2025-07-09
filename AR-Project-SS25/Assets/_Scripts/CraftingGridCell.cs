@@ -1,5 +1,7 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 [ExecuteAlways]
@@ -14,11 +16,15 @@ public class CraftingGridCell : MonoBehaviour
     [ShowInInspector, ReadOnly] public TrackedMarkerInfo previousMarker;
 
     public Toggle worldToggle;
-    public SpriteRenderer spriteRenderer;
+    public Image visualImage;
 
     private bool isWorldToggleOn = false;
     private float reassignmentCooldown = 0f;
 
+
+    public Action<TrackedMarkerInfo> OnAssignedMarker;
+    public Action OnRemovedMarker;
+    
     
     private void Start()
     {
@@ -116,22 +122,28 @@ public class CraftingGridCell : MonoBehaviour
             Debug.Log($"🟢 Marker assigned to cell '{name}': {assignedMarker.name}");
             
             // Set Color of spriteRenderer
-            Color color = spriteRenderer.color;
+            Color color = visualImage.color;
             color.a = 0.1f;
-            spriteRenderer.color = color;
+            visualImage.color = color;
+            
+            // Make callback
+            OnAssignedMarker?.Invoke(assignedMarker);
         }
         else
         {
             Debug.Log($"🔴 Marker removed from cell '{name}'");
             
             // Set Color of spriteRenderer
-            Color color = spriteRenderer.color;
+            Color color = visualImage.color;
             color.a = 1f;
-            spriteRenderer.color = color;
+            visualImage.color = color;
+            
+            // Make callback
+            OnRemovedMarker?.Invoke();
         }
         
         // Checking for crafting result
-        GridManagement.Instance.CheckCraftingResult();
+        PlayfieldManagement.Instance.CheckCraftingResult();
     }
 
     private void SpawnMarker()

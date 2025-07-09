@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 
 public class CraftingGrid : Singleton<CraftingGrid>
 {
@@ -8,16 +10,20 @@ public class CraftingGrid : Singleton<CraftingGrid>
     public List<CraftingGridCell> middleRow = new List<CraftingGridCell>(3);
     public List<CraftingGridCell> bottomRow = new List<CraftingGridCell>(3);
 
-    [Header("Element Cell")]
-    public CraftingGridCell elementCell;
+    [BoxGroup("Settings")] public Vector3 playerCraftingGridOffset = new Vector3(0, 0, 0);
 
-    [Header("Runtime Markers")]
-    public TrackedMarkerInfo[] currentMarkers;
+    public GameObject scalerChild;
+
+
+    private void Start()
+    {
+        scalerChild.SetActive(false);
+    }
 
     private void Update()
     {
-        if (currentMarkers == null || currentMarkers.Length == 0)
-            return;
+        // if (currentMarkers == null || currentMarkers.Length == 0)
+        //     return;
 
         // foreach (var cell in GetAllCells())
         // {
@@ -25,11 +31,37 @@ public class CraftingGrid : Singleton<CraftingGrid>
         // }
     }
 
-    public CraftingGridCell GetElementCell()
+    
+    #region Updat position and rotation / visual
+    
+    public void UpdateGridPosition(Vector3 position, Quaternion rotation)
     {
-        return elementCell;
+        if (scalerChild != null)
+        {
+            scalerChild.transform.position = position + rotation * playerCraftingGridOffset;
+            scalerChild.transform.rotation = rotation;
+        }
     }
 
+    public void ShowVisual()
+    {
+        if (scalerChild != null)
+        {
+            scalerChild.SetActive(true);
+        }
+    }
+    
+    public void HideVisual()
+    {
+        if (scalerChild != null)
+        {
+            scalerChild.SetActive(false);
+        }
+    }
+    
+    #endregion
+    
+    
     public bool[] GetCurrentActionGridState()
     {
         List<CraftingGridCell> ordered = new List<CraftingGridCell>();
@@ -70,13 +102,5 @@ public class CraftingGrid : Singleton<CraftingGrid>
         }
 
         return null;
-    }
-
-    private IEnumerable<CraftingGridCell> GetAllCells()
-    {
-        foreach (var cell in topRow) yield return cell;
-        foreach (var cell in middleRow) yield return cell;
-        foreach (var cell in bottomRow) yield return cell;
-        if (elementCell != null) yield return elementCell;
     }
 }
