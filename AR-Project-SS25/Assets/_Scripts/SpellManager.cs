@@ -11,6 +11,7 @@ public class SpellManager : MonoBehaviour
     [SerializeField] private Transform centerMarker;
     [SerializeField] private Transform[] lifeCrystals;
     [SerializeField] private GameObject spellPreview;
+    
     private SpellType _currentSpellType;
     private ElementType _currentElementType;
 
@@ -114,16 +115,16 @@ public class SpellManager : MonoBehaviour
         {
             case SpellType.GroundPound:
                 (spawnPosition, spawnRotation) = GetGroundPoundSpawn(currentPlayerId);
-                targetPosition = GridManagement.Instance.enemyHealthVisual.transform.position;
+                targetPosition = PlayfieldManagement.Instance.enemyHealthVisual.transform.position;
                 radius = 1.0f;
                 break;
             case SpellType.Shield:
                 (spawnPosition, spawnRotation) = GetShieldSpawn(currentPlayerId);
-                targetPosition = GridManagement.Instance.playerHealthVisual.transform.position;
+                targetPosition = PlayfieldManagement.Instance.playerHealthVisual.transform.position;
                 break;
             default:
                 (spawnPosition, spawnRotation) = GetDefaultSpellSpawn(currentPlayerId);
-                targetPosition = GridManagement.Instance.enemyHealthVisual.transform.position;
+                targetPosition = PlayfieldManagement.Instance.enemyHealthVisual.transform.position;
                 break;
         }
         
@@ -149,7 +150,7 @@ public class SpellManager : MonoBehaviour
     private (Vector3, Quaternion) GetGroundPoundSpawn(int currentPlayerId)
     {
         int enemyId = (currentPlayerId == 0) ? 1 : 0; // TODO: do we need this or maybe when spawning crystal?
-        var crystalPosition = GridManagement.Instance.enemyHealthVisual.transform.position;
+        var crystalPosition = PlayfieldManagement.Instance.enemyHealthVisual.transform.position;
         Vector3 spawnPosition = crystalPosition;
         Quaternion spawnRotation = Quaternion.identity;
         return (spawnPosition, spawnRotation);
@@ -157,7 +158,7 @@ public class SpellManager : MonoBehaviour
     
     private (Vector3, Quaternion) GetShieldSpawn(int currentPlayerId)
     {
-        Vector3 spawnPosition = GridManagement.Instance.playerHealthVisual.transform.position; // TODO: maybe need distance from crystal
+        Vector3 spawnPosition = PlayfieldManagement.Instance.playerHealthVisual.transform.position; // TODO: maybe need distance from crystal
         Vector3 direction = (centerMarker.position - spawnPosition).normalized;
         Quaternion spawnRotation = Quaternion.LookRotation(direction);
         return (spawnPosition, spawnRotation);
@@ -166,7 +167,7 @@ public class SpellManager : MonoBehaviour
     private (Vector3, Quaternion) GetDefaultSpellSpawn(int currentPlayerId)
     {
         int enemyId = (currentPlayerId == 0) ? 1 : 0; // TODO: do we need this or maybe when spawning crystal?
-        var crystalPosition = GridManagement.Instance.enemyHealthVisual.transform.position;
+        var crystalPosition = PlayfieldManagement.Instance.enemyHealthVisual.transform.position;
         Vector3 direction = (crystalPosition - centerMarker.position).normalized;
         Vector3 spawnPosition = centerMarker.position; // TODO: maybe needs to be closer or further away from crystal
         Quaternion spawnRotation = Quaternion.LookRotation(direction);

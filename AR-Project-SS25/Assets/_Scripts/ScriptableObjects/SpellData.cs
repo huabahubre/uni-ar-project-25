@@ -54,11 +54,11 @@ public class SpellVisualData
 
 public enum ElementType
 {
-    None,
     Fire,
     Water,
     Earth,
-    Air
+    Air,
+    None
 }
 
 public enum SpellEffect

@@ -64,7 +64,7 @@ public class TestButton : MonoBehaviour
             turnStatusText.color = isMyTurn ? Color.green : Color.gray;
         }
     }
-
+    
     public void OnEndTurnClicked()
     {
         if (GameStateManager.Instance != null)

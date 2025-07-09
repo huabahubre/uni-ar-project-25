@@ -34,6 +34,12 @@ public class DataManagement : Singleton<DataManagement>
     [BoxGroup("Scriptable Objects")]
     public List<ElementVisualData> ElementVisualDataList;
 
+
+    public ElementVisualData GetElementVisualData(int elementIdx)
+    {
+        return GetElementVisualData((ElementType)elementIdx);
+    }
+
     public ElementVisualData GetElementVisualData(ElementType elementType)
     {
         foreach (var data in ElementVisualDataList)
@@ -124,6 +130,7 @@ public class ElementVisualData
     public ElementType Element;
     public GameObject CrystalPrefab;
     public Color Color;
+    public Sprite Icon;
 }
 
 

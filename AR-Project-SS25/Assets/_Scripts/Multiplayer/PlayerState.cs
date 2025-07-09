@@ -1,0 +1,100 @@
+using System;
+using Sirenix.OdinInspector;
+using Unity.Collections;
+using Unity.Netcode;
+using Unity.Services.Authentication;
+using UnityEngine;
+
+public class PlayerState : NetworkBehaviour
+{
+    public static PlayerState LocalPlayer;
+    public static PlayerState EnemyPlayer;
+
+    // Inspector exposed variables
+    [SerializeField, BoxGroup("Runtime Variables")] private bool isLocalPlayer;
+    
+    
+    
+    public static event Action<PlayerState> OnPlayerStateUpdated;
+    public static event Action<PlayerState> OnEnemyJoined;
+    
+    // Networked Variables
+    public NetworkVariable<int> PlayerHealth = new NetworkVariable<int>(100, 
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> ElementIndex = new();
+    public NetworkVariable<FixedString32Bytes> PlayerName = new();
+
+
+    private void Start()
+    {
+        // Read
+        // int myElement = PlayerState.LocalPlayer.ElementIndex.Value;
+        // int enemyElement = PlayerState.EnemyPlayer.ElementIndex.Value;
+    }
+
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            LocalPlayer = this;
+            isLocalPlayer = true;
+            Debug.Log("LocalPlayer spawned");
+        }
+        else
+        {
+            EnemyPlayer = this;
+            isLocalPlayer = false;
+            Debug.Log("EnemyPlayer spawned");
+        }
+        
+        // Subscribe to changes
+        ElementIndex.OnValueChanged += (_, _) => OnPlayerStateUpdated?.Invoke(this);
+        PlayerName.OnValueChanged += (_, _) => OnPlayerStateUpdated?.Invoke(this);
+
+        // Init local player
+        InitLocalPlayerData();
+        
+        if(!isLocalPlayer)
+            OnEnemyJoined?.Invoke(this);
+    }
+
+
+    void InitLocalPlayerData()
+    {
+        SetElementIndexServerRpc(0);
+        SetPlayerNameServerRpc(AuthenticationService.Instance.PlayerName);
+    }
+    
+    
+    
+    [Button]
+    [ServerRpc(RequireOwnership = false)]
+    public void UpdatePlayerHealthServerRpc(int diff)
+    {
+        int currentHealth = PlayerHealth.Value;
+        currentHealth += diff;
+        
+        // Ensure health does not go below 0
+        currentHealth = Mathf.Max(0, currentHealth);
+        PlayerHealth.Value = currentHealth;
+    }
+    
+    
+    [Button]
+    [ServerRpc(RequireOwnership = false)]
+    public void SetElementIndexServerRpc(int idx)
+    {
+        ElementIndex.Value = idx;
+    }
+    
+    
+    [Button]
+    [ServerRpc(RequireOwnership = false)]
+    public void SetPlayerNameServerRpc(string name)
+    {
+        PlayerName.Value = name;
+    }
+}
+
