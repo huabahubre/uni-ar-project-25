@@ -50,7 +50,7 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
         
         Initialize();
         ShowPage("Menu");
-        // HideAllPages();
+        //HideAllPages();
     }
 
 
