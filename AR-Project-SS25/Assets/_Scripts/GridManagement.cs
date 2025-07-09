@@ -26,6 +26,7 @@ public class GridManagement : Singleton<GridManagement>
     public Action onRecipeInvalid;
     
     
+    
     private void Start()
     {
         // SpawnLocalPlayer();
@@ -136,7 +137,6 @@ public class GridManagement : Singleton<GridManagement>
 
     
     #endregion
-    
     
     
     /// <summary>

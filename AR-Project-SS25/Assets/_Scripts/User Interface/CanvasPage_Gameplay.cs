@@ -21,6 +21,9 @@ public class CanvasPage_Gameplay : CanvasPage
     [BoxGroup("References")]
     public GameObject Panel_OpponentTurn;
     
+    [BoxGroup("References")]
+    public GameObject Panel_ActiveSpellCasting;
+
     
     [BoxGroup("References"), Header("Player Info")]
     public TextMeshProUGUI Text_PlayerName;
@@ -46,6 +49,9 @@ public class CanvasPage_Gameplay : CanvasPage
     public Image Image_EnemyIcon;
 
 
+
+    private Tuple<SpellType?, ElementType?> currentSpellData = null;
+    public Action<Tuple<SpellType?, ElementType?>> onCastSpell;
     
     
     public override void Initialize()
@@ -56,6 +62,7 @@ public class CanvasPage_Gameplay : CanvasPage
         // Subscribe to events
         GridManagement.Instance.onValidCraftingRecipeFound += OnValidRecipeFound;
         GridManagement.Instance.onRecipeInvalid += OnInvalidRecipe;
+        GameStateManager.Instance.onFinishedTurn += OnFinishedTurn;
         
         base.Initialize();
     }
@@ -63,8 +70,12 @@ public class CanvasPage_Gameplay : CanvasPage
 
     public override void OnShow()
     {
-        Panel_YourTurn.SetActive(true);
-        Panel_OpponentTurn.SetActive(false);
+        bool isPlayerTurn = GameStateManager.Instance.IsCurrentPlayersTurn();
+        
+        // Set Panels
+        Panel_YourTurn.SetActive(isPlayerTurn);
+        Panel_OpponentTurn.SetActive(!isPlayerTurn);
+        Panel_ActiveSpellCasting.SetActive(false);
         
         base.OnShow();
     }
@@ -76,34 +87,58 @@ public class CanvasPage_Gameplay : CanvasPage
     }
     
 
+    #region Turn funcitonality
+
+    public void OnFinishedTurn()
+    {
+        bool isPlayerTurn = GameStateManager.Instance.IsCurrentPlayersTurn();
+        
+        // Update UI
+        UpdateLocalPlayerInfo(GameStateManager.Instance.player1HP.Value);
+        UpdateRemotePlayerInfo(GameStateManager.Instance.player2HP.Value);
+        
+        // Set Panels
+        Panel_YourTurn.SetActive(isPlayerTurn);
+        Panel_OpponentTurn.SetActive(!isPlayerTurn);
+        Panel_ActiveSpellCasting.SetActive(false);
+    }
+    
+    #endregion
+    
+    #region Recipe & Spell casting
 
     void OnCastSpell()
     {
         Panel_YourTurn.SetActive(false);
         Panel_OpponentTurn.SetActive(true);
-
-        StartCoroutine(WaitOpponentTurn());
+        
+        // Try to cast spell with Action
+        onCastSpell?.Invoke(currentSpellData);
+        
+        // StartCoroutine(WaitOpponentTurn());
     }
-
-
-
+    
     public void OnValidRecipeFound(Tuple<SpellType?, ElementType?> recipe)
     {
         // Handle valid crafting recipe found
-        // Debug.Log($"Valid recipe found: {recipe.Item1}, {recipe.Item2}");
         
         Button_Cast.interactable = true;
+        currentSpellData = recipe;
     }
 
     public void OnInvalidRecipe()
     {
         // Handle invalid crafting recipe
-        // Debug.Log("Invalid recipe.");
+        
         Button_Cast.interactable = false;
+        currentSpellData = null;
     }
 
+    #endregion
 
 
+    
+    
     //TODO: Remove this when functionality is ready
     public void OnManualWin()
     {
@@ -121,6 +156,10 @@ public class CanvasPage_Gameplay : CanvasPage
     
     
     
+    #region Player and Enemy Info
+    
+    
+    // LOCAL PLAYER INFO
     public void UpdateLocalPlayerInfo(int health)
     {
         Slider_PlayerHealth.value = health;
@@ -135,11 +174,21 @@ public class CanvasPage_Gameplay : CanvasPage
         Image_PlayerIcon.sprite = icon;
     }
 
+    
+    // REMOTE PLAYER INFO
+    public void UpdateRemotePlayerInfo(int health)
+    {
+        Slider_EnemyHealth.value = health;
+    }
+
+    
     public void UpdateRemotePlayerInfo(string playerName, int health, Sprite icon)
     {
         Text_EnemyName.text = playerName;
         Slider_EnemyHealth.value = health;
         Image_EnemyIcon.sprite = icon;
     }
+    
+    #endregion
 
 }

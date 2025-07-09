@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -16,6 +17,11 @@ public class GameStateManager : NetworkBehaviour
         0, 
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
+
+
+    public Action onFinishedTurn;
+    
+    
     
     // TODO: create shield network variable with type and health
 
@@ -130,6 +136,8 @@ public class GameStateManager : NetworkBehaviour
             activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
             Debug.Log($"Turn changed to Player 1 (ClientId: {activePlayerClientId.Value})");
         }
+        
+        onFinishedTurn?.Invoke();
     }
     
     private void CheckWinCondition()
