@@ -18,10 +18,10 @@ public class GridPlacer : MonoBehaviour
     public TextMeshProUGUI debugText;
     
     // marker names
-    private string air = "qr-code_air";
-    private string water = "qr-code_water";
-    private string earth = "qr-code_earth";
-    private string fire = "qr-code_fire";
+    private const string air = "qr-code_air";
+    private const string water = "qr-code_water";
+    private const string earth = "qr-code_earth";
+    private const string fire = "qr-code_fire";
     private string anchor = "marker0";
     private string card = "marker1";
     
@@ -53,6 +53,7 @@ public class GridPlacer : MonoBehaviour
             {
                 debugText.text = "Card detected: " + trackedImage.referenceImage.name;
                 GameObject cardInstance = Instantiate(cardPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
+                cardInstance.GetComponent<TrackedMarkerInfo>().markerType = MarkerType.Action;
                 spawnedMarkers[trackedImage.referenceImage.name] = cardInstance;
                 cardInstance.transform.SetParent(trackedImage.transform);
                 debugText.text += " Card instance created.";
@@ -62,6 +63,26 @@ public class GridPlacer : MonoBehaviour
                      trackedImage.referenceImage.name == earth || trackedImage.referenceImage.name == fire)
             {
                 debugText.text = "Element detected: " + trackedImage.referenceImage.name;
+                GameObject cardInstance = Instantiate(cardPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
+                cardInstance.GetComponent<TrackedMarkerInfo>().markerType = MarkerType.Element;
+                switch (trackedImage.referenceImage.name)
+                {
+                    case air:
+                        cardInstance.GetComponent<TrackedMarkerInfo>().elementType = ElementType.Air;
+                        break;
+                    case water:
+                        cardInstance.GetComponent<TrackedMarkerInfo>().elementType = ElementType.Water;
+                        break;
+                    case earth:
+                        cardInstance.GetComponent<TrackedMarkerInfo>().elementType = ElementType.Earth;
+                        break;
+                    case fire:
+                        cardInstance.GetComponent<TrackedMarkerInfo>().elementType = ElementType.Fire;
+                        break;
+                    
+                }
+                spawnedMarkers[trackedImage.referenceImage.name] = cardInstance;
+                cardInstance.transform.SetParent(trackedImage.transform);
                 //gridManagement.RegisterMarker(trackedImage);
             }
             else
