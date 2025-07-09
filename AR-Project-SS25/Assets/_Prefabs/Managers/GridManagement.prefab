@@ -44,21 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e1cf4df96f688d46894949bf099c130, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trackedMarkerObject: {fileID: 0}
-  trackedMarkers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  playfieldTrackedMarker: {fileID: 0}
+  trackedMarkers: []
   mainCamera: {fileID: 0}
+  playerHealthVisual: {fileID: 0}
+  enemyHealthVisual: {fileID: 0}
   playerVisualOffset: {x: 0, y: 0, z: -1.5}
   gridOffset: {x: 0, y: 0, z: -3}

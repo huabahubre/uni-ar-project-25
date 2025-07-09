@@ -2131,12 +2131,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5124932351770806923, guid: 0b21fc990f542c84c99586abe751d9d4,
-        type: 3}
-      propertyPath: actionCardPrefab
-      value: 
-      objectReference: {fileID: 8951500695699765690, guid: ec6daf2d43f471c43b13b7f384c7c799,
-        type: 3}
     - target: {fileID: 8755671323436853707, guid: 0b21fc990f542c84c99586abe751d9d4,
         type: 3}
       propertyPath: m_Name
@@ -2207,38 +2201,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3396895624294641008, guid: c7d52e7088ea14f4a98d5435194a1eb5,
         type: 3}
-      propertyPath: AllowOwnerToParent
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3396895624294641008, guid: c7d52e7088ea14f4a98d5435194a1eb5,
-        type: 3}
       propertyPath: GlobalObjectIdHash
       value: 27198642
-      objectReference: {fileID: 0}
-    - target: {fileID: 3396895624294641008, guid: c7d52e7088ea14f4a98d5435194a1eb5,
-        type: 3}
-      propertyPath: SpawnWithObservers
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3396895624294641008, guid: c7d52e7088ea14f4a98d5435194a1eb5,
-        type: 3}
-      propertyPath: SceneMigrationSynchronization
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3396895624294641008, guid: c7d52e7088ea14f4a98d5435194a1eb5,
-        type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 2951197718
       objectReference: {fileID: 0}
     - target: {fileID: 4188791374940692895, guid: c7d52e7088ea14f4a98d5435194a1eb5,
         type: 3}
       propertyPath: m_Name
       value: SyncStartGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 4188791374940692895, guid: c7d52e7088ea14f4a98d5435194a1eb5,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5287865717970022986, guid: c7d52e7088ea14f4a98d5435194a1eb5,
         type: 3}
@@ -2255,16 +2224,6 @@ PrefabInstance:
       propertyPath: 'managerObjects.Array.data[2]'
       value: 
       objectReference: {fileID: 1585510539}
-    - target: {fileID: 5287865717970022986, guid: c7d52e7088ea14f4a98d5435194a1eb5,
-        type: 3}
-      propertyPath: 'managerObjects.Array.data[3]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5287865717970022986, guid: c7d52e7088ea14f4a98d5435194a1eb5,
-        type: 3}
-      propertyPath: 'managerObjects.Array.data[4]'
-      value: 
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2335,84 +2294,9 @@ PrefabInstance:
       objectReference: {fileID: 1197395639}
     - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
         type: 3}
-      propertyPath: trackedMarkerObject
-      value: 
-      objectReference: {fileID: 1436892456}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
       propertyPath: playfieldTrackedMarker
       value: 
       objectReference: {fileID: 1436892456}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: trackedMarkers.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[0]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[1]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[2]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[3]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[4]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[5]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[6]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[7]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[8]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[9]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[10]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[11]'
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7701362390694677831, guid: 372812244335c844d8e2f44cbdd6aa7c,
-        type: 3}
-      propertyPath: 'trackedMarkers.Array.data[12]'
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 7972323213218967840, guid: 372812244335c844d8e2f44cbdd6aa7c,
         type: 3}
       propertyPath: m_Name
@@ -2435,11 +2319,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MainCanvasManagement
-      objectReference: {fileID: 0}
-    - target: {fileID: 963626848730654138, guid: 5bdefeb2921212c439219cce30f08809,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7847148857794596187, guid: 5bdefeb2921212c439219cce30f08809,
         type: 3}
@@ -2692,25 +2571,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 3256207711
       objectReference: {fileID: 0}
-    - target: {fileID: 5841271838901443938, guid: c3164e02b9712ce4290b68f6ed76c2a0,
-        type: 3}
-      propertyPath: SceneMigrationSynchronization
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5841271838901443938, guid: c3164e02b9712ce4290b68f6ed76c2a0,
-        type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 3146067046
-      objectReference: {fileID: 0}
     - target: {fileID: 9198976657842247477, guid: c3164e02b9712ce4290b68f6ed76c2a0,
         type: 3}
       propertyPath: m_Name
       value: GameStateManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 9198976657842247477, guid: c3164e02b9712ce4290b68f6ed76c2a0,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

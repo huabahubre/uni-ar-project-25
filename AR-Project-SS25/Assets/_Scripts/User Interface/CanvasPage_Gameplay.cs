@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Sirenix.OdinInspector;
 using TMPro;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,6 +38,8 @@ public class CanvasPage_Gameplay : CanvasPage
     [BoxGroup("References")]
     public Image Image_PlayerIcon;
     
+    [BoxGroup("References")]
+    public Image Image_PlayerIconBackground;
     
     
     [BoxGroup("References"), Header("Enemy Info")]
@@ -47,12 +50,18 @@ public class CanvasPage_Gameplay : CanvasPage
 
     [BoxGroup("References")]
     public Image Image_EnemyIcon;
+    
+    [BoxGroup("References")]
+    public Image Image_EnemyIconBackground;
 
 
 
     private Tuple<SpellType?, ElementType?> currentSpellData = null;
     public Action<Tuple<SpellType?, ElementType?>> onCastSpell;
     
+    
+    
+    private bool isSubscribed = false;
     
     public override void Initialize()
     {
@@ -76,6 +85,9 @@ public class CanvasPage_Gameplay : CanvasPage
         Panel_YourTurn.SetActive(isPlayerTurn);
         Panel_OpponentTurn.SetActive(!isPlayerTurn);
         Panel_ActiveSpellCasting.SetActive(false);
+
+        // Setup Information
+        SetupPlayerAndEnemyInfo();
         
         base.OnShow();
     }
@@ -85,6 +97,63 @@ public class CanvasPage_Gameplay : CanvasPage
     {
         MainCanvasManagement.Instance.ShowPage("Pause");
     }
+
+    #region Init
+
+    void SetupPlayerAndEnemyInfo()
+    {
+        // Subscribe to player updates
+        if (!isSubscribed)
+        {
+            isSubscribed = true;
+            PlayerState.OnPlayerStateUpdated += HandlePlayerUpdate;
+        }
+
+
+        // Set fixed stuff once
+        Image_PlayerIcon.sprite = DataManagement.Instance.GetElementVisualData(PlayerState.LocalPlayer.ElementIndex.Value).Icon;
+        Image_PlayerIconBackground.color = DataManagement.Instance
+            .GetElementVisualData(PlayerState.LocalPlayer.ElementIndex.Value).Color;
+        Text_PlayerName.text = PlayerState.LocalPlayer.PlayerName.Value.ToString();
+        
+        Image_EnemyIcon.sprite = DataManagement.Instance.GetElementVisualData(PlayerState.EnemyPlayer.ElementIndex.Value).Icon;
+        Image_EnemyIconBackground.color = DataManagement.Instance
+            .GetElementVisualData(PlayerState.EnemyPlayer.ElementIndex.Value).Color;
+        Text_EnemyName.text = PlayerState.EnemyPlayer.PlayerName.Value.ToString();
+        
+        // Manually update player states
+        HandlePlayerUpdate(PlayerState.EnemyPlayer);
+        HandlePlayerUpdate(PlayerState.LocalPlayer);
+    }
+    
+    #endregion
+    
+    #region Player and Enemy Updates
+    
+    private void HandlePlayerUpdate(PlayerState player)
+    {
+        if(player == null)
+        {
+            Debug.Log("PlayerState is null in HandlePlayerUpdate");
+            return;
+        }
+        
+        Debug.Log($"[UI] Player {player.OwnerClientId} ({(player.IsLocalPlayer ? "Local" : "Remote")}) updated ElementIndex to {player.ElementIndex.Value}");
+        
+        bool isLocalPlayer = player.IsLocalPlayer;
+        if (isLocalPlayer)
+        {
+            // Update local player UI
+            Slider_PlayerHealth.value = PlayerState.LocalPlayer.PlayerHealth.Value;
+        }
+        else
+        {
+            // Update remote player UI
+            Slider_EnemyHealth.value = PlayerState.EnemyPlayer.PlayerHealth.Value;
+        }
+    }
+    
+    #endregion
     
 
     #region Turn funcitonality
@@ -94,8 +163,8 @@ public class CanvasPage_Gameplay : CanvasPage
         bool isPlayerTurn = GameStateManager.Instance.IsCurrentPlayersTurn();
         
         // Update UI
-        UpdateLocalPlayerInfo(GameStateManager.Instance.player1HP.Value);
-        UpdateRemotePlayerInfo(GameStateManager.Instance.player2HP.Value);
+        // UpdateLocalPlayerInfo(GameStateManager.Instance.player1HP.Value);
+        // UpdateRemotePlayerInfo(GameStateManager.Instance.player2HP.Value);
         
         // Set Panels
         Panel_YourTurn.SetActive(isPlayerTurn);
@@ -154,41 +223,5 @@ public class CanvasPage_Gameplay : CanvasPage
         Panel_OpponentTurn.SetActive(false);
     }
     
-    
-    
-    #region Player and Enemy Info
-    
-    
-    // LOCAL PLAYER INFO
-    public void UpdateLocalPlayerInfo(int health)
-    {
-        Slider_PlayerHealth.value = health;
-    }
-
-    
-    public void UpdateLocalPlayerInfo(string playerName, int health, int energy, Sprite icon)
-    {
-        Text_PlayerName.text = playerName;
-        Slider_PlayerHealth.value = health;
-        Slider_PlayerEnergy.value = energy;
-        Image_PlayerIcon.sprite = icon;
-    }
-
-    
-    // REMOTE PLAYER INFO
-    public void UpdateRemotePlayerInfo(int health)
-    {
-        Slider_EnemyHealth.value = health;
-    }
-
-    
-    public void UpdateRemotePlayerInfo(string playerName, int health, Sprite icon)
-    {
-        Text_EnemyName.text = playerName;
-        Slider_EnemyHealth.value = health;
-        Image_EnemyIcon.sprite = icon;
-    }
-    
-    #endregion
 
 }

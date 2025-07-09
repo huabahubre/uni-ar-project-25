@@ -23,6 +23,7 @@ public class JoinLobbyUI : MonoBehaviour
         MainCanvasManagement.Instance.StartLoading("Joining Lobby...");
         
         var lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code);
+        
         NetworkManager.Singleton.StartClient();
         
         FindObjectOfType<CanvasPage_Lobby>()?.OnJoinedLobby(lobby);

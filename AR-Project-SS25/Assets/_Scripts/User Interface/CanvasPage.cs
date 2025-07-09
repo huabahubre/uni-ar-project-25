@@ -1,5 +1,7 @@
+using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CanvasPage : MonoBehaviour
 {
@@ -42,11 +44,30 @@ public class CanvasPage : MonoBehaviour
     {
         this.OnShow();
         this.gameObject.SetActive(true);
+        RefreshAllLayoutGroups();
     }
 
     public virtual void OnShow()
     {
-        
+    }
+    
+    
+    public virtual void RefreshAllLayoutGroups()
+    {
+        StartCoroutine(DelayedRefresh());
+    }
+
+    private IEnumerator DelayedRefresh()
+    {
+        // Wait one frame to ensure layout is stable
+        yield return null;
+
+        var layouts = GetComponentsInChildren<LayoutGroup>(true);
+
+        foreach (var layout in layouts)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>());
+        }
     }
 
     #endregion

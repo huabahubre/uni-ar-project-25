@@ -7,7 +7,7 @@ public class Copy : MonoBehaviour
     
     public void OnCopyButtonClicked()
     {
-        Debug.Log("Copy Button Clicked");
+        // Debug.Log("Copy Button Clicked");
         if (displayCode == null || string.IsNullOrEmpty(displayCode.text))
         {
             Debug.Log("No code to copy");
