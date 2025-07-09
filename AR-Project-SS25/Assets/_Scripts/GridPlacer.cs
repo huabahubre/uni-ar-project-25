@@ -22,7 +22,8 @@ public class GridPlacer : MonoBehaviour
     private const string water = "qr-code_water";
     private const string earth = "qr-code_earth";
     private const string fire = "qr-code_fire";
-    private string anchor = "marker0";
+    private string anchor = "anchor";
+    
     private string card = "marker1";
     
     void Awake()
@@ -54,7 +55,7 @@ public class GridPlacer : MonoBehaviour
                 debugText.text = "Card detected: " + trackedImage.referenceImage.name;
                 GameObject cardInstance = Instantiate(cardPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
                 cardInstance.GetComponent<TrackedMarkerInfo>().markerType = MarkerType.Action;
-                spawnedMarkers[trackedImage.referenceImage.name] = cardInstance;
+                spawnedMarkers[trackedImage.trackableId.ToString()] = cardInstance;
                 cardInstance.transform.SetParent(trackedImage.transform);
                 debugText.text += " Card instance created.";
                 //gridManagement.RegisterMarker(trackedImage);
@@ -81,7 +82,7 @@ public class GridPlacer : MonoBehaviour
                         break;
                     
                 }
-                spawnedMarkers[trackedImage.referenceImage.name] = cardInstance;
+                spawnedMarkers[trackedImage.trackableId.ToString()] = cardInstance;
                 cardInstance.transform.SetParent(trackedImage.transform);
                 //gridManagement.RegisterMarker(trackedImage);
             }
@@ -102,7 +103,7 @@ public class GridPlacer : MonoBehaviour
                 }
                 else if (trackedImage.referenceImage.name == card)
                 {
-                    spawnedMarkers[trackedImage.referenceImage.name].transform.position = trackedImage.transform.position;
+                    spawnedMarkers[trackedImage.trackableId.ToString()].transform.position = trackedImage.transform.position;
                     debugText.text = "Card updated: " + trackedImage.referenceImage.name;
                     //gridManagement.UpdateMarker(trackedImage);
                 }
@@ -114,7 +115,6 @@ public class GridPlacer : MonoBehaviour
                     debugText.text = "Element updated: " + trackedImage.referenceImage.name;
                     //gridManagement.UpdateMarker(trackedImage);
                 }
-                UpdateGridPosition(trackedImage);
             }
             else if (trackedImage.trackingState == TrackingState.None)
             {
@@ -145,10 +145,10 @@ public class GridPlacer : MonoBehaviour
             else if (trackedImage.referenceImage.name == card)
             {
                 debugText.text = "Card removed: " + trackedImage.referenceImage.name;
-                if (spawnedMarkers.ContainsKey(trackedImage.referenceImage.name))
+                if (spawnedMarkers.ContainsKey(trackedImage.trackableId.ToString()))
                 {
-                    Destroy(spawnedMarkers[trackedImage.referenceImage.name]);
-                    spawnedMarkers.Remove(trackedImage.referenceImage.name);
+                    Destroy(spawnedMarkers[trackedImage.trackableId.ToString()]);
+                    spawnedMarkers.Remove(trackedImage.trackableId.ToString());
                 }
             }
             else if (trackedImage.referenceImage.name == air || 

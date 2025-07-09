@@ -68,7 +68,7 @@ public class CraftingGridCell : MonoBehaviour
             if (!IsInsideBox(assignedMarker.transform.position))
             {
                 assignedMarker = null;
-                OnAssignedMarkerChanged();
+                OnAssignedMarkerChanged(); 
             }
         }
     }
