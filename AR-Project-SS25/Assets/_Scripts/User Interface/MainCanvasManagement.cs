@@ -12,27 +12,19 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
     [ShowInInspector, ReadOnly, BoxGroup("MainCanvasManagement")] protected List<CanvasPage> CanvasPages;
 
 
-    [ShowInInspector, BoxGroup("References")]
+    [ShowInInspector, BoxGroup("References"), Header("LoadingScreen")]
     public GameObject loadingScreen;
     
     [ShowInInspector, BoxGroup("References")]
     public TextMeshProUGUI loadingMessageText;
     
+    
+    [ShowInInspector, BoxGroup("References"), Header("ScanSomethingScreen")]
+    public GameObject scanScreen;
+    
+    [ShowInInspector, BoxGroup("References")]
+    public TextMeshProUGUI scanMessageText;
 
-    // TODO: This is for later, when we have a global message panel
-    // [FoldoutGroup("References")] public GameObject GlobalMessagePanel;
-    // [FoldoutGroup("References")] public TextMeshProUGUI GlobalMessageText;
-    // [FoldoutGroup("References")] public Image GlobalMessageIcon;
-    // [FoldoutGroup("References")] public Image GlobalMessageIconBg;
-    // [FoldoutGroup("References")] public Image GlobalMessageBg;
-    // [FoldoutGroup("References")] public Sprite MessageIcon_Info;
-    // [FoldoutGroup("References")] public Sprite MessageIcon_Warning;
-    // [FoldoutGroup("References")] public Sprite MessageIcon_Error;
-    // [FoldoutGroup("References")] public Sprite MessageIcon_Success;
-    // [FoldoutGroup("References")] public Color MessageColor_Info;
-    // [FoldoutGroup("References")] public Color MessageColor_Warning;
-    // [FoldoutGroup("References")] public Color MessageColor_Error;
-    // [FoldoutGroup("References")] public Color MessageColor_Success;
     
 
     public enum MessageType
@@ -275,6 +267,7 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
     #region Loading Screen
 
 
+    [Button]
     public void StartLoading(string loadingMessage = null)
     {
         if(loadingMessage != null)
@@ -289,6 +282,7 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
         loadingScreen.SetActive(true);
     }
 
+    [Button]
     public void StopLoading()
     {
         loadingMessageText.text = "";
@@ -296,5 +290,36 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
     }
     
     #endregion
+    
+    
+    
+    
+    #region Scan Screen
+
+
+    [Button]
+    public void ShowScanScreen(string scanMessage = null)
+    {
+        if(scanMessage != null)
+        {
+            scanMessageText.text = scanMessage;
+        }
+        else
+        {
+            scanMessageText.text = "";
+        }
+
+        scanScreen.SetActive(true);
+    }
+
+    [Button]
+    public void StopScanScreen()
+    {
+        scanMessageText.text = "";
+        scanScreen.SetActive(false);
+    }
+    
+    #endregion
+
     
 }
