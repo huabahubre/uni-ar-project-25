@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -10,7 +8,6 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     [BoxGroup("References")] public CraftingGridCell playerElementCell;
     [BoxGroup("References")] public HealthVisualPrefab playerHealthVisual;
     [BoxGroup("References")] public HealthVisualPrefab enemyHealthVisual;
-
     
     [BoxGroup("Settings")] public Vector3 playerVisualOffset = new Vector3(0, 0, 0);
     [BoxGroup("Settings")] public Vector3 playerElementCellOffset = new Vector3(0, 0, 0);
@@ -74,6 +71,10 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
             initedPlayfield = true;
             MainCanvasManagement.Instance.StartLoading("Waiting for other players to scan the playfield...");
             GameStateManager.Instance.SetPlayerReadyServerRpc();
+            
+            // Init Health Visuals
+            playerHealthVisual.Init(true, (ElementType)PlayerState.LocalPlayer.ElementIndex.Value);
+            enemyHealthVisual.Init(false, (ElementType)PlayerState.EnemyPlayer.ElementIndex.Value);
         }
     }
 
@@ -125,7 +126,6 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     
     #endregion
     
-    
     #region Element checking
 
     void OnPlacedElementCard(TrackedMarkerInfo markerInfo)
@@ -151,7 +151,6 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     
     
     #endregion
-    
 
     #region Spawn Grid
     

@@ -5,28 +5,16 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 
 
-public class SpellManager : MonoBehaviour
+public class SpellManager : Singleton<SpellManager>
 {
 	public static SpellManager Instance;
-    [SerializeField] private Transform centerMarker;
-    [SerializeField] private Transform[] lifeCrystals;
+    
     [SerializeField] private GameObject spellPreview;
+    
     
     private SpellType _currentSpellType;
     private ElementType _currentElementType;
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+    
     
     private void Start()
     {
@@ -42,7 +30,7 @@ public class SpellManager : MonoBehaviour
 
     public bool SpawnSpell(SpellType spellType, ElementType elementType)
     {
-        bool isPlayerTurn = GameStateManager.Instance.IsCurrentPlayersTurn();
+        bool isPlayerTurn = GameStateManager.Instance.IsMyTurn();
     
         // Prevent duplicate spell preview when not player's turn
         if (!isPlayerTurn)
@@ -60,6 +48,9 @@ public class SpellManager : MonoBehaviour
             SpawnSpellAttack(spellType, elementType);
             _currentSpellType = spellType;
             _currentElementType = elementType;
+
+            // This waits until the spell animation is complete
+            StartCoroutine(SpellAnimationRoutine());
             return true;
         }
     
@@ -67,6 +58,30 @@ public class SpellManager : MonoBehaviour
         SpawnSpellPreview(spellType);
         return false;
     }
+    
+    
+    // TODO: @Juli Actually set the correct values here
+    private System.Collections.IEnumerator SpellAnimationRoutine()
+    {
+        float waitTime = 0f;
+
+        switch (_currentSpellType)
+        {
+            case SpellType.GroundPound:
+                waitTime = 1.5f;
+                break;
+            case SpellType.Shield:
+                waitTime = 2.0f;
+                break;
+            default:
+                waitTime = 1.0f;
+                break;
+        }
+        
+        yield return new WaitForSeconds(waitTime);
+        GameStateManager.Instance.NotifySpellAnimationCompleteServerRpc();
+    }
+    
     
     private void SpawnSpellPreview(SpellType spellType)
     {
@@ -159,7 +174,7 @@ public class SpellManager : MonoBehaviour
     private (Vector3, Quaternion) GetShieldSpawn(int currentPlayerId)
     {
         Vector3 spawnPosition = PlayfieldManagement.Instance.playerHealthVisual.transform.position; // TODO: maybe need distance from crystal
-        Vector3 direction = (centerMarker.position - spawnPosition).normalized;
+        Vector3 direction = (PlayfieldManagement.Instance.playFieldVisual.transform.position - spawnPosition).normalized;
         Quaternion spawnRotation = Quaternion.LookRotation(direction);
         return (spawnPosition, spawnRotation);
     }
@@ -168,8 +183,8 @@ public class SpellManager : MonoBehaviour
     {
         int enemyId = (currentPlayerId == 0) ? 1 : 0; // TODO: do we need this or maybe when spawning crystal?
         var crystalPosition = PlayfieldManagement.Instance.enemyHealthVisual.transform.position;
-        Vector3 direction = (crystalPosition - centerMarker.position).normalized;
-        Vector3 spawnPosition = centerMarker.position; // TODO: maybe needs to be closer or further away from crystal
+        Vector3 direction = (crystalPosition - PlayfieldManagement.Instance.playFieldVisual.transform.position).normalized;
+        Vector3 spawnPosition = PlayfieldManagement.Instance.playFieldVisual.transform.position; // TODO: maybe needs to be closer or further away from crystal
         Quaternion spawnRotation = Quaternion.LookRotation(direction);
         return (spawnPosition, spawnRotation);
     }

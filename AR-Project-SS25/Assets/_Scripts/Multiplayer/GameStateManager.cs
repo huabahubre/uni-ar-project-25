@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -66,6 +67,7 @@ public class GameStateManager : NetworkBehaviour
         NetworkVariableWritePermission.Server);
     
     public static event Action<bool> OnLocalTurnChanged;
+    public static event Action OnActivePlayerConfirmedSpellCast;
     
     
     
@@ -132,6 +134,9 @@ public class GameStateManager : NetworkBehaviour
     
     #region Turn Logic
 
+    #region Ready Up (Scan the playfield)
+    
+    
     // Called by both players when they are ready
     [ServerRpc(RequireOwnership = false)]
     public void SetPlayerReadyServerRpc(ServerRpcParams rpcParams = default)
@@ -174,18 +179,10 @@ public class GameStateManager : NetworkBehaviour
         BeginTurn();
     }
     
-
-    private void BeginTurn()
-    {
-        if (!IsServer) return;
-
-        currentTurnPhase = TurnPhase.Start;
-        Debug.Log($"[Server] Turn started for ClientId: {activePlayerClientId.Value}");
-
-        // Notify both clients whose turn it is
-        NotifyTurnClientRpc(activePlayerClientId.Value);
-    }
-
+    #endregion
+    
+    
+    #region 1. Confirm Spell cast
     
     // Called from client once they try to cast their spell
     [ServerRpc(RequireOwnership = false)]
@@ -202,35 +199,112 @@ public class GameStateManager : NetworkBehaviour
 
         Debug.Log($"[Server] Spell cast confirmed by ClientId: {sender}, Element: {(ElementType)elementId}, SpellType: {(SpellType)spellTypeId}");
         
-        HandleSpellCast(sender, spellTypeId, elementId);
+        HandleSpellCastStart(sender, spellTypeId, elementId);
     }
 
     
-    private void HandleSpellCast(ulong casterClientId, int spellTypeId, int elementId)
+    #endregion
+
+    #region 2. Wait for Spell Animation
+
+    private SpellType currentSpellType;
+    private ElementType currentElementType;
+    private ulong currentCasterId;
+
+    private void HandleSpellCastStart(ulong casterClientId, int spellTypeId, int elementId)
     {
         currentTurnPhase = TurnPhase.Casting;
+    
+        currentCasterId = casterClientId;
+        currentSpellType = (SpellType)spellTypeId;
+        currentElementType = (ElementType)elementId;
 
-        int damage = UnityEngine.Random.Range(10, 25); // Example fixed spell damage
+        Debug.Log($"[Server] Broadcasting spell animation: {currentSpellType} of {currentElementType}");
 
-        // Determine who gets damaged
-        bool casterIsPlayer1 = (casterClientId == NetworkManager.Singleton.ConnectedClientsIds[0]);
+        PlaySpellAnimationClientRpc(spellTypeId, elementId);
+    }
+
+    [ClientRpc]
+    private void PlaySpellAnimationClientRpc(int spellTypeId, int elementId)
+    {
+        SpellType spellType = (SpellType)spellTypeId;
+        ElementType elementType = (ElementType)elementId;
+        
+        Debug.Log($"[Client] Playing spell animation: {spellType} of {elementType}");
+
+        // Set Callbacks for UI updates
+        OnActivePlayerConfirmedSpellCast?.Invoke();
+        
+        // Spawn the spell
+        // SpellManager.Instance.SpawnSpell(spellType, elementType);
+        StartCoroutine(SpellAnimationRoutine());
+    }
+
+    // TODO: THIS IS ONLY FOR DEBUGGING --> SKIPPING ANIMATION HERE!
+    private System.Collections.IEnumerator SpellAnimationRoutine()
+    {
+        yield return new WaitForSeconds(1.5f);
+        NotifySpellAnimationCompleteServerRpc();
+    }
+    
+    
+    private HashSet<ulong> animationFinishedClients = new();
+
+    // Call this from both clients, when spell animation is complete
+    [ServerRpc(RequireOwnership = false)]
+    public void NotifySpellAnimationCompleteServerRpc(ServerRpcParams rpcParams = default)
+    {
+        ulong sender = rpcParams.Receive.SenderClientId;
+
+        animationFinishedClients.Add(sender);
+
+        if (animationFinishedClients.Count >= NetworkManager.Singleton.ConnectedClientsIds.Count)
+        {
+            animationFinishedClients.Clear();
+            HandleSpellCastResolve();
+        }
+    }
+    
+    
+    #endregion
+    
+    #region 3. Resolve Spell Damage
+    
+    private void HandleSpellCastResolve()
+    {
+        // TODO: @Dawin Calculate the damage of the spell here
+        
+        int damage = UnityEngine.Random.Range(10, 25); // Example
+
+        bool casterIsPlayer1 = (currentCasterId == NetworkManager.Singleton.ConnectedClientsIds[0]);
 
         if (casterIsPlayer1)
-        {
-            player2HP.Value = Mathf.Max(0, player2HP.Value - damage);
             PlayerState.EnemyPlayer.UpdatePlayerHealthServerRpc(-damage);
-        }
         else
-        {
-            player1HP.Value = Mathf.Max(0, player1HP.Value - damage);
             PlayerState.LocalPlayer.UpdatePlayerHealthServerRpc(-damage);
-        }
 
-        Debug.Log($"[Server] Player {(casterIsPlayer1 ? "2" : "1")} took {damage} damage");
+        Debug.Log($"[Server] Spell resolved: Player {(casterIsPlayer1 ? "2" : "1")} took {damage} damage");
 
         EndTurn();
     }
+    
+    #endregion
 
+    
+    
+
+    private void BeginTurn()
+    {
+        if (!IsServer) return;
+
+        currentTurnPhase = TurnPhase.Start;
+        Debug.Log($"[Server] Turn started for ClientId: {activePlayerClientId.Value}");
+
+        // Notify both clients whose turn it is
+        NotifyTurnClientRpc(activePlayerClientId.Value);
+    }
+
+    
     private void EndTurn()
     {
         currentTurnPhase = TurnPhase.End;
@@ -299,12 +373,7 @@ public class GameStateManager : NetworkBehaviour
     
     
     // TODO: create shield network variable with type and health
-
-
-    public bool IsCurrentPlayersTurn()
-    {
-        return activePlayerClientId.Value == NetworkManager.Singleton.LocalClientId;
-    }
+    
     
     #region OnNetworkSpawn
     
