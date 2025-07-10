@@ -1,12 +1,284 @@
 using System;
-using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 
+public enum GameState
+{
+    Lobby,
+    Gameplay,
+    GameOver
+}
+
+public enum TurnPhase
+{
+    None,
+    Start,
+    Casting,
+    End
+}
+
 public class GameStateManager : NetworkBehaviour
 {
+    
     public static GameStateManager Instance;
+    
+    #region Awake and OnDestroy
+    
+    void Awake()
+    {
+        Debug.Log("Initializing GameStateManager");
+        
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
+    
+    
+    private void OnDestroy()
+    {
+        CurrentGameState.OnValueChanged -= OnGameStateChanged;
+        PlayerState.OnPlayerStateUpdated -= HandlePlayerUpdate;
+    }
+    
+    
+    #endregion
+    
+    
+    
+    // Synced Game State
+    public NetworkVariable<GameState> CurrentGameState = new NetworkVariable<GameState>(
+        GameState.Lobby,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+    public static event Action<GameState> GameStateChanged;
+    
+    
+    
+    // Synced Turn Phase
+    private TurnPhase currentTurnPhase = TurnPhase.None;
+
+    // The client ID of the active player (already declared as: activePlayerClientId)
+    public NetworkVariable<ulong> activePlayerClientId = new NetworkVariable<ulong>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+    
+    public static event Action<bool> OnLocalTurnChanged;
+    
+    
+    
+    // Track player readiness --> both have to scan the playfield before the game starts
+    private NetworkVariable<bool> player1Ready = new NetworkVariable<bool>(
+        false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private NetworkVariable<bool> player2Ready = new NetworkVariable<bool>(
+        false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+
+    
+    
+    
+    
+    
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        Debug.Log("[GameStateManager] OnNetworkSpawn called");
+
+        // Subscribe to game state changes
+        CurrentGameState.OnValueChanged += OnGameStateChanged;
+
+        // Set initial state on server if not already set
+        if (IsServer && CurrentGameState.Value == GameState.Lobby)
+        {
+            SetGameState(GameState.Lobby);
+        }
+
+        
+        // OBSOLETE
+        // PlayerState.OnPlayerStateUpdated += HandlePlayerUpdate;
+        // AssignFirstPlayerServer();
+    }
+
+    
+    
+    
+    
+    
+    #region GameState
+    
+    /// <summary>
+    /// Server-only: Changes the game state and notifies clients and local subscribers.
+    /// </summary>
+    public void SetGameState(GameState newState)
+    {
+        if (!IsServer) return;
+
+        Debug.Log($"[GameState] changed to: {newState}");
+        
+        CurrentGameState.Value = newState;
+        GameStateChanged?.Invoke(newState);
+    }
+
+    private void OnGameStateChanged(GameState oldState, GameState newState)
+    {
+        Debug.Log($"[Client] GameState changed from {oldState} to {newState}");
+        GameStateChanged?.Invoke(newState);
+    }
+    
+    #endregion
+    
+    #region Turn Logic
+
+    // Called by both players when they are ready
+    [ServerRpc(RequireOwnership = false)]
+    public void SetPlayerReadyServerRpc(ServerRpcParams rpcParams = default)
+    {
+        ulong senderId = rpcParams.Receive.SenderClientId;
+        var ids = NetworkManager.Singleton.ConnectedClientsIds;
+
+        if (ids.Count < 2) return;
+
+        if (senderId == ids[0])
+        {
+            player1Ready.Value = true;
+            Debug.Log("Player 1 is ready.");
+        }
+        else if (senderId == ids[1])
+        {
+            player2Ready.Value = true;
+            Debug.Log("Player 2 is ready.");
+        }
+
+        // Check if both are ready
+        if (player1Ready.Value && player2Ready.Value)
+        {
+            Debug.Log("[Server] Both players are ready. Starting game...");
+            SelectRandomFirstPlayerAndStart();
+        }
+    }
+
+    private void SelectRandomFirstPlayerAndStart()
+    {
+        var ids = NetworkManager.Singleton.ConnectedClientsIds;
+        if (ids.Count < 2) return;
+
+        // Randomly pick who goes first
+        int randomIndex = UnityEngine.Random.Range(0, 2);
+        activePlayerClientId.Value = ids[randomIndex];
+
+        Debug.Log($"[Server] Randomly selected starting player: ClientId {activePlayerClientId.Value}");
+
+        BeginTurn();
+    }
+    
+
+    private void BeginTurn()
+    {
+        if (!IsServer) return;
+
+        currentTurnPhase = TurnPhase.Start;
+        Debug.Log($"[Server] Turn started for ClientId: {activePlayerClientId.Value}");
+
+        // Notify both clients whose turn it is
+        NotifyTurnClientRpc(activePlayerClientId.Value);
+    }
+
+    
+    // Called from client once they try to cast their spell
+    [ServerRpc(RequireOwnership = false)]
+    public void ConfirmSpellCastServerRpc(int spellTypeId, int elementId, ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer) return;
+
+        ulong sender = rpcParams.Receive.SenderClientId;
+        if (sender != activePlayerClientId.Value)
+        {
+            Debug.LogWarning($"[Server] Client {sender} tried to act out of turn.");
+            return;
+        }
+
+        Debug.Log($"[Server] Spell cast confirmed by ClientId: {sender}, Element: {(ElementType)elementId}, SpellType: {(SpellType)spellTypeId}");
+        
+        HandleSpellCast(sender, spellTypeId, elementId);
+    }
+
+    
+    private void HandleSpellCast(ulong casterClientId, int spellTypeId, int elementId)
+    {
+        currentTurnPhase = TurnPhase.Casting;
+
+        int damage = UnityEngine.Random.Range(10, 25); // Example fixed spell damage
+
+        // Determine who gets damaged
+        bool casterIsPlayer1 = (casterClientId == NetworkManager.Singleton.ConnectedClientsIds[0]);
+
+        if (casterIsPlayer1)
+        {
+            player2HP.Value = Mathf.Max(0, player2HP.Value - damage);
+            PlayerState.EnemyPlayer.UpdatePlayerHealthServerRpc(-damage);
+        }
+        else
+        {
+            player1HP.Value = Mathf.Max(0, player1HP.Value - damage);
+            PlayerState.LocalPlayer.UpdatePlayerHealthServerRpc(-damage);
+        }
+
+        Debug.Log($"[Server] Player {(casterIsPlayer1 ? "2" : "1")} took {damage} damage");
+
+        EndTurn();
+    }
+
+    private void EndTurn()
+    {
+        currentTurnPhase = TurnPhase.End;
+
+        CheckWinCondition();
+
+        if (player1HP.Value <= 0 || player2HP.Value <= 0)
+        {
+            Debug.Log("[Server] Game over.");
+            SetGameState(GameState.GameOver);
+            return;
+        }
+
+        // Switch active player
+        ulong current = activePlayerClientId.Value;
+        ulong next = NetworkManager.Singleton.ConnectedClientsIds[0] == current
+            ? NetworkManager.Singleton.ConnectedClientsIds[1]
+            : NetworkManager.Singleton.ConnectedClientsIds[0];
+
+        activePlayerClientId.Value = next;
+
+        Debug.Log($"[Server] Turn switched to ClientId: {next}");
+
+        BeginTurn();
+    }
+
+    [ClientRpc]
+    private void NotifyTurnClientRpc(ulong currentPlayerId)
+    {
+        bool isMyTurn = (currentPlayerId == NetworkManager.Singleton.LocalClientId);
+        
+        OnLocalTurnChanged?.Invoke(isMyTurn);
+        
+        Debug.Log($"[Client] It is {(isMyTurn ? "my" : "their")} turn.");
+    }
+
+    // Optional helper
+    public bool IsMyTurn()
+    {
+        return activePlayerClientId.Value == NetworkManager.Singleton.LocalClientId;
+    }
+
+#endregion
+
+    
+    
+    
+    
 
     public NetworkVariable<int> player1HP = new NetworkVariable<int>(100, 
         NetworkVariableReadPermission.Everyone,
@@ -16,13 +288,10 @@ public class GameStateManager : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
     
-    public NetworkVariable<ulong> activePlayerClientId = new NetworkVariable<ulong>(
-        0, 
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server);
-    
-    
-    [SerializeField] private GameObject playerStateManagerPrefab;
+    // public NetworkVariable<ulong> activePlayerClientId = new NetworkVariable<ulong>(
+    //     0, 
+    //     NetworkVariableReadPermission.Everyone,
+    //     NetworkVariableWritePermission.Server);
 
 
     public Action onFinishedTurn;
@@ -31,36 +300,7 @@ public class GameStateManager : NetworkBehaviour
     
     // TODO: create shield network variable with type and health
 
-    void Awake()
-    {
-        Debug.Log("Initializing GameStateManager");
-        
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
-    public override void OnNetworkSpawn()
-    {
-        Debug.Log("GameStateManager OnNetworkSpawn called");
-        
-        // CheckValues();
-        
-        // player1HP.OnValueChanged += OnPlayer1HealthChanged;
-        // player2HP.OnValueChanged += OnPlayer2HealthChanged;
-        
-        PlayerState.OnPlayerStateUpdated += HandlePlayerUpdate;
-        
-        //NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected; TODO: test later by using a build
-        AssignFirstPlayerServer();
-    }
-    
     public bool IsCurrentPlayersTurn()
     {
         return activePlayerClientId.Value == NetworkManager.Singleton.LocalClientId;
@@ -72,6 +312,7 @@ public class GameStateManager : NetworkBehaviour
     {
         Debug.Log("Player ids: " + string.Join(", ", NetworkManager.Singleton.ConnectedClientsIds));
         Debug.Log("Assigning first player: IsServer: " + IsServer + ", playerCount: " + NetworkManager.Singleton.ConnectedClientsIds.Count);
+        
         if (IsServer && activePlayerClientId.Value == 0 && NetworkManager.Singleton.ConnectedClientsIds.Count > 0)
         {
             activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
@@ -90,10 +331,6 @@ public class GameStateManager : NetworkBehaviour
             activePlayerClientId.Value = clientId;
             Debug.Log($"Assigned Active player to clientId: {clientId}");
         }
-        
-        var instance = Instantiate(playerStateManagerPrefab);
-        var netObj = instance.GetComponent<NetworkObject>();
-        netObj.SpawnAsPlayerObject(clientId); // ✅ important: ties it to the client
     }
     
     
@@ -180,7 +417,6 @@ public class GameStateManager : NetworkBehaviour
     
     
     #endregion
-    
     
     #region NetworkVariable Subscriptions
 

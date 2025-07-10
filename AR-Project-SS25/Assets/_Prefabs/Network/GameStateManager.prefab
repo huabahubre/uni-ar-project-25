@@ -77,4 +77,3 @@ MonoBehaviour:
     m_InternalValue: 100
   activePlayerClientId:
     m_InternalValue: 0
-  playerStateManagerPrefab: {fileID: 0}

@@ -10,21 +10,21 @@ public class EXAMPLE_PlayfieldMarker : MonoBehaviour
     [Button]
     public void IamTrackedNow()
     {
-        Debug.Log("Playfield marker is now tracked.");
+        Debug.Log("[DEBUG] Emulating playfield marker is now tracked.");
         PlayfieldManagement.Instance.OnPlayfieldTracked();
     }
     
     [Button]
     public void IamLost()
     {
-        Debug.Log("Playfield marker tracking lost.");
+        Debug.Log("[DEBUG] Emulating playfield marker tracking lost.");
         PlayfieldManagement.Instance.OnLostPlayfieldTracking();
     }
 
     private void Update()
     {
         if(updateMyPosition)
-            PlayfieldManagement.Instance.UpdatePlayfieldPosition( transform.position,
+            PlayfieldManagement.Instance.UpdatePlayfieldPosition(transform.position,
             transform.rotation);
     }
 }

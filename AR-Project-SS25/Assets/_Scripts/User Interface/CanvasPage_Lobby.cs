@@ -80,7 +80,7 @@ public class CanvasPage_Lobby : CanvasPage
         Panel_ActiveLobby.SetActive(false);
         Panel_WaitingForOtherPlayer.SetActive(false);
 
-        FirstElementToggle.isOn = true;
+        // FirstElementToggle.isOn = true;
         
         base.OnShow();
     }
@@ -95,46 +95,34 @@ public class CanvasPage_Lobby : CanvasPage
         Panel_ActiveLobby.SetActive(true);
         RefreshAllLayoutGroups();
     
-        // Set local Player Information
-        // if (PlayerState.LocalPlayer != null)
-        //     Text_PlayerNamePlaceholder.text = PlayerState.LocalPlayer.PlayerName.Value.ToString();
-
         // Check if host
-        if (lobby.HostId == AuthenticationService.Instance.PlayerId)
-        {
-            Panel_WaitingForOtherPlayer.SetActive(true);
-            
-            PlayerState.OnEnemyJoined += OnOtherPlayerConnected;
-        }
-        else
-        {
-            Panel_WaitingForOtherPlayer.SetActive(true);
-            HandlePlayerUpdate(PlayerState.EnemyPlayer);
-        }
         Button_StartGame.gameObject.SetActive(lobby.HostId == AuthenticationService.Instance.PlayerId);
+        Panel_WaitingForOtherPlayer.SetActive(true);
         
         // Subscribe to player updates
+        PlayerState.OnEnemyJoined += OnEnemyConnected;
         PlayerState.OnPlayerStateUpdated += HandlePlayerUpdate;
+        MainCanvasManagement.Instance.SubscribeToGameStateManager();
         
         MainCanvasManagement.Instance.StopLoading();
     }
 
     [Button]
-    public void OnOtherPlayerConnected(PlayerState playerState)
+    public void OnEnemyConnected(PlayerState playerState)
     {
         Panel_WaitingForOtherPlayer.SetActive(false);
-        PlayerState.OnEnemyJoined -= OnOtherPlayerConnected;
+        PlayerState.OnEnemyJoined -= OnEnemyConnected;
     }
     
     
     public void OnStartGame()
     {
-        SyncStartGame.Instance.gameStarted = true;
+        // SyncStartGame.Instance.gameStarted = true;
+        GameStateManager.Instance.SetGameState(GameState.Gameplay);
     }
     
     
     #endregion
-    
     
     #region Player State Management
     

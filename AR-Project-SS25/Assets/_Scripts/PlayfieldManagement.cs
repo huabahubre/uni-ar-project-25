@@ -25,7 +25,12 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
 
     
     [SerializeField, ReadOnly]
-    private TrackedMarkerInfo currentElementMarker;
+    public TrackedMarkerInfo currentElementMarker;
+    
+    
+    
+    
+    private bool initedPlayfield = false;
     
     
     private void Start()
@@ -53,11 +58,22 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     {
         playFieldVisual.SetActive(true);
         
+        // Hide the scan screen
+        MainCanvasManagement.Instance.StopScanScreen();
+        
         // Subscribe to element cell
         if (playerElementCell != null)
         {
             playerElementCell.OnAssignedMarker += OnPlacedElementCard;
             playerElementCell.OnRemovedMarker += OnRemovedElementCard;
+        }
+        
+        // Tell the server, that we scanned the playfield for the first time
+        if (!initedPlayfield)
+        {
+            initedPlayfield = true;
+            MainCanvasManagement.Instance.StartLoading("Waiting for other players to scan the playfield...");
+            GameStateManager.Instance.SetPlayerReadyServerRpc();
         }
     }
 
@@ -73,6 +89,9 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
             playerElementCell.OnAssignedMarker -= OnPlacedElementCard;
             playerElementCell.OnRemovedMarker -= OnRemovedElementCard;
         }
+        
+        // Show scan screen
+        MainCanvasManagement.Instance.ShowScanScreen("You lost the playfield tracking.\nPlease scan the playfield again to continue!");
     }
     
     

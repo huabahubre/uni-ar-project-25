@@ -62,6 +62,7 @@ public class CanvasPage_Gameplay : CanvasPage
     
     
     private bool isSubscribed = false;
+    private bool isFirstTurn = true;
     
     public override void Initialize()
     {
@@ -71,7 +72,6 @@ public class CanvasPage_Gameplay : CanvasPage
         // Subscribe to events
         PlayfieldManagement.Instance.onValidCraftingRecipeFound += OnValidRecipeFound;
         PlayfieldManagement.Instance.onRecipeInvalid += OnInvalidRecipe;
-        GameStateManager.Instance.onFinishedTurn += OnFinishedTurn;
         
         base.Initialize();
     }
@@ -79,15 +79,24 @@ public class CanvasPage_Gameplay : CanvasPage
 
     public override void OnShow()
     {
-        bool isPlayerTurn = GameStateManager.Instance.IsCurrentPlayersTurn();
+        // Subscribe to events
+        if (!isSubscribed)
+        {
+            isSubscribed = true;
+            PlayerState.OnPlayerStateUpdated += HandlePlayerUpdate;
+            GameStateManager.OnLocalTurnChanged += OnLocalTurnChanged;
+        }
         
         // Set Panels
-        Panel_YourTurn.SetActive(isPlayerTurn);
-        Panel_OpponentTurn.SetActive(!isPlayerTurn);
+        Panel_YourTurn.SetActive(false);
+        Panel_OpponentTurn.SetActive(false);
         Panel_ActiveSpellCasting.SetActive(false);
 
         // Setup Information
         SetupPlayerAndEnemyInfo();
+        
+        // Show scan screen
+        MainCanvasManagement.Instance.ShowScanScreen("Please scan the playfield marker to start the game!");
         
         base.OnShow();
     }
@@ -102,14 +111,6 @@ public class CanvasPage_Gameplay : CanvasPage
 
     void SetupPlayerAndEnemyInfo()
     {
-        // Subscribe to player updates
-        if (!isSubscribed)
-        {
-            isSubscribed = true;
-            PlayerState.OnPlayerStateUpdated += HandlePlayerUpdate;
-        }
-
-
         // Set fixed stuff once
         Image_PlayerIcon.sprite = DataManagement.Instance.GetElementVisualData(PlayerState.LocalPlayer.ElementIndex.Value).Icon;
         Image_PlayerIconBackground.color = DataManagement.Instance
@@ -126,6 +127,7 @@ public class CanvasPage_Gameplay : CanvasPage
         HandlePlayerUpdate(PlayerState.LocalPlayer);
     }
     
+    
     #endregion
     
     #region Player and Enemy Updates
@@ -138,7 +140,7 @@ public class CanvasPage_Gameplay : CanvasPage
             return;
         }
         
-        Debug.Log($"[UI] Player {player.OwnerClientId} ({(player.IsLocalPlayer ? "Local" : "Remote")}) updated ElementIndex to {player.ElementIndex.Value}");
+        // Debug.Log($"[UI] Player {player.OwnerClientId} ({(player.IsLocalPlayer ? "Local" : "Remote")}) updated ElementIndex to {player.ElementIndex.Value}");
         
         bool isLocalPlayer = player.IsLocalPlayer;
         if (isLocalPlayer)
@@ -154,13 +156,20 @@ public class CanvasPage_Gameplay : CanvasPage
     }
     
     #endregion
-    
 
     #region Turn funcitonality
 
-    public void OnFinishedTurn()
+    public void OnLocalTurnChanged(bool isPlayerTurn)
     {
-        bool isPlayerTurn = GameStateManager.Instance.IsCurrentPlayersTurn();
+        if (isFirstTurn)
+        {
+            isFirstTurn = false;
+            MainCanvasManagement.Instance.StopLoading();
+            Debug.Log("[UI] First turn initialized, stopping loading screen.");
+        }
+        
+        Debug.Log("[UI] Local turn changed: " + isPlayerTurn);
+        
         
         // Update UI
         // UpdateLocalPlayerInfo(GameStateManager.Instance.player1HP.Value);
@@ -181,9 +190,14 @@ public class CanvasPage_Gameplay : CanvasPage
         Panel_YourTurn.SetActive(false);
         Panel_OpponentTurn.SetActive(true);
         
+        Debug.Log("Player trying to cast spell: " + currentSpellData);
+        
         // Try to cast spell with Action
         onCastSpell?.Invoke(currentSpellData);
-        
+
+
+        GameStateManager.Instance.ConfirmSpellCastServerRpc((int)currentSpellData.Item1, (int)currentSpellData.Item2);
+
         // StartCoroutine(WaitOpponentTurn());
     }
     

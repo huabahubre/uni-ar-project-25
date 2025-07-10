@@ -40,12 +40,14 @@ public class PlayerState : NetworkBehaviour
         {
             LocalPlayer = this;
             isLocalPlayer = true;
+            this.gameObject.name = "[Local] Player";
             Debug.Log("LocalPlayer spawned");
         }
         else
         {
             EnemyPlayer = this;
             isLocalPlayer = false;
+            this.gameObject.name = "[Remote] Player";
             Debug.Log("EnemyPlayer spawned");
         }
         
@@ -58,13 +60,15 @@ public class PlayerState : NetworkBehaviour
         
         if(!isLocalPlayer)
             OnEnemyJoined?.Invoke(this);
+        
+        Debug.Log(AuthenticationService.Instance.PlayerName);
     }
 
 
     void InitLocalPlayerData()
     {
         SetElementIndexServerRpc(0);
-        SetPlayerNameServerRpc(AuthenticationService.Instance.PlayerName);
+        SetPlayerNameServerRpc("?");
     }
     
     

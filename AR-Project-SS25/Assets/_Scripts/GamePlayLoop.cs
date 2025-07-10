@@ -10,8 +10,8 @@ public class GamePlayLoop : MonoBehaviour
     
     private void Start()
     {
-        if(gameplayPage != null)
-            gameplayPage.onCastSpell += OnCastSpell;
+        // if(gameplayPage != null)
+        //     gameplayPage.onCastSpell += OnCastSpell;
     }
     
     
