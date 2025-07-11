@@ -136,7 +136,7 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
         currentElementMarker = markerInfo;
         CraftingGrid.Instance.ShowVisual();
         
-        Debug.Log("🔵 Element card placed: " + markerInfo.name);
+        Debug.Log("🔵 Element card placed: " + markerInfo.elementType);
     }
 
     void OnRemovedElementCard()

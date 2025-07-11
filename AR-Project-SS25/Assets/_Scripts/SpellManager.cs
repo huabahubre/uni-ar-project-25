@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using PixPlays.ElementalVFX;
 using Sirenix.OdinInspector;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 
 
 public class SpellManager : Singleton<SpellManager>
 {
-	public static SpellManager Instance;
-    
     [SerializeField] private GameObject spellPreview;
     
     
@@ -28,26 +28,30 @@ public class SpellManager : Singleton<SpellManager>
     }
 
 
-    public bool SpawnSpell(SpellType spellType, ElementType elementType)
+    public bool SpawnSpell(bool isLocalPlayerCaster, SpellType spellType, ElementType elementType)
     {
-        bool isPlayerTurn = GameStateManager.Instance.IsMyTurn();
+        // bool isPlayerTurn = GameStateManager.Instance.IsMyTurn();
     
         // Prevent duplicate spell preview when not player's turn
-        if (!isPlayerTurn)
-        {
-            if (spellType == _currentSpellType)
-                return false;
+        // if (!isPlayerTurn)
+        // {
+        //     if (spellType == _currentSpellType)
+        //         return false;
+        //
+        //     SpawnSpellPreview(spellType);
+        //     return false;
+        // }
     
-            SpawnSpellPreview(spellType);
-            return false;
-        }
-    
-        // Only spawn attack if a valid element is selected
+        // Only spawn attack if a valid element is selected --> This will alawys be valid, as server now checks this before spawning
         if (elementType != ElementType.None)
         {
-            SpawnSpellAttack(spellType, elementType);
             _currentSpellType = spellType;
             _currentElementType = elementType;
+            
+            // Debug.Log( $"[SpellManager] {spellType} with element: {elementType} for local player: {isLocalPlayerCaster}");
+            
+            // Spawn the spell attack
+            SpawnSpellAttack(isLocalPlayerCaster, spellType, elementType);
 
             // This waits until the spell animation is complete
             StartCoroutine(SpellAnimationRoutine());
@@ -55,13 +59,13 @@ public class SpellManager : Singleton<SpellManager>
         }
     
         // Show preview if no valid element is selected
-        SpawnSpellPreview(spellType);
+        // SpawnSpellPreview(spellType);
         return false;
     }
     
     
     // TODO: @Juli Actually set the correct values here
-    private System.Collections.IEnumerator SpellAnimationRoutine()
+    private IEnumerator SpellAnimationRoutine()
     {
         float waitTime = 0f;
 
@@ -79,10 +83,13 @@ public class SpellManager : Singleton<SpellManager>
         }
         
         yield return new WaitForSeconds(waitTime);
+        
+        // Notify the server that the spell animation on local client is complete
         GameStateManager.Instance.NotifySpellAnimationCompleteServerRpc();
     }
     
     
+    // Do we need this?
     private void SpawnSpellPreview(SpellType spellType)
     {
         var spellData = DataManagement.Instance.spellDataList.Find(data => data.Recipe == spellType);
@@ -109,23 +116,28 @@ public class SpellManager : Singleton<SpellManager>
         spellPreview.SetActive(true);
     }
 
-    private void SpawnSpellAttack(SpellType spellType, ElementType elementType)
+    private void SpawnSpellAttack(bool isLocalPlayerCaster, SpellType spellType, ElementType elementType)
     {
         var spellData = DataManagement.Instance.spellDataList.Find(data => data.Recipe == spellType);
         var visualData = spellData.GetPrefabTuple(elementType);
+        
+        // Skip spell spawning if no visual data is found
         if (visualData == null)
         {
             Debug.LogError($"No prefab found for spell {spellType} and element {elementType}");
             return;
         }
     
-        var currentPlayerId = (int) GameStateManager.Instance.activePlayerClientId.Value;
+        Debug.Log( $"[SpellManager] Found Spell Tuple: {spellType} with element: {visualData.Element}");
+        
+        int currentPlayerId = isLocalPlayerCaster ? (int)PlayerState.LocalPlayer.OwnerClientId : (int)PlayerState.EnemyPlayer.OwnerClientId;
     
         Vector3 spawnPosition;
         Quaternion spawnRotation;
         Vector3 targetPosition;
         float radius = 0.5f; // Default radius
         
+        // Calculate spawn position and rotation based on spell type
         switch (spellType)
         {
             case SpellType.GroundPound:
@@ -143,6 +155,7 @@ public class SpellManager : Singleton<SpellManager>
                 break;
         }
         
+        // Instantiate the spell visual prefab
         var spellInstance = Instantiate(visualData.VisualPrefab, spawnPosition, spawnRotation);
 
         var vfxData = new VfxData(

@@ -342,7 +342,7 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
                 ShowPage("Gameplay");
                 break;
             case GameState.GameOver:
-                ShowPage("GameOver");
+                // ShowPage("GameOver");
                 break;
             default:
                 Debug.LogWarning("Unhandled game state: " + gameState);

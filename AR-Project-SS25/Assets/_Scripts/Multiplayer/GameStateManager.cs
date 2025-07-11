@@ -63,12 +63,6 @@ public class GameStateManager : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
     
-    // The client ID of the winner (used in GameOver state)
-    public NetworkVariable<ulong> winnerClientId = new NetworkVariable<ulong>(
-        0,
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server);
-    
     // Track player readiness --> both have to scan the playfield before the game starts
     private NetworkVariable<bool> player1Ready = new NetworkVariable<bool>(
         false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -224,12 +218,13 @@ public class GameStateManager : NetworkBehaviour
 
         // Debug.Log($"[Server] Broadcasting spell animation: {currentSpellType} of {currentElementType}");
 
-        PlaySpellAnimationClientRpc(elementId, spellTypeId);
+        PlaySpellAnimationClientRpc(casterClientId, elementId, spellTypeId);
     }
 
     [ClientRpc]
-    private void PlaySpellAnimationClientRpc(int elementId, int spellTypeId)
+    private void PlaySpellAnimationClientRpc(ulong casterClientId, int elementId, int spellTypeId)
     {
+        bool isLocalPlayerCaster = (casterClientId == NetworkManager.Singleton.LocalClientId);
         SpellType spellType = (SpellType)spellTypeId;
         ElementType elementType = (ElementType)elementId;
         
@@ -239,8 +234,8 @@ public class GameStateManager : NetworkBehaviour
         OnActivePlayerConfirmedSpellCast?.Invoke();
         
         // Spawn the spell
-        // SpellManager.Instance.SpawnSpell(spellType, elementType);
-        StartCoroutine(SpellAnimationRoutine());
+        SpellManager.Instance.SpawnSpell(isLocalPlayerCaster, spellType, elementType);
+        // StartCoroutine(SpellAnimationRoutine());
     }
 
     // TODO: THIS IS ONLY FOR DEBUGGING --> SKIPPING ANIMATION HERE!
@@ -326,44 +321,91 @@ public class GameStateManager : NetworkBehaviour
 
         Debug.Log($"[Server] Spell resolved: Player {(isHostCastingPlayer ? "2" : "1")} took {damage} damage");
 
-        EndTurn();
+        CheckWinCondition();
     }
     
     #endregion
 
+    #region 4. Check Win condition
     
     
-
-    private void BeginTurn()
+    private void CheckWinCondition()
     {
-        if (!IsServer) return;
-
-        currentTurnPhase = TurnPhase.Start;
-        // Debug.Log($"[Server] Turn started for ClientId: {activePlayerClientId.Value}");
-
-        // Notify both clients whose turn it is
-        NotifyTurnClientRpc(activePlayerClientId.Value);
-    }
-
-    
-    private void EndTurn()
-    {
-        currentTurnPhase = TurnPhase.End;
-
         bool localDead = PlayerState.LocalPlayer.PlayerHealth.Value <= 0;
         bool enemyDead = PlayerState.EnemyPlayer.PlayerHealth.Value <= 0;
 
         if (localDead || enemyDead)
         {
             ulong winner = localDead ? PlayerState.EnemyPlayer.OwnerClientId : PlayerState.LocalPlayer.OwnerClientId;
-            winnerClientId.Value = winner;
 
             Debug.Log($"[Server] Game over. Winner is ClientId: {winner}");
+
+            AnnounceGameOverClientRpc(winner);
 
             SetGameState(GameState.GameOver);
             return;
         }
 
+        
+        // If no one is dead, just end the turn
+        EndTurn();
+    }
+    
+    private bool isLocalPlayerWinner = false;
+    
+    [ClientRpc]
+    private void AnnounceGameOverClientRpc(ulong winnerId)
+    {
+        Debug.Log($"[Client] GameOver RPC. Winner: {winnerId}, You: {NetworkManager.Singleton.LocalClientId}");
+
+        isLocalPlayerWinner = winnerId == NetworkManager.Singleton.LocalClientId;
+        
+        if (isLocalPlayerWinner)
+            Debug.Log("[Client] YOU WIN (via RPC)!");
+        else
+            Debug.Log("[Client] YOU LOSE (via RPC)!");
+
+        MainCanvasManagement.Instance.ShowPage("GameOver");
+
+        GameStateChanged?.Invoke(GameState.GameOver);
+    }
+
+
+    
+    
+    // Called from client to forfeit the game
+    [ServerRpc(RequireOwnership = false)]
+    public void SurrenderServerRpc(ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer) return;
+
+        ulong surrenderingClientId = rpcParams.Receive.SenderClientId;
+
+        var ids = NetworkManager.Singleton.ConnectedClientsIds;
+        if (ids.Count < 2) return;
+
+        // Determine the winner (the other player)
+        ulong winner = ids[0] == surrenderingClientId ? ids[1] : ids[0];
+        AnnounceGameOverClientRpc(winner);
+        
+        Debug.Log($"[Server] Client {surrenderingClientId} surrendered. Winner is ClientId {winner}");
+
+        SetGameState(GameState.GameOver);
+    }
+
+    public bool IsLocalPlayerWinner()
+    {
+        return isLocalPlayerWinner;
+    }
+
+    
+    #endregion
+    
+    #region 5. End of Turn
+    
+    private void EndTurn()
+    {
+        currentTurnPhase = TurnPhase.End;
 
         // Switch active player
         ulong current = activePlayerClientId.Value;
@@ -387,40 +429,23 @@ public class GameStateManager : NetworkBehaviour
         
         Debug.Log($"[Client] It is {(isMyTurn ? "YOUR" : "ENEMY")} turn.");
     }
+    
+    #endregion
+    
+    
 
-    // Called from client to forfeit the game
-    [ServerRpc(RequireOwnership = false)]
-    public void SurrenderServerRpc(ServerRpcParams rpcParams = default)
+    private void BeginTurn()
     {
         if (!IsServer) return;
 
-        ulong surrenderingClientId = rpcParams.Receive.SenderClientId;
+        currentTurnPhase = TurnPhase.Start;
+        // Debug.Log($"[Server] Turn started for ClientId: {activePlayerClientId.Value}");
 
-        var ids = NetworkManager.Singleton.ConnectedClientsIds;
-        if (ids.Count < 2) return;
-
-        // Determine the winner (the other player)
-        ulong winner = ids[0] == surrenderingClientId ? ids[1] : ids[0];
-        winnerClientId.Value = winner;
-
-        Debug.Log($"[Server] Client {surrenderingClientId} surrendered. Winner is ClientId {winner}");
-
-        SetGameState(GameState.GameOver);
-    }
-
-    
-    
-    // Optional helper
-    public bool IsMyTurn()
-    {
-        return activePlayerClientId.Value == NetworkManager.Singleton.LocalClientId;
-    }
-
-    public bool IsLocalPlayerWinner()
-    {
-        return winnerClientId.Value == NetworkManager.Singleton.LocalClientId;
+        // Notify both clients whose turn it is
+        NotifyTurnClientRpc(activePlayerClientId.Value);
     }
     
+
 #endregion
 
     
