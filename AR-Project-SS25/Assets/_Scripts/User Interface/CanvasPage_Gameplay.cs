@@ -76,6 +76,8 @@ public class CanvasPage_Gameplay : CanvasPage
             PlayerState.OnPlayerStateUpdated += HandlePlayerUpdate;
             GameStateManager.OnLocalTurnChanged += OnLocalTurnChanged;
             GameStateManager.OnActivePlayerConfirmedSpellCast += OnStartSpellCastAnimation;
+            
+            // Debug.Log( "[UI] Subscribed to PlayerState and GameStateManager events.");
         }
 
         // Set Panels
@@ -129,11 +131,11 @@ public class CanvasPage_Gameplay : CanvasPage
     {
         if (player == null)
         {
-            Debug.Log("PlayerState is null in HandlePlayerUpdate");
+            Debug.Log("[UI] PlayerState is null in HandlePlayerUpdate");
             return;
         }
 
-        // Debug.Log($"[UI] Player {player.OwnerClientId} ({(player.IsLocalPlayer ? "Local" : "Remote")}) updated ElementIndex to {player.ElementIndex.Value}");
+        // Debug.Log("[UI] Handling player update for: " + player.PlayerName.Value);
 
         bool isLocalPlayer = player.IsLocalPlayer;
         if (isLocalPlayer)
@@ -155,7 +157,7 @@ public class CanvasPage_Gameplay : CanvasPage
 
     void OnStartSpellCastAnimation()
     {
-        Debug.Log("[UI] Spell cast animation started.");
+        // Debug.Log("[UI] Spell cast animation started.");
 
         // Set Panels
         Panel_YourTurn.SetActive(false);
@@ -172,7 +174,7 @@ public class CanvasPage_Gameplay : CanvasPage
             Debug.Log("[UI] First turn initialized, stopping loading screen.");
         }
 
-        Debug.Log("[UI] Local turn changed: " + isPlayerTurn);
+        // Debug.Log("[UI] Local turn changed: " + isPlayerTurn);
 
 
         // Update UI
@@ -194,13 +196,13 @@ public class CanvasPage_Gameplay : CanvasPage
         Panel_YourTurn.SetActive(false);
         Panel_OpponentTurn.SetActive(true);
 
-        Debug.Log("Player trying to cast spell: " + currentSpellData);
+        // Debug.Log("Player trying to cast spell: " + currentSpellData);
 
         // Try to cast spell with Action
         onCastSpell?.Invoke(currentSpellData);
 
 
-        GameStateManager.Instance.ConfirmSpellCastServerRpc((int)currentSpellData.Item1, (int)currentSpellData.Item2);
+        GameStateManager.Instance.ConfirmSpellCastServerRpc((int)currentSpellData.Item2, (int)currentSpellData.Item1);
 
         // StartCoroutine(WaitOpponentTurn());
     }
@@ -222,15 +224,4 @@ public class CanvasPage_Gameplay : CanvasPage
     }
 
     #endregion
-
-
-
-
-    //TODO: Remove this when functionality is ready
-    public void OnManualWin()
-    {
-        DataManagement.Instance.isWin = true;
-        MainCanvasManagement.Instance.ShowPage("GameOver");
-    }
-    
 }

@@ -97,11 +97,6 @@ public class DataManagement : Singleton<DataManagement>
     
     #endregion
     
-    
-    
-    // TODO: These are hardcoded values
-    [BoxGroup("DEVELOPER")] public bool isWin = true;
-
 }
 
 

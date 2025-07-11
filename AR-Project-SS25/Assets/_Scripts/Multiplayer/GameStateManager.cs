@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Unity.Android.Gradle;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -40,7 +41,6 @@ public class GameStateManager : NetworkBehaviour
     private void OnDestroy()
     {
         CurrentGameState.OnValueChanged -= OnGameStateChanged;
-        PlayerState.OnPlayerStateUpdated -= HandlePlayerUpdate;
     }
     
     
@@ -53,9 +53,6 @@ public class GameStateManager : NetworkBehaviour
         GameState.Lobby,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
-    public static event Action<GameState> GameStateChanged;
-    
-    
     
     // Synced Turn Phase
     private TurnPhase currentTurnPhase = TurnPhase.None;
@@ -66,10 +63,11 @@ public class GameStateManager : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
     
-    public static event Action<bool> OnLocalTurnChanged;
-    public static event Action OnActivePlayerConfirmedSpellCast;
-    
-    
+    // The client ID of the winner (used in GameOver state)
+    public NetworkVariable<ulong> winnerClientId = new NetworkVariable<ulong>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
     
     // Track player readiness --> both have to scan the playfield before the game starts
     private NetworkVariable<bool> player1Ready = new NetworkVariable<bool>(
@@ -79,6 +77,11 @@ public class GameStateManager : NetworkBehaviour
 
 
     
+    
+    public static event Action<GameState> GameStateChanged;
+    public static event Action<bool> OnLocalTurnChanged;
+    public static event Action OnActivePlayerConfirmedSpellCast;
+
     
     
     
@@ -186,7 +189,7 @@ public class GameStateManager : NetworkBehaviour
     
     // Called from client once they try to cast their spell
     [ServerRpc(RequireOwnership = false)]
-    public void ConfirmSpellCastServerRpc(int spellTypeId, int elementId, ServerRpcParams rpcParams = default)
+    public void ConfirmSpellCastServerRpc(int elementId, int spellTypeId, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
 
@@ -199,7 +202,7 @@ public class GameStateManager : NetworkBehaviour
 
         Debug.Log($"[Server] Spell cast confirmed by ClientId: {sender}, Element: {(ElementType)elementId}, SpellType: {(SpellType)spellTypeId}");
         
-        HandleSpellCastStart(sender, spellTypeId, elementId);
+        HandleSpellCastStart(sender, elementId, spellTypeId);
     }
 
     
@@ -211,7 +214,7 @@ public class GameStateManager : NetworkBehaviour
     private ElementType currentElementType;
     private ulong currentCasterId;
 
-    private void HandleSpellCastStart(ulong casterClientId, int spellTypeId, int elementId)
+    private void HandleSpellCastStart(ulong casterClientId, int elementId, int spellTypeId)
     {
         currentTurnPhase = TurnPhase.Casting;
     
@@ -219,13 +222,13 @@ public class GameStateManager : NetworkBehaviour
         currentSpellType = (SpellType)spellTypeId;
         currentElementType = (ElementType)elementId;
 
-        Debug.Log($"[Server] Broadcasting spell animation: {currentSpellType} of {currentElementType}");
+        // Debug.Log($"[Server] Broadcasting spell animation: {currentSpellType} of {currentElementType}");
 
-        PlaySpellAnimationClientRpc(spellTypeId, elementId);
+        PlaySpellAnimationClientRpc(elementId, spellTypeId);
     }
 
     [ClientRpc]
-    private void PlaySpellAnimationClientRpc(int spellTypeId, int elementId)
+    private void PlaySpellAnimationClientRpc(int elementId, int spellTypeId)
     {
         SpellType spellType = (SpellType)spellTypeId;
         ElementType elementType = (ElementType)elementId;
@@ -270,20 +273,58 @@ public class GameStateManager : NetworkBehaviour
     
     #region 3. Resolve Spell Damage
     
+    
+    // TODO: @Dawin Calculate the damage of the spell here
     private void HandleSpellCastResolve()
     {
-        // TODO: @Dawin Calculate the damage of the spell here
+        Debug.Log($"[Server] Resolving spell cast: {currentSpellType} of {currentElementType} by ClientId: {currentCasterId}");
         
-        int damage = UnityEngine.Random.Range(10, 25); // Example
+        // THIS IS HOW YOU GET ALL THE REFERENCES TO ALL PLAYERS
+        bool isHostCastingPlayer = (currentCasterId == NetworkManager.Singleton.ConnectedClientsIds[0]);   // We check here which player is the caster --> Server == Host == PlayerState.LocalPlayer
+        PlayerState castingPlayer = isHostCastingPlayer ? PlayerState.LocalPlayer : PlayerState.EnemyPlayer;    // This is the spell caster
+        PlayerState targetPlayer = isHostCastingPlayer ? PlayerState.EnemyPlayer : PlayerState.LocalPlayer;     // This is the target player
+        ElementType casterElement = (ElementType)castingPlayer.ElementIndex.Value; // The element of the casting player
+        ElementType targetElement = (ElementType)targetPlayer.ElementIndex.Value; // The element of the target player
+        int damage = UnityEngine.Random.Range(10, 25); // EXAMPLE RANDOM DAMAGE
 
-        bool casterIsPlayer1 = (currentCasterId == NetworkManager.Singleton.ConnectedClientsIds[0]);
+        // CALCULATING DAMAGE BASED ON SPELL TYPE TODO: @Dawin Implement actual damage calculation based on spell type and casterElement / targetElement
+        switch (currentSpellType)
+        {
+            case SpellType.SingleShot:
+                damage = 10;
+                break;
+            case SpellType.Spear:
+                damage = 30;
+                break;
+            case SpellType.WideShot:
+                damage = 50;
+                break;
+            case SpellType.Shield:
+                damage = 0; // Set damage to 0, as shield does not deal damage
+                castingPlayer.IsShieldActive.Value = true; // Activate shield for the caster
+                castingPlayer.ActiveShieldElement.Value = (int)currentElementType; // Set the shield element for the caster
+                break;
+            case SpellType.GroundPound:
+                damage = 80;
+                break;
+        }
+        
+        
+        // CHECK HERE IF TARGET HAS A SHIELD ACTIVE TODO: @Dawin Calculate damage reduction based on shield element
+        if (targetPlayer.IsShieldActive.Value)
+        {
+            ElementType targetShieldType = (ElementType)targetPlayer.ActiveShieldElement.Value; // The element of the target player's shield
+            damage = 0; // --> Calculate damage reduction
+            
+            // Disable shield after use
+            targetPlayer.IsShieldActive.Value = false;
+        }
+        
+        
+        // UPDATE HEALTH OF THE TARGET PLAYER
+        targetPlayer.UpdatePlayerHealthServerRpc(-damage);
 
-        if (casterIsPlayer1)
-            PlayerState.EnemyPlayer.UpdatePlayerHealthServerRpc(-damage);
-        else
-            PlayerState.LocalPlayer.UpdatePlayerHealthServerRpc(-damage);
-
-        Debug.Log($"[Server] Spell resolved: Player {(casterIsPlayer1 ? "2" : "1")} took {damage} damage");
+        Debug.Log($"[Server] Spell resolved: Player {(isHostCastingPlayer ? "2" : "1")} took {damage} damage");
 
         EndTurn();
     }
@@ -298,7 +339,7 @@ public class GameStateManager : NetworkBehaviour
         if (!IsServer) return;
 
         currentTurnPhase = TurnPhase.Start;
-        Debug.Log($"[Server] Turn started for ClientId: {activePlayerClientId.Value}");
+        // Debug.Log($"[Server] Turn started for ClientId: {activePlayerClientId.Value}");
 
         // Notify both clients whose turn it is
         NotifyTurnClientRpc(activePlayerClientId.Value);
@@ -309,14 +350,20 @@ public class GameStateManager : NetworkBehaviour
     {
         currentTurnPhase = TurnPhase.End;
 
-        CheckWinCondition();
+        bool localDead = PlayerState.LocalPlayer.PlayerHealth.Value <= 0;
+        bool enemyDead = PlayerState.EnemyPlayer.PlayerHealth.Value <= 0;
 
-        if (player1HP.Value <= 0 || player2HP.Value <= 0)
+        if (localDead || enemyDead)
         {
-            Debug.Log("[Server] Game over.");
+            ulong winner = localDead ? PlayerState.EnemyPlayer.OwnerClientId : PlayerState.LocalPlayer.OwnerClientId;
+            winnerClientId.Value = winner;
+
+            Debug.Log($"[Server] Game over. Winner is ClientId: {winner}");
+
             SetGameState(GameState.GameOver);
             return;
         }
+
 
         // Switch active player
         ulong current = activePlayerClientId.Value;
@@ -338,44 +385,64 @@ public class GameStateManager : NetworkBehaviour
         
         OnLocalTurnChanged?.Invoke(isMyTurn);
         
-        Debug.Log($"[Client] It is {(isMyTurn ? "my" : "their")} turn.");
+        Debug.Log($"[Client] It is {(isMyTurn ? "YOUR" : "ENEMY")} turn.");
     }
 
+    // Called from client to forfeit the game
+    [ServerRpc(RequireOwnership = false)]
+    public void SurrenderServerRpc(ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer) return;
+
+        ulong surrenderingClientId = rpcParams.Receive.SenderClientId;
+
+        var ids = NetworkManager.Singleton.ConnectedClientsIds;
+        if (ids.Count < 2) return;
+
+        // Determine the winner (the other player)
+        ulong winner = ids[0] == surrenderingClientId ? ids[1] : ids[0];
+        winnerClientId.Value = winner;
+
+        Debug.Log($"[Server] Client {surrenderingClientId} surrendered. Winner is ClientId {winner}");
+
+        SetGameState(GameState.GameOver);
+    }
+
+    
+    
     // Optional helper
     public bool IsMyTurn()
     {
         return activePlayerClientId.Value == NetworkManager.Singleton.LocalClientId;
     }
 
+    public bool IsLocalPlayerWinner()
+    {
+        return winnerClientId.Value == NetworkManager.Singleton.LocalClientId;
+    }
+    
 #endregion
 
     
     
     
-    
-
-    public NetworkVariable<int> player1HP = new NetworkVariable<int>(100, 
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server);
-    
-    public NetworkVariable<int> player2HP = new NetworkVariable<int>(100, 
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server);
+    // [OBSOLETE] 
+    // public NetworkVariable<int> player1HP = new NetworkVariable<int>(100, 
+    //     NetworkVariableReadPermission.Everyone,
+    //     NetworkVariableWritePermission.Server);
+    //
+    // public NetworkVariable<int> player2HP = new NetworkVariable<int>(100, 
+    //     NetworkVariableReadPermission.Everyone,
+    //     NetworkVariableWritePermission.Server);
     
     // public NetworkVariable<ulong> activePlayerClientId = new NetworkVariable<ulong>(
     //     0, 
     //     NetworkVariableReadPermission.Everyone,
     //     NetworkVariableWritePermission.Server);
-
-
-    public Action onFinishedTurn;
     
+    // public Action onFinishedTurn;
     
-    
-    // TODO: create shield network variable with type and health
-    
-    
-    #region OnNetworkSpawn
+    #region [OBSOLETE] OnNetworkSpawn
     
     private void AssignFirstPlayerServer()
     {
@@ -406,102 +473,89 @@ public class GameStateManager : NetworkBehaviour
     
     #endregion
 
-    #region NetworkVariable Updates
+    #region [OBSOLETE] NetworkVariable Updates
     
-    [ServerRpc(RequireOwnership = false)] // From client to the server
-    public void EndTurnRequestServerRpc(int damage, ServerRpcParams rpcParams = default)
-    {
-        ulong requestingClientId = rpcParams.Receive.SenderClientId;
-        Debug.Log($"RPC EndTurnRequestServerRpc: {requestingClientId}");
-
-        if (requestingClientId != activePlayerClientId.Value)
-        {
-            Debug.LogWarning($"Client {requestingClientId} tried to act out of turn. It is {activePlayerClientId.Value}s turn.");
-            return;
-        }
-
-        if (IsServer)
-        {
-            UpdateHealth(damage, requestingClientId);
-            UpdateTurn();
-            CheckWinCondition();
-        }
-    }
-
-    [Button]
-    private void UpdateHealth(int damage, ulong requestingClientId)
-    {
-        bool playerOneAttacks = NetworkManager.Singleton.ConnectedClientsIds[0] == requestingClientId;
-        if (playerOneAttacks)
-        {
-            // Player 1 is attacking → damage Player 2
-            string x = $"Player {player2HP.Value} health reduced by {damage}";
-            player2HP.Value = Mathf.Max(0, player2HP.Value - damage);
-            
-            // Update PlayerState of LocalPlayer
-            PlayerState.LocalPlayer.UpdatePlayerHealthServerRpc(-damage);
-            
-            
-            Debug.Log($"{x}. New health {player2HP.Value}");
-        }
-        else
-        {
-            // Player 2 is attacking → damage Player 1
-            string x = $"Player {player1HP.Value} health reduced by {damage}";
-            player1HP.Value = Mathf.Max(0, player1HP.Value - damage);
-            
-            // Update PlayerState of Enemy
-            PlayerState.EnemyPlayer.UpdatePlayerHealthServerRpc(-damage);
-            
-            Debug.Log($"{x}. New health {player1HP.Value}");
-        }
-    }
     
-    private void UpdateTurn()
-    {
-        // Switch active player
-        if (activePlayerClientId.Value == NetworkManager.Singleton.ConnectedClientsIds[0])
-        {
-            activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[1];
-            Debug.Log($"Turn changed to Player 2 (ClientId: {activePlayerClientId.Value})");
-        }
-        else
-        {
-            activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
-            Debug.Log($"Turn changed to Player 1 (ClientId: {activePlayerClientId.Value})");
-        }
-        
-        onFinishedTurn?.Invoke();
-    }
+    // [ServerRpc(RequireOwnership = false)] // From client to the server
+    // public void EndTurnRequestServerRpc(int damage, ServerRpcParams rpcParams = default)
+    // {
+    //     ulong requestingClientId = rpcParams.Receive.SenderClientId;
+    //     Debug.Log($"RPC EndTurnRequestServerRpc: {requestingClientId}");
+    //
+    //     if (requestingClientId != activePlayerClientId.Value)
+    //     {
+    //         Debug.LogWarning($"Client {requestingClientId} tried to act out of turn. It is {activePlayerClientId.Value}s turn.");
+    //         return;
+    //     }
+    //
+    //     if (IsServer)
+    //     {
+    //         UpdateHealth(damage, requestingClientId);
+    //         UpdateTurn();
+    //         CheckWinCondition();
+    //     }
+    // }
+
+    // [Button]
+    // private void UpdateHealth(int damage, ulong requestingClientId)
+    // {
+    //     bool playerOneAttacks = NetworkManager.Singleton.ConnectedClientsIds[0] == requestingClientId;
+    //     
+    //     if (playerOneAttacks)
+    //     {
+    //         // Player 1 is attacking → damage Player 2
+    //         string x = $"Player {player2HP.Value} health reduced by {damage}";
+    //         player2HP.Value = Mathf.Max(0, player2HP.Value - damage);
+    //         
+    //         // Update PlayerState of LocalPlayer
+    //         PlayerState.LocalPlayer.UpdatePlayerHealthServerRpc(-damage);
+    //         
+    //         
+    //         Debug.Log($"{x}. New health {player2HP.Value}");
+    //     }
+    //     else
+    //     {
+    //         // Player 2 is attacking → damage Player 1
+    //         string x = $"Player {player1HP.Value} health reduced by {damage}";
+    //         player1HP.Value = Mathf.Max(0, player1HP.Value - damage);
+    //         
+    //         // Update PlayerState of Enemy
+    //         PlayerState.EnemyPlayer.UpdatePlayerHealthServerRpc(-damage);
+    //         
+    //         Debug.Log($"{x}. New health {player1HP.Value}");
+    //     }
+    // }
     
-    private void CheckWinCondition()
-    {
-        if (player1HP.Value <= 0)
-            Debug.Log("Player 2 wins!");
-            // Update UI, etc.
-        else if (player2HP.Value <= 0)
-            Debug.Log("Player 1 wins!");
-            // Update UI, etc.
-    }
+    // private void UpdateTurn()
+    // {
+    //     // Switch active player
+    //     if (activePlayerClientId.Value == NetworkManager.Singleton.ConnectedClientsIds[0])
+    //     {
+    //         activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[1];
+    //         Debug.Log($"Turn changed to Player 2 (ClientId: {activePlayerClientId.Value})");
+    //     }
+    //     else
+    //     {
+    //         activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
+    //         Debug.Log($"Turn changed to Player 1 (ClientId: {activePlayerClientId.Value})");
+    //     }
+    //     
+    //     onFinishedTurn?.Invoke();
+    // }
+    //
+    // private void CheckWinCondition()
+    // {
+    //     if (player1HP.Value <= 0)
+    //         Debug.Log("Player 2 wins!");
+    //         // Update UI, etc.
+    //     else if (player2HP.Value <= 0)
+    //         Debug.Log("Player 1 wins!");
+    //         // Update UI, etc.
+    // }
     
     
     #endregion
     
-    #region NetworkVariable Subscriptions
-
-
-    private void HandlePlayerUpdate(PlayerState player)
-    {
-        
-    }
-    
-    private void OnIsServerTurnChanged(bool oldValue, bool newValue)
-    {
-        // Update UI, etc.
-    }
-    
-    
-    #endregion
     
     #region Debug checks
 

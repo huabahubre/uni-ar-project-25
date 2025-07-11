@@ -47,10 +47,8 @@ public class CanvasPage_GameOver : CanvasPage
         Panel_WaitingForRematch.SetActive(false);
         
         // Set Win or Loose panel based on game result
-        Panel_Win.SetActive(DataManagement.Instance.isWin);
-        Panel_Lose.SetActive(!DataManagement.Instance.isWin);
-        
-        
+        Panel_Win.SetActive(GameStateManager.Instance.IsLocalPlayerWinner());
+        Panel_Lose.SetActive(!GameStateManager.Instance.IsLocalPlayerWinner());
         
         base.OnShow();
     }

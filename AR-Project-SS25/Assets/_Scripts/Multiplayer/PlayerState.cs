@@ -11,21 +11,33 @@ public class PlayerState : NetworkBehaviour
     public static PlayerState EnemyPlayer;
 
     // Inspector exposed variables
-    [SerializeField, BoxGroup("Runtime Variables")] private bool isLocalPlayer;
+    [SerializeField, BoxGroup("Runtime Player Variables")] private bool isLocalPlayer;
     
     
     
-    public static event Action<PlayerState> OnPlayerStateUpdated;
-    public static event Action<PlayerState> OnEnemyJoined;
     
-    // Networked Variables
+    // Networked Variables --> Only from LocalPlayer
+    [BoxGroup("Runtime Player Variables")]
     public NetworkVariable<int> PlayerHealth = new NetworkVariable<int>(100, 
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
+    
+    [BoxGroup("Runtime Player Variables")]
     public NetworkVariable<int> ElementIndex = new();
+    
+    [BoxGroup("Runtime Player Variables")]
     public NetworkVariable<FixedString32Bytes> PlayerName = new();
 
+    [BoxGroup("Runtime Player Variables")]
+    public NetworkVariable<bool> IsShieldActive = new();
+    
+    [BoxGroup("Runtime Player Variables")]
+    public NetworkVariable<int> ActiveShieldElement = new();
+    
+    public static event Action<PlayerState> OnPlayerStateUpdated;
+    public static event Action<PlayerState> OnEnemyJoined;
 
+    
     private void Start()
     {
         // Read
@@ -51,20 +63,29 @@ public class PlayerState : NetworkBehaviour
             Debug.Log("EnemyPlayer spawned");
         }
         
-        // Subscribe to changes
-        ElementIndex.OnValueChanged += (_, _) => OnPlayerStateUpdated?.Invoke(this);
-        PlayerName.OnValueChanged += (_, _) => OnPlayerStateUpdated?.Invoke(this);
+        // Subscribe callback to changes
+        ElementIndex.OnValueChanged += (_, _) => OnPlayerStateUpdate();
+        PlayerName.OnValueChanged += (_, _) => OnPlayerStateUpdate();
+        PlayerHealth.OnValueChanged += (_, _) => OnPlayerStateUpdate();
+        IsShieldActive.OnValueChanged += (_, _) => OnPlayerStateUpdate();
 
         // Init local player
         InitLocalPlayerData();
         
         if(!isLocalPlayer)
             OnEnemyJoined?.Invoke(this);
-        
-        Debug.Log(AuthenticationService.Instance.PlayerName);
     }
 
 
+    void OnPlayerStateUpdate()
+    {
+        // Debug.Log($"[PlayerState] {(isLocalPlayer ? "Local::" : "Remote::")} Player state updated!");
+        
+        OnPlayerStateUpdated?.Invoke(this);
+    }
+    
+    
+    
     void InitLocalPlayerData()
     {
         SetElementIndexServerRpc(0);

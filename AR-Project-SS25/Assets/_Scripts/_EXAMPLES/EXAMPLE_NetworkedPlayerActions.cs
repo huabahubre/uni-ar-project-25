@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 #if NEW_INPUT_SYSTEM_INSTALLED
 using UnityEngine.InputSystem;
@@ -14,30 +15,46 @@ public class EXAMPLE_NetworkedPlayerActions : NetworkBehaviour
     {
         if (!IsOwner || !IsSpawned) return;
 
+        
 #if ENABLE_INPUT_SYSTEM && NEW_INPUT_SYSTEM_INSTALLED
 
-            if (Keyboard.current.spaceKey.isPressed)
+            if (Keyboard.current.spaceKey.wasPressedThisFrame)
             {
                 Debug.Log("[DEBUG] Emulating playfield marker is now tracked.");
                 PlayfieldManagement.Instance.OnPlayfieldTracked();
             }
-            if (Keyboard.current.escapeKey.isPressed)
+            if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 Debug.Log("[DEBUG] Emulating playfield marker tracking lost.");
                 PlayfieldManagement.Instance.OnLostPlayfieldTracking();
             }
 #else
         // Old input backends are enabled.
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("[DEBUG] Emulating playfield marker is now tracked.");
             PlayfieldManagement.Instance.OnPlayfieldTracked();
         }
         
-        if (Input.GetKey(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Debug.Log("[DEBUG] Emulating playfield marker tracking lost.");
             PlayfieldManagement.Instance.OnLostPlayfieldTracking();
+        }
+        
+        
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Debug.Log("[DEBUG] Emulating local player lost HP.");
+            
+            PlayerState.LocalPlayer.UpdatePlayerHealthServerRpc(-1);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Debug.Log("[DEBUG] Emulating remote player lost HP.");
+            
+            PlayerState.EnemyPlayer.UpdatePlayerHealthServerRpc(-1);
         }
 #endif
     }
