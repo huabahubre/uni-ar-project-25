@@ -449,6 +449,108 @@ public class GameStateManager : NetworkBehaviour
 #endregion
 
     
+#region Rematch Logic --> This is not working for a second match ONLY FOR VIDEO
+
+    private NetworkVariable<bool> player1Rematch = new NetworkVariable<bool>(
+        false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private NetworkVariable<bool> player2Rematch = new NetworkVariable<bool>(
+        false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    public static event Action<bool> OnLocalRematchUpdated;
+    public static event Action OnRematchOffered;
+
+    
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestRematchServerRpc(ServerRpcParams rpcParams = default)
+    {
+        ulong sender = rpcParams.Receive.SenderClientId;
+        var ids = NetworkManager.Singleton.ConnectedClientsIds;
+
+        if (ids.Count < 2) return;
+
+        if (sender == ids[0])
+        {
+            player1Rematch.Value = true;
+            Debug.Log("Player 1 requested a rematch.");
+        }
+        else if (sender == ids[1])
+        {
+            player2Rematch.Value = true;
+            Debug.Log("Player 2 requested a rematch.");
+        }
+
+        // Notify the *other* player
+        NotifyRematchOfferedClientRpc(sender);
+
+        CheckRematchState();
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CancelRematchServerRpc(ServerRpcParams rpcParams = default)
+    {
+        ulong sender = rpcParams.Receive.SenderClientId;
+        var ids = NetworkManager.Singleton.ConnectedClientsIds;
+
+        if (ids.Count < 2) return;
+
+        if (sender == ids[0])
+            player1Rematch.Value = false;
+        else if (sender == ids[1])
+            player2Rematch.Value = false;
+
+        Debug.Log($"Player {sender} canceled rematch.");
+
+        CancelRematchClientRpc();
+    }
+
+    private void CheckRematchState()
+    {
+        if (player1Rematch.Value && player2Rematch.Value)
+        {
+            Debug.Log("[Server] Both players accepted rematch. Restarting...");
+
+            ResetGameState();
+        }
+    }
+
+    private void ResetGameState()
+    {
+        // Reset all necessary values before returning to Lobby
+        player1Rematch.Value = false;
+        player2Rematch.Value = false;
+        player1Ready.Value = false;
+        player2Ready.Value = false;
+        currentTurnPhase = TurnPhase.None;
+
+        // Reset health values
+        // PlayerState.LocalPlayer.ResetPlayerServerRpc();
+        // PlayerState.EnemyPlayer.ResetPlayerServerRpc();
+
+        SetGameState(GameState.Lobby);
+    }
+
+    [ClientRpc]
+    private void CancelRematchClientRpc()
+    {
+        Debug.Log("[Client] Rematch canceled by opponent.");
+        OnLocalRematchUpdated?.Invoke(false);
+    }
+    
+    [ClientRpc]
+    private void NotifyRematchOfferedClientRpc(ulong offeringClientId)
+    {
+        if (NetworkManager.Singleton.LocalClientId == offeringClientId)
+            return; // Don't show it to the one who offered
+
+        Debug.Log($"[Client] Received rematch offer from Client {offeringClientId}");
+        
+        OnRematchOffered?.Invoke(); // Show rematch UI
+    }
+
+
+#endregion
+
     
     
     // [OBSOLETE] 

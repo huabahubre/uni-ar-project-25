@@ -76,8 +76,8 @@ public class CanvasPage_Lobby : CanvasPage
 
     public override void OnShow()
     {
-        Panel_Actions.SetActive(true);
-        Panel_ActiveLobby.SetActive(false);
+        Panel_Actions.SetActive(!DataManagement.Instance.isRematchLobby);
+        Panel_ActiveLobby.SetActive(DataManagement.Instance.isRematchLobby);
         Panel_WaitingForOtherPlayer.SetActive(false);
 
         // FirstElementToggle.isOn = true;
@@ -93,6 +93,7 @@ public class CanvasPage_Lobby : CanvasPage
     {
         Panel_Actions.SetActive(false);
         Panel_ActiveLobby.SetActive(true);
+        Button_Back.gameObject.SetActive(false);
         RefreshAllLayoutGroups();
     
         // Check if host

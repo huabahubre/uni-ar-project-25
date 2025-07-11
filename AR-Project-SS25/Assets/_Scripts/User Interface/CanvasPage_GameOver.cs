@@ -50,6 +50,9 @@ public class CanvasPage_GameOver : CanvasPage
         Panel_Win.SetActive(GameStateManager.Instance.IsLocalPlayerWinner());
         Panel_Lose.SetActive(!GameStateManager.Instance.IsLocalPlayerWinner());
         
+        // Subscribe to rematch events
+        GameStateManager.OnRematchOffered += OnOfferedRematch;
+        
         base.OnShow();
     }
 
@@ -72,9 +75,10 @@ public class CanvasPage_GameOver : CanvasPage
     public void OfferRematch()
     {
         Panel_WaitingForRematch.SetActive(true);
+        DataManagement.Instance.isRematchLobby = true;
+        GameStateManager.Instance.RequestRematchServerRpc();
     }
 
-    
     
     public void OnOfferedRematch()
     {
@@ -82,12 +86,21 @@ public class CanvasPage_GameOver : CanvasPage
         Panel_AcceptRematch.SetActive(true);
     }
     
-
-    public void AcceptRematch()
+    
+    public void AcceptRematchOffer()
     {
-        MainCanvasManagement.Instance.ShowPage("Lobby");
+        DataManagement.Instance.isRematchLobby = true;
+        GameStateManager.Instance.RequestRematchServerRpc();
     }
 
+    public void CancelRematchOffer()
+    {
+        GameStateManager.Instance.CancelRematchServerRpc();
+        
+        DataManagement.Instance.isRematchLobby = false;
+        Panel_WaitingForRematch.SetActive(false);
+        Panel_AcceptRematch.SetActive(false);
+    }
     
     
     #endregion

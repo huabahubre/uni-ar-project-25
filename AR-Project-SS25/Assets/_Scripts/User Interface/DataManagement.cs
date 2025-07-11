@@ -96,7 +96,12 @@ public class DataManagement : Singleton<DataManagement>
     
     
     #endregion
+ 
     
+    
+    
+    // This is not good, dont do this in your project
+    public bool isRematchLobby = false;
 }
 
 
