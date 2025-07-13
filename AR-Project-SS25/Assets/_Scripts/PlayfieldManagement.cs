@@ -187,7 +187,7 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
         
         if (elementMarker == null || elementMarker.markerType != MarkerType.Element)
         {
-            Debug.Log("❌ No valid element marker placed. Crafting requires an element card.");
+            Debug.LogError("❌ No valid element marker placed. Crafting requires an element card.");
             onRecipeInvalid?.Invoke();
             return;
         }
@@ -207,7 +207,7 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
             && elementMarker != null 
             && elementMarker.markerType == MarkerType.Element)
         {
-            Debug.Log($"✅ Valid recipe found!\n" +
+            Debug.LogError($"✅ Valid recipe found!\n" +
                       $"Spell Type: <b>{recipe.spellType}</b>\n" +
                       $"Element Used: <b>{elementText}</b>");
                       

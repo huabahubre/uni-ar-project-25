@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using TMPro;
 
 [ExecuteAlways]
 public class CraftingGridCell : MonoBehaviour
@@ -25,6 +26,10 @@ public class CraftingGridCell : MonoBehaviour
     public Action<TrackedMarkerInfo> OnAssignedMarker;
     public Action OnRemovedMarker;
     
+    // Debug
+    private TextMeshProUGUI debugText;
+    private bool hasLoggedMarkers = false;
+    
     
     private void Start()
     {
@@ -45,6 +50,11 @@ public class CraftingGridCell : MonoBehaviour
                 }
             });
         }
+        
+        Debug.LogError("Crafting Cell Started");
+        
+        debugText = GameObject.Find("DebugText")?.GetComponent<TextMeshProUGUI>();
+        debugText.text = "Gridcell found DebugText: " + (debugText != null ? debugText.name : "Not found");
     }
 
     private void Update()
@@ -58,13 +68,50 @@ public class CraftingGridCell : MonoBehaviour
         }
 
         TrackedMarkerInfo[] allMarkers = FindObjectsOfType<TrackedMarkerInfo>();
-
+        
+        // Debug
+        if (allMarkers != null && allMarkers.Length > 0)
+        {
+            if (!hasLoggedMarkers)
+            {
+                Debug.LogError($"🔍 Found {allMarkers.Length} markers in scene for cell '{name}'");
+                hasLoggedMarkers = true;
+            }
+            
+            // Raycast down from the center of the cell to detect a marker below
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, 10f, LayerMask.GetMask("Marker")))
+            {
+                Debug.LogError("Raycast hit 1");
+                TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
+                if (markerInfo != null)
+                {
+                    assignedMarker = markerInfo;
+                    Debug.LogError($"🟡 Raycast found marker below cell '{name}': {markerInfo.name}");
+                    OnAssignedMarkerChanged();
+                }
+            } 
+            else if (Physics.Raycast(transform.position, Vector3.up, out hit, 3f, LayerMask.GetMask("Marker")))
+            {
+                Debug.LogError("Raycast hit 2");
+                TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
+                if (markerInfo != null)
+                {
+                    assignedMarker = markerInfo;
+                    Debug.LogError($"🟡 Raycast found marker above cell '{name}': {markerInfo.name}");
+                    OnAssignedMarkerChanged();
+                }
+            }
+        }
+        
+        
         if (assignedMarker == null)
         {
             TrackedMarkerInfo found = FindMatchingMarkerInBox(allMarkers);
 
             if (found != null && found != previousMarker)
             {
+                Debug.LogError("🟢 Found matching marker for cell '" + name + "': " + found.name);
                 assignedMarker = found;
                 OnAssignedMarkerChanged();
             }

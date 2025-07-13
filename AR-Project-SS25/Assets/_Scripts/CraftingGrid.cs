@@ -18,6 +18,9 @@ public class CraftingGrid : Singleton<CraftingGrid>
     private void Start()
     {
         scalerChild.SetActive(false);
+        
+        Debug.LogError("Grid Started");
+        
     }
 
     private void Update()
@@ -32,7 +35,7 @@ public class CraftingGrid : Singleton<CraftingGrid>
     }
 
     
-    #region Updat position and rotation / visual
+    #region Update position and rotation / visual
     
     public void UpdateGridPosition(Vector3 position, Quaternion rotation)
     {

@@ -229,6 +229,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1917587312508469731, guid: 372812244335c844d8e2f44cbdd6aa7c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2336989455438297277, guid: 372812244335c844d8e2f44cbdd6aa7c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -437,7 +442,6 @@ GameObject:
   - component: {fileID: 641401826}
   - component: {fileID: 641401832}
   - component: {fileID: 641401833}
-  - component: {fileID: 641401834}
   m_Layer: 0
   m_Name: XR Origin (Mobile AR)
   m_TagString: Untagged
@@ -558,23 +562,95 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridPrefab: {fileID: 5125414030496144318, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
     type: 3}
+  spawnedGrid: {fileID: 809399457}
   gridManagement: {fileID: 111608551}
   cardPrefab: {fileID: 4465495395296327294, guid: fc664f03878e57348ac472137993fe59,
     type: 3}
   debugText: {fileID: 942672727}
---- !u!114 &641401834
-MonoBehaviour:
+--- !u!1001 &809399456
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5125414030496144318, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_Name
+      value: PlayerCraftingGrid
+      objectReference: {fileID: 0}
+    - target: {fileID: 5125414030496144318, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5223137659574220230, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.3098235
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.771407
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7083913402576796685, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 192dd20f3a44f9a459803abd5ef2cd6d, type: 3}
+--- !u!1 &809399457 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5125414030496144318, guid: 192dd20f3a44f9a459803abd5ef2cd6d,
+    type: 3}
+  m_PrefabInstance: {fileID: 809399456}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 641401825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cb2ef2b26a1593479987786b3f31855, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textMeshProUGUI: {fileID: 0}
 --- !u!1 &942672725
 GameObject:
   m_ObjectHideFlags: 0
@@ -632,7 +708,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 'Gridcell found DebugText: DebugText'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1323,3 +1399,4 @@ SceneRoots:
   - {fileID: 80550858}
   - {fileID: 1184068784}
   - {fileID: 111608550}
+  - {fileID: 809399456}

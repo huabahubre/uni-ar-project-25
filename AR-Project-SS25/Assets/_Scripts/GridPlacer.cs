@@ -3,14 +3,16 @@ using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using System.Collections.Generic;
 using TMPro;
+using Sirenix.OdinInspector;
 
 public class GridPlacer : MonoBehaviour
 {
     public GameObject gridPrefab; // Assign a 3x3 grid prefab in the inspector
-    private ARTrackedImageManager trackedImageManager;
-    private GameObject spawnedGrid;
     
-    [SerializeField] private GridManagement gridManagement;
+    private ARTrackedImageManager trackedImageManager;
+    public GameObject spawnedGrid;
+    
+    [SerializeField] private PlayfieldManagement gridManagement;
     [SerializeField] private GameObject cardPrefab;
     
     private Dictionary<string, GameObject> spawnedMarkers = new Dictionary<string, GameObject>();
@@ -41,6 +43,12 @@ public class GridPlacer : MonoBehaviour
         trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
     }
     
+    [Button]
+    public void InstantiatePrefab()
+    {
+        spawnedGrid = Instantiate(gridPrefab, Vector3.zero, Quaternion.identity);
+    }
+    
     void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
         foreach (var trackedImage in args.added)
@@ -49,6 +57,8 @@ public class GridPlacer : MonoBehaviour
             {
                 debugText.text = "Anchor detected: " + trackedImage.referenceImage.name;
                 PlaceGrid(trackedImage);
+                Debug.Log("Anchor detected: " + trackedImage.referenceImage.name);
+                Debug.LogError("test error");
             }
             else if (trackedImage.referenceImage.name == card)
             {
@@ -60,8 +70,7 @@ public class GridPlacer : MonoBehaviour
                 debugText.text += " Card instance created.";
                 //gridManagement.RegisterMarker(trackedImage);
             }
-            else if (trackedImage.referenceImage.name == air || trackedImage.referenceImage.name == water ||
-                     trackedImage.referenceImage.name == earth || trackedImage.referenceImage.name == fire)
+            else if (trackedImage.referenceImage.name is air or water or earth or fire)
             {
                 debugText.text = "Element detected: " + trackedImage.referenceImage.name;
                 GameObject cardInstance = Instantiate(cardPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
@@ -80,7 +89,6 @@ public class GridPlacer : MonoBehaviour
                     case fire:
                         cardInstance.GetComponent<TrackedMarkerInfo>().elementType = ElementType.Fire;
                         break;
-                    
                 }
                 spawnedMarkers[trackedImage.trackableId.ToString()] = cardInstance;
                 cardInstance.transform.SetParent(trackedImage.transform);
@@ -107,10 +115,7 @@ public class GridPlacer : MonoBehaviour
                     debugText.text = "Card updated: " + trackedImage.referenceImage.name;
                     //gridManagement.UpdateMarker(trackedImage);
                 }
-                else if (trackedImage.referenceImage.name == air || 
-                         trackedImage.referenceImage.name == water || 
-                         trackedImage.referenceImage.name == earth || 
-                         trackedImage.referenceImage.name == fire)
+                else if (trackedImage.referenceImage.name is air or water or earth or fire)
                 {
                     debugText.text = "Element updated: " + trackedImage.referenceImage.name;
                     //gridManagement.UpdateMarker(trackedImage);
@@ -124,11 +129,7 @@ public class GridPlacer : MonoBehaviour
                     debugText.text = "Anchor lost, hiding grid.";
                     if (spawnedGrid) spawnedGrid.SetActive(false);
                 }
-                else if (trackedImage.referenceImage.name == card || 
-                         trackedImage.referenceImage.name == air || 
-                         trackedImage.referenceImage.name == water || 
-                         trackedImage.referenceImage.name == earth || 
-                         trackedImage.referenceImage.name == fire)
+                else
                 {
                     debugText.text = "Element or card marker lost.";
                     //gridManagement.UnregisterMarker(trackedImage);
@@ -151,10 +152,7 @@ public class GridPlacer : MonoBehaviour
                     spawnedMarkers.Remove(trackedImage.trackableId.ToString());
                 }
             }
-            else if (trackedImage.referenceImage.name == air || 
-                     trackedImage.referenceImage.name == water || 
-                     trackedImage.referenceImage.name == earth || 
-                     trackedImage.referenceImage.name == fire)
+            else if (trackedImage.referenceImage.name is air or water or earth or fire)
             {
                 debugText.text = "Element marker removed: " + trackedImage.referenceImage.name;
                 //gridManagement.UnregisterMarker(trackedImage);
@@ -164,6 +162,15 @@ public class GridPlacer : MonoBehaviour
     
     void PlaceGrid(ARTrackedImage trackedImage)
     {
+        if (spawnedGrid != null)
+        {
+            spawnedGrid.transform.position = trackedImage.transform.position;
+            spawnedGrid.transform.rotation = trackedImage.transform.rotation;
+            spawnedGrid.transform.SetParent(trackedImage.transform);
+            spawnedGrid.SetActive(true);
+            return;
+        }
+        
         if (gridPrefab == null) return;
         
         float offset = 5f; // Adjust the offset as needed
@@ -193,5 +200,4 @@ public class GridPlacer : MonoBehaviour
             spawnedGrid.transform.rotation = trackedImage.transform.rotation;
         }
     }
-    
 }
