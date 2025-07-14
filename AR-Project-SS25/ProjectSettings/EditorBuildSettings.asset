@@ -23,9 +23,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/_Scenes/MultiplayerUiCustom.unity
     guid: f53a51c267eba6b45a702d7cf2a0cbea
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/MultiplayerUiCustomAndIngame.unity
     guid: fae1456512913c74a807d33f5927c509
+  - enabled: 1
+    path: Assets/_Scenes/NewGrid.unity
+    guid: 7fa641077b9617f42909e00200e849f5
+  - enabled: 0
+    path: Assets/_Scenes/E_MultiplayerUiCustomAndIngame 1.unity
+    guid: 4947dfbaf1cbb784d9762338c0c3a740
+  - enabled: 0
+    path: Assets/_Scenes/sam.unity
+    guid: 214424f42022f97498688689e798d52a
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6ee72d15cf39dd748a13eac57397b9af,
       type: 2}

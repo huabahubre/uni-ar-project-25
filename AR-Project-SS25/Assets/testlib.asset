@@ -27,3 +27,143 @@ MonoBehaviour:
     m_SpecifySize: 1
     m_Name: QRCode
     m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4873873295783476373
+      m_GuidHigh: 8477488750476721548
+    m_SerializedTextureGuid:
+      m_GuidLow: 2018762977496644518
+      m_GuidHigh: 16549602617179455944
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: ar_marker_fire
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4844144770728671514
+      m_GuidHigh: 3561780766667627448
+    m_SerializedTextureGuid:
+      m_GuidLow: 1253216224771419681
+      m_GuidHigh: 9005668159273323448
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: qr-code_air
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5456679094869443061
+      m_GuidHigh: 14705467169056838590
+    m_SerializedTextureGuid:
+      m_GuidLow: 4531750081237427671
+      m_GuidHigh: 6577163209253850441
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: qr-code_earth
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4725708482043687432
+      m_GuidHigh: 17603904686553716612
+    m_SerializedTextureGuid:
+      m_GuidLow: 8522167043093172303
+      m_GuidHigh: 5137634150912405049
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: qr-code_fire
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5675745749178943071
+      m_GuidHigh: 8587925534544833942
+    m_SerializedTextureGuid:
+      m_GuidLow: 6139777251839076207
+      m_GuidHigh: 3103491177325095400
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: qr-code_water
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5355237348812146709
+      m_GuidHigh: 6143283863196124831
+    m_SerializedTextureGuid:
+      m_GuidLow: 3788839263365243528
+      m_GuidHigh: 10200308009220549659
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: marker1
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5151028816674678985
+      m_GuidHigh: 6786696160670488759
+    m_SerializedTextureGuid:
+      m_GuidLow: 16592579882932301017
+      m_GuidHigh: 1597889050255437610
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: anchor
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5578620512490217896
+      m_GuidHigh: 9568446217573769651
+    m_SerializedTextureGuid:
+      m_GuidLow: 13034652965795978782
+      m_GuidHigh: 15341698122451833131
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: marker1
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5117224491783473407
+      m_GuidHigh: 15640204265655660468
+    m_SerializedTextureGuid:
+      m_GuidLow: 11782627840632680294
+      m_GuidHigh: 16004274189354845947
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: marker1
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4928718067828660282
+      m_GuidHigh: 2738954519111467417
+    m_SerializedTextureGuid:
+      m_GuidLow: 721967042452116524
+      m_GuidHigh: 12161337361787219914
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: marker1
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4890162234561854886
+      m_GuidHigh: 14096560616422653842
+    m_SerializedTextureGuid:
+      m_GuidLow: 17105895531770670630
+      m_GuidHigh: 11377251447982346120
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: marker1
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4719390302651157929
+      m_GuidHigh: 987934250503096215
+    m_SerializedTextureGuid:
+      m_GuidLow: 11404496879685870109
+      m_GuidHigh: 9137178925856872427
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: marker1
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5709367077611465675
+      m_GuidHigh: 843839523218874047
+    m_SerializedTextureGuid:
+      m_GuidLow: 7044903272313509652
+      m_GuidHigh: 8733052653859194843
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: marker1
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5059158681635769229
+      m_GuidHigh: 16732975977279368330
+    m_SerializedTextureGuid:
+      m_GuidLow: 8693080297904304193
+      m_GuidHigh: 6662626245622635240
+    m_Size: {x: 0.06, y: 0.06}
+    m_SpecifySize: 1
+    m_Name: marker1
+    m_Texture: {fileID: 0}

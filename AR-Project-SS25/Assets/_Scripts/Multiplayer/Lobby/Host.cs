@@ -4,11 +4,12 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Services.Lobbies;
 using TMPro;
+using UnityEditor;
 
 public class HostLobbyUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text lobbyCodeText;
-    [SerializeField] private TMP_Text sessionNameText;
+    // [SerializeField] private TMP_Text sessionNameText;
 
     private async void Awake()
     {
@@ -22,9 +23,12 @@ public class HostLobbyUI : MonoBehaviour
         
         // Start loading
         MainCanvasManagement.Instance.StartLoading("Hosting Lobby...");
+
+        // TODO: fix compile error
+        string guidSessionName = "xyz";
         
         var lobby = await LobbyService.Instance.CreateLobbyAsync(
-            sessionNameText.text,
+            guidSessionName,
             2
         );
 
