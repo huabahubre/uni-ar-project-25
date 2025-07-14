@@ -322,4 +322,35 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
     #endregion
 
     
+    #region Networked CanvasPage Management
+
+    public void SubscribeToGameStateManager()
+    {
+        // Subscribe to game state manager events if needed
+        GameStateManager.GameStateChanged += HandleGameStateChanged;
+    }
+
+    void HandleGameStateChanged(GameState gameState)
+    {
+        // Handle game state changes if needed
+        switch (gameState)
+        {
+            case GameState.Lobby:
+                ShowPage("Lobby");
+                break;
+            case GameState.Gameplay:
+                ShowPage("Gameplay");
+                break;
+            case GameState.GameOver:
+                // ShowPage("GameOver");
+                break;
+            default:
+                Debug.LogWarning("Unhandled game state: " + gameState);
+                break;
+        }
+    }
+    
+    #endregion
+    
+    
 }

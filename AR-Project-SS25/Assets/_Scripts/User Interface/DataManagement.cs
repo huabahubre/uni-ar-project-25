@@ -96,12 +96,12 @@ public class DataManagement : Singleton<DataManagement>
     
     
     #endregion
+ 
     
     
     
-    // TODO: These are hardcoded values
-    [BoxGroup("DEVELOPER")] public bool isWin = true;
-
+    // This is not good, dont do this in your project
+    public bool isRematchLobby = false;
 }
 
 

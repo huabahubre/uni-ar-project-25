@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -10,7 +8,6 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     [BoxGroup("References")] public CraftingGridCell playerElementCell;
     [BoxGroup("References")] public HealthVisualPrefab playerHealthVisual;
     [BoxGroup("References")] public HealthVisualPrefab enemyHealthVisual;
-
     
     [BoxGroup("Settings")] public Vector3 playerVisualOffset = new Vector3(0, 0, 0);
     [BoxGroup("Settings")] public Vector3 playerElementCellOffset = new Vector3(0, 0, 0);
@@ -25,7 +22,12 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
 
     
     [SerializeField, ReadOnly]
-    private TrackedMarkerInfo currentElementMarker;
+    public TrackedMarkerInfo currentElementMarker;
+    
+    
+    
+    
+    private bool initedPlayfield = false;
     
     
     private void Start()
@@ -53,11 +55,26 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     {
         playFieldVisual.SetActive(true);
         
+        // Hide the scan screen
+        MainCanvasManagement.Instance.StopScanScreen();
+        
         // Subscribe to element cell
         if (playerElementCell != null)
         {
             playerElementCell.OnAssignedMarker += OnPlacedElementCard;
             playerElementCell.OnRemovedMarker += OnRemovedElementCard;
+        }
+        
+        // Tell the server, that we scanned the playfield for the first time
+        if (!initedPlayfield)
+        {
+            initedPlayfield = true;
+            MainCanvasManagement.Instance.StartLoading("Waiting for other players to scan the playfield...");
+            GameStateManager.Instance.SetPlayerReadyServerRpc();
+            
+            // Init Health Visuals
+            playerHealthVisual.Init(true, (ElementType)PlayerState.LocalPlayer.ElementIndex.Value);
+            enemyHealthVisual.Init(false, (ElementType)PlayerState.EnemyPlayer.ElementIndex.Value);
         }
     }
 
@@ -73,6 +90,9 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
             playerElementCell.OnAssignedMarker -= OnPlacedElementCard;
             playerElementCell.OnRemovedMarker -= OnRemovedElementCard;
         }
+        
+        // Show scan screen
+        MainCanvasManagement.Instance.ShowScanScreen("You lost the playfield tracking.\nPlease scan the playfield again to continue!");
     }
     
     
@@ -106,7 +126,6 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     
     #endregion
     
-    
     #region Element checking
 
     void OnPlacedElementCard(TrackedMarkerInfo markerInfo)
@@ -117,7 +136,7 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
         currentElementMarker = markerInfo;
         CraftingGrid.Instance.ShowVisual();
         
-        Debug.Log("🔵 Element card placed: " + markerInfo.name);
+        Debug.Log("🔵 Element card placed: " + markerInfo.elementType);
     }
 
     void OnRemovedElementCard()
@@ -132,7 +151,6 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     
     
     #endregion
-    
 
     #region Spawn Grid
     

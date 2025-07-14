@@ -76,11 +76,11 @@ public class CanvasPage_Lobby : CanvasPage
 
     public override void OnShow()
     {
-        Panel_Actions.SetActive(true);
-        Panel_ActiveLobby.SetActive(false);
+        Panel_Actions.SetActive(!DataManagement.Instance.isRematchLobby);
+        Panel_ActiveLobby.SetActive(DataManagement.Instance.isRematchLobby);
         Panel_WaitingForOtherPlayer.SetActive(false);
 
-        FirstElementToggle.isOn = true;
+        // FirstElementToggle.isOn = true;
         
         base.OnShow();
     }
@@ -93,48 +93,37 @@ public class CanvasPage_Lobby : CanvasPage
     {
         Panel_Actions.SetActive(false);
         Panel_ActiveLobby.SetActive(true);
+        Button_Back.gameObject.SetActive(false);
         RefreshAllLayoutGroups();
     
-        // Set local Player Information
-        // if (PlayerState.LocalPlayer != null)
-        //     Text_PlayerNamePlaceholder.text = PlayerState.LocalPlayer.PlayerName.Value.ToString();
-
         // Check if host
-        if (lobby.HostId == AuthenticationService.Instance.PlayerId)
-        {
-            Panel_WaitingForOtherPlayer.SetActive(true);
-            
-            PlayerState.OnEnemyJoined += OnOtherPlayerConnected;
-        }
-        else
-        {
-            Panel_WaitingForOtherPlayer.SetActive(true);
-            HandlePlayerUpdate(PlayerState.EnemyPlayer);
-        }
         Button_StartGame.gameObject.SetActive(lobby.HostId == AuthenticationService.Instance.PlayerId);
+        Panel_WaitingForOtherPlayer.SetActive(true);
         
         // Subscribe to player updates
+        PlayerState.OnEnemyJoined += OnEnemyConnected;
         PlayerState.OnPlayerStateUpdated += HandlePlayerUpdate;
+        MainCanvasManagement.Instance.SubscribeToGameStateManager();
         
         MainCanvasManagement.Instance.StopLoading();
     }
 
     [Button]
-    public void OnOtherPlayerConnected(PlayerState playerState)
+    public void OnEnemyConnected(PlayerState playerState)
     {
         Panel_WaitingForOtherPlayer.SetActive(false);
-        PlayerState.OnEnemyJoined -= OnOtherPlayerConnected;
+        PlayerState.OnEnemyJoined -= OnEnemyConnected;
     }
     
     
     public void OnStartGame()
     {
-        SyncStartGame.Instance.gameStarted = true;
+        // SyncStartGame.Instance.gameStarted = true;
+        GameStateManager.Instance.SetGameState(GameState.Gameplay);
     }
     
     
     #endregion
-    
     
     #region Player State Management
     

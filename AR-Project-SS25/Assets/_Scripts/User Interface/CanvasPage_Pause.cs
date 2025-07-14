@@ -61,9 +61,7 @@ public class CanvasPage_Pause : CanvasPage
     public void ConfirmGiveUp()
     {
         Debug.Log("Player confirmed GiveUp!");
-        
-        DataManagement.Instance.isWin = false;
-        MainCanvasManagement.Instance.ShowPage("GameOver");
+        GameStateManager.Instance.SurrenderServerRpc();
     }
     
     

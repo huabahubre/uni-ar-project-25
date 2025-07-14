@@ -24,6 +24,12 @@ public class CanvasPage_MainMenu : CanvasPage
     }
 
 
+    public override void OnShow()
+    {
+        DataManagement.Instance.isRematchLobby = false;
+        base.OnShow();
+    }
+
     void OnPlayButtonClick()
     {
         MainCanvasManagement.Instance.ShowPage("Lobby");

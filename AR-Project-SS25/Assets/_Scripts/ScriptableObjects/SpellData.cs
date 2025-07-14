@@ -74,9 +74,9 @@ public enum SpellEffect
 public enum SpellType
 {
     None,
-    Shield,
-    Spear,
-    GroundPound,
     SingleShot,
-    WideShot
+    Spear,
+    WideShot,
+    Shield,
+    GroundPound
 }
