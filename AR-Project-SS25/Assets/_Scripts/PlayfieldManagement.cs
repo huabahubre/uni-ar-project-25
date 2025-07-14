@@ -56,7 +56,7 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
         playFieldVisual.SetActive(true);
         
         // Hide the scan screen
-        MainCanvasManagement.Instance.StopScanScreen();
+       MainCanvasManagement.Instance.StopScanScreen();
         
         // Subscribe to element cell
         if (playerElementCell != null)
@@ -70,12 +70,15 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
         {
             initedPlayfield = true;
             MainCanvasManagement.Instance.StartLoading("Waiting for other players to scan the playfield...");
-            GameStateManager.Instance.SetPlayerReadyServerRpc();
+            // TODO: UNCOMMENT THIS WHEN READY
+            //GameStateManager.Instance.SetPlayerReadyServerRpc();
             
             // Init Health Visuals
-            playerHealthVisual.Init(true, (ElementType)PlayerState.LocalPlayer.ElementIndex.Value);
-            enemyHealthVisual.Init(false, (ElementType)PlayerState.EnemyPlayer.ElementIndex.Value);
+            //playerHealthVisual.Init(true, (ElementType)PlayerState.LocalPlayer.ElementIndex.Value);
+            //enemyHealthVisual.Init(false, (ElementType)PlayerState.EnemyPlayer.ElementIndex.Value);
         }
+        
+        Debug.LogError("test");
     }
 
     
@@ -106,20 +109,20 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
         // Set position of PlayerElementCell
         if (playerElementCell != null)
         {
-            playerElementCell.transform.position = position + rotation * playerElementCellOffset;
+            playerElementCell.transform.localPosition = position + rotation * playerElementCellOffset;
             playerElementCell.transform.rotation = rotation;
         }
         
         // Set position of HealthVisuals
         if (playerHealthVisual != null)
         {
-            playerHealthVisual.transform.position = position + rotation * playerVisualOffset;
+            playerHealthVisual.transform.localPosition = position + rotation * playerVisualOffset;
             playerHealthVisual.transform.rotation = rotation;
         }
         if (enemyHealthVisual != null)
         {
             Vector3 enemyOffset = -playerVisualOffset;
-            enemyHealthVisual.transform.position = position + rotation * enemyOffset;
+            enemyHealthVisual.transform.localPosition = position + rotation * enemyOffset;
             enemyHealthVisual.transform.rotation = rotation;
         }
     }
@@ -131,8 +134,13 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     void OnPlacedElementCard(TrackedMarkerInfo markerInfo)
     {
         if (markerInfo == null)
+        {
+            Debug.LogError("❌ Marker info is null. Cannot place element card.");
             return;
-
+        }
+        
+        Debug.LogError("🟢 Placed element card in cell: " + markerInfo.name);
+        
         currentElementMarker = markerInfo;
         CraftingGrid.Instance.ShowVisual();
         
@@ -146,6 +154,7 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
         CraftingGrid.Instance.HideVisual();
         
         Debug.Log("🔴 Element card removed from cell.");
+        Debug.LogError("🔴 Element card removed from cell.");
     }
 
     
@@ -155,34 +164,34 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     #region Spawn Grid
     
     
-    [Button]
-    public void SpawnLocalPlayer(Transform trackedMarkerObject = null)
-    {
-        Vector3 markerPosition = trackedMarkerObject.position;
-        Quaternion markerRotation = trackedMarkerObject.rotation;
-
-        // Instantiate Player Visual
-        Vector3 playerPos = markerPosition + markerRotation * playerVisualOffset;
-        playerHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, playerPos, markerRotation);
-        playerHealthVisual.name = "PlayerHealthVisual";
-        playerHealthVisual.Init(true, ElementType.Fire);
-
-        // Instantiate Enemy Visual (opposite position)
-        Vector3 enemyOffset = -playerVisualOffset;
-        Vector3 enemyPos = markerPosition + markerRotation * enemyOffset;
-        enemyHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, enemyPos, markerRotation);
-        enemyHealthVisual.name = "EnemyHealthVisual";
-        enemyHealthVisual.Init(false, ElementType.Water);
-        
-
-        // Instantiate Player Grid
-        Vector3 gridPos = markerPosition + markerRotation * gridOffset;
-        CraftingGrid playerGrid = Instantiate(DataManagement.Instance.craftingGridPrefab, gridPos, markerRotation);
-        playerGrid.gameObject.name = "PlayerCraftingGrid";
-        
-        // TODO: ONLY FOR DEBUGGING
-        // playerGrid.currentMarkers = trackedMarkers.ToArray();
-    }
+    // [Button]
+    // public void SpawnLocalPlayer(Transform trackedMarkerObject = null)
+    // {
+    //     Vector3 markerPosition = trackedMarkerObject.position;
+    //     Quaternion markerRotation = trackedMarkerObject.rotation;
+    //
+    //     // Instantiate Player Visual
+    //     Vector3 playerPos = markerPosition + markerRotation * playerVisualOffset;
+    //     playerHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, playerPos, markerRotation);
+    //     playerHealthVisual.name = "PlayerHealthVisual";
+    //     playerHealthVisual.Init(true, ElementType.Fire);
+    //
+    //     // Instantiate Enemy Visual (opposite position)
+    //     Vector3 enemyOffset = -playerVisualOffset;
+    //     Vector3 enemyPos = markerPosition + markerRotation * enemyOffset;
+    //     enemyHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, enemyPos, markerRotation);
+    //     enemyHealthVisual.name = "EnemyHealthVisual";
+    //     enemyHealthVisual.Init(false, ElementType.Water);
+    //     
+    //
+    //     // Instantiate Player Grid
+    //     Vector3 gridPos = markerPosition + markerRotation * gridOffset;
+    //     CraftingGrid playerGrid = Instantiate(DataManagement.Instance.craftingGridPrefab, gridPos, markerRotation);
+    //     playerGrid.gameObject.name = "PlayerCraftingGrid";
+    //     
+    //     // TODO: ONLY FOR DEBUGGING
+    //     // playerGrid.currentMarkers = trackedMarkers.ToArray();
+    // }
 
 
 

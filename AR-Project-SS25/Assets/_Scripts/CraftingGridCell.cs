@@ -29,6 +29,9 @@ public class CraftingGridCell : MonoBehaviour
     // Debug
     private TextMeshProUGUI debugText;
     private bool hasLoggedMarkers = false;
+
+
+    public GameObject debugRaycast;
     
     
     private void Start()
@@ -50,11 +53,7 @@ public class CraftingGridCell : MonoBehaviour
                 }
             });
         }
-        
-        Debug.LogError("Crafting Cell Started");
-        
-        debugText = GameObject.Find("DebugText")?.GetComponent<TextMeshProUGUI>();
-        debugText.text = "Gridcell found DebugText: " + (debugText != null ? debugText.name : "Not found");
+
     }
 
     private void Update()
@@ -67,6 +66,33 @@ public class CraftingGridCell : MonoBehaviour
             return;
         }
 
+            
+        // Raycast down from the center of the cell to detect a marker below
+        // RaycastHit hit;
+        // if (Physics.Raycast(transform.position, Vector3.down, out hit, 10f, LayerMask.GetMask("Marker")))
+        // {
+        //     Debug.LogError("Raycast hit 1");
+        //     TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
+        //     if (markerInfo != null)
+        //     {
+        //         assignedMarker = markerInfo;
+        //         Debug.LogError($"🟡 Raycast found marker below cell '{name}': {markerInfo.name}");
+        //         OnAssignedMarkerChanged();
+        //     }
+        // } 
+        // else if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, LayerMask.GetMask("Marker")))
+        // {
+        //     Debug.LogError("Raycast hit 2");
+        //     TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
+        //     if (markerInfo != null)
+        //     {
+        //         assignedMarker = markerInfo;
+        //         Debug.LogError($"🟡 Raycast found marker above cell '{name}': {markerInfo.name}");
+        //         OnAssignedMarkerChanged();
+        //     }
+        // }
+
+        
         TrackedMarkerInfo[] allMarkers = FindObjectsOfType<TrackedMarkerInfo>();
         
         // Debug
@@ -78,51 +104,35 @@ public class CraftingGridCell : MonoBehaviour
                 hasLoggedMarkers = true;
             }
             
-            // Raycast down from the center of the cell to detect a marker below
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, Vector3.down, out hit, 10f, LayerMask.GetMask("Marker")))
+            if (assignedMarker == null)
             {
-                TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
-                if (markerInfo != null)
-                {
-                    assignedMarker = markerInfo;
-                    // Debug.LogError($"🟡 Raycast found marker below cell '{name}': {markerInfo.name}");
-                    OnAssignedMarkerChanged();
-                }
-            } 
-            else if (Physics.Raycast(transform.position, Vector3.up, out hit, 3f, LayerMask.GetMask("Marker")))
-            {
-                Debug.LogError("Raycast hit 2");
-                TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
-                if (markerInfo != null)
-                {
-                    assignedMarker = markerInfo;
-                    // Debug.LogError($"🟡 Raycast found marker above cell '{name}': {markerInfo.name}");
-                    OnAssignedMarkerChanged();
-                }
-            }
-        }
-        
-        
-        if (assignedMarker == null)
-        {
-            TrackedMarkerInfo found = FindMatchingMarkerInBox(allMarkers);
+                TrackedMarkerInfo found = FindMatchingMarkerInBox(allMarkers);
 
-            if (found != null && found != previousMarker)
-            {
-                Debug.LogError("🟢 Found matching marker for cell '" + name + "': " + found.name);
-                assignedMarker = found;
-                OnAssignedMarkerChanged();
+                if (found != null && found != previousMarker)
+                {
+                    Debug.LogError("🟢 Found matching marker for cell '" + name + "': " + found.name);
+                    assignedMarker = found;
+                    OnAssignedMarkerChanged();
+                }
             }
-        }
-        else
-        {
-            if (!IsInsideBox(assignedMarker.transform.position))
+            else
             {
-                assignedMarker = null;
-                OnAssignedMarkerChanged(); 
+                if (!IsHitByRaycast(assignedMarker.transform))
+                {
+                    assignedMarker = null;
+                    OnAssignedMarkerChanged(); 
+                }
             }
+            
         }
+        
+        
+        
+        if(debugRaycast != null)
+            debugRaycast.transform.position = transform.position;
+        
+        
+
     }
 
 
@@ -137,7 +147,7 @@ public class CraftingGridCell : MonoBehaviour
             if (marker == null || marker.gameObject == null) continue;
             if (marker.GetInstanceID() == 0) continue; // 💡 Completely destroyed (defensive check)
             if (marker.markerType != cellType) continue;
-            if (!IsInsideBox(marker.transform.position)) continue;
+            if (!IsHitByRaycast(marker.transform)) continue;
 
             float dist = Vector3.Distance(transform.position, marker.transform.position);
             if (dist < closestDist)
@@ -151,6 +161,48 @@ public class CraftingGridCell : MonoBehaviour
     }
 
 
+    private bool IsHitByRaycast(Transform toCheckTransform)
+    {
+        if (toCheckTransform == null) return false;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 10f, LayerMask.GetMask("Marker")))
+        {
+            Debug.LogError("Raycast hit 1");
+
+            if (hit.transform == toCheckTransform)
+            {
+                Debug.LogError($"🟡 Raycast hit the transform of cell '{name}'");
+                return true;
+            }
+            TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
+            if (markerInfo != null)
+            {
+                //assignedMarker = markerInfo;
+                Debug.LogError($"🟡 Raycast found marker below cell '{name}': {markerInfo.name}");
+                return true;
+            }
+        }
+        else if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, LayerMask.GetMask("Marker")))
+        {
+            Debug.LogError("Raycast hit 2");
+
+            if (hit.transform == toCheckTransform)
+            {
+                Debug.LogError($"🟡 Raycast hit the transform of cell '{name}'");
+                return true;
+            }
+            TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
+            if (markerInfo != null)
+            {
+                //assignedMarker = markerInfo;
+                Debug.LogError($"🟡 Raycast found marker above cell '{name}': {markerInfo.name}");
+                return true;
+            }
+            
+        }
+
+        return false;
+    }
 
     private bool IsInsideBox(Vector3 worldPoint)
     {
@@ -174,6 +226,12 @@ public class CraftingGridCell : MonoBehaviour
             
             // Make callback
             OnAssignedMarker?.Invoke(assignedMarker);
+            
+
+            if (debugRaycast != null)
+            {
+                debugRaycast.GetComponent<Renderer>().material.color = Color.green;
+            }
         }
         else
         {
@@ -186,6 +244,12 @@ public class CraftingGridCell : MonoBehaviour
             
             // Make callback
             OnRemovedMarker?.Invoke();
+            
+            
+            if (debugRaycast != null)
+            {
+                debugRaycast.GetComponent<Renderer>().material.color = Color.red;
+            }
         }
         
         // Checking for crafting result

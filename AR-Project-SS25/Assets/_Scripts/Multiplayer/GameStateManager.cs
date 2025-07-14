@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
-using Unity.Android.Gradle;
 using Unity.Netcode;
 using UnityEngine;
 

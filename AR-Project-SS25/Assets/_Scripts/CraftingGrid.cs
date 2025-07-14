@@ -41,7 +41,7 @@ public class CraftingGrid : Singleton<CraftingGrid>
     {
         if (scalerChild != null)
         {
-            scalerChild.transform.position = position + rotation * playerCraftingGridOffset;
+            scalerChild.transform.localPosition = position + rotation * playerCraftingGridOffset;
             scalerChild.transform.rotation = rotation;
         }
     }

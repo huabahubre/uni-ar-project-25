@@ -548,7 +548,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellType: 0
-  baseDetectionBoxSize: {x: 2, y: 3, z: 3}
+  baseDetectionBoxSize: {x: 2.93, y: 4.19, z: 3.94}
   assignedMarker: {fileID: 0}
   previousMarker: {fileID: 0}
   worldToggle: {fileID: 5562274274627927101}
