@@ -25,7 +25,7 @@ public class HostLobbyUI : MonoBehaviour
         MainCanvasManagement.Instance.StartLoading("Hosting Lobby...");
 
         // TODO: fix compile error
-        /*string guidSessionName = GUID.Generate().ToString();
+        string guidSessionName = "xyz";
         
         var lobby = await LobbyService.Instance.CreateLobbyAsync(
             guidSessionName,
@@ -34,6 +34,6 @@ public class HostLobbyUI : MonoBehaviour
 
         lobbyCodeText.text = lobby.LobbyCode;
         
-        FindObjectOfType<CanvasPage_Lobby>()?.OnJoinedLobby(lobby);*/
+        FindObjectOfType<CanvasPage_Lobby>()?.OnJoinedLobby(lobby);
     }
 }

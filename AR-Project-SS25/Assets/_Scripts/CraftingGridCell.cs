@@ -82,12 +82,11 @@ public class CraftingGridCell : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(transform.position, Vector3.down, out hit, 10f, LayerMask.GetMask("Marker")))
             {
-                Debug.LogError("Raycast hit 1");
                 TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
                 if (markerInfo != null)
                 {
                     assignedMarker = markerInfo;
-                    Debug.LogError($"🟡 Raycast found marker below cell '{name}': {markerInfo.name}");
+                    // Debug.LogError($"🟡 Raycast found marker below cell '{name}': {markerInfo.name}");
                     OnAssignedMarkerChanged();
                 }
             } 
@@ -98,7 +97,7 @@ public class CraftingGridCell : MonoBehaviour
                 if (markerInfo != null)
                 {
                     assignedMarker = markerInfo;
-                    Debug.LogError($"🟡 Raycast found marker above cell '{name}': {markerInfo.name}");
+                    // Debug.LogError($"🟡 Raycast found marker above cell '{name}': {markerInfo.name}");
                     OnAssignedMarkerChanged();
                 }
             }
