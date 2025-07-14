@@ -76,9 +76,12 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
             // Init Health Visuals
             //playerHealthVisual.Init(true, (ElementType)PlayerState.LocalPlayer.ElementIndex.Value);
             //enemyHealthVisual.Init(false, (ElementType)PlayerState.EnemyPlayer.ElementIndex.Value);
+            
+            
+            Debug.LogError("inited playfield");
         }
         
-        Debug.LogError("test");
+        Debug.LogError("OnPlayFieldTracked");
     }
 
     
@@ -96,6 +99,8 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
         
         // Show scan screen
         MainCanvasManagement.Instance.ShowScanScreen("You lost the playfield tracking.\nPlease scan the playfield again to continue!");
+        
+        Debug.LogError("OnLostPlayfield");
     }
     
     

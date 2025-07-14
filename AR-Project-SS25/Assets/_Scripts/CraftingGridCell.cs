@@ -10,8 +10,8 @@ public class CraftingGridCell : MonoBehaviour
 {
     public MarkerType cellType;
 
-    [Header("Detection Zone (Cube, scales with transform)")]
-    public Vector3 baseDetectionBoxSize = new Vector3(0.05f, 0.05f, 0.05f);
+    // [Header("Detection Zone (Cube, scales with transform)")]
+    // public Vector3 baseDetectionBoxSize = new Vector3(0.05f, 0.05f, 0.05f);
 
     [ShowInInspector, ReadOnly] public TrackedMarkerInfo assignedMarker;
     [ShowInInspector, ReadOnly] public TrackedMarkerInfo previousMarker;
@@ -26,11 +26,24 @@ public class CraftingGridCell : MonoBehaviour
     public Action<TrackedMarkerInfo> OnAssignedMarker;
     public Action OnRemovedMarker;
     
-    // Debug
+    
+    
+    
+    [BoxGroup("Raycast Settings")]
+    public float raycastLength = 10f;
+
+    [BoxGroup("Raycast Settings")]
+    public float debugCubeScaleXZ = 0.02f;
+
+
+    
+    // DEBUG TODO: Remove when ready!
     private TextMeshProUGUI debugText;
     private bool hasLoggedMarkers = false;
 
 
+    
+    [BoxGroup("DEBUG")]
     public GameObject debugRaycast;
     
     
@@ -128,11 +141,8 @@ public class CraftingGridCell : MonoBehaviour
         
         
         
-        if(debugRaycast != null)
-            debugRaycast.transform.position = transform.position;
-        
-        
-
+        // DEBUG
+        UpdateDebugRaycastCube();
     }
 
 
@@ -165,52 +175,13 @@ public class CraftingGridCell : MonoBehaviour
     {
         if (toCheckTransform == null) return false;
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, 10f, LayerMask.GetMask("Marker")))
-        {
-            Debug.LogError("Raycast hit 1");
 
-            if (hit.transform == toCheckTransform)
-            {
-                Debug.LogError($"🟡 Raycast hit the transform of cell '{name}'");
-                return true;
-            }
-            TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
-            if (markerInfo != null)
-            {
-                //assignedMarker = markerInfo;
-                Debug.LogError($"🟡 Raycast found marker below cell '{name}': {markerInfo.name}");
-                return true;
-            }
-        }
-        else if (Physics.Raycast(transform.position, Vector3.up, out hit, 10f, LayerMask.GetMask("Marker")))
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, raycastLength, LayerMask.GetMask("Marker")) || Physics.Raycast(transform.position, Vector3.up, out hit, raycastLength, LayerMask.GetMask("Marker")) )
         {
-            Debug.LogError("Raycast hit 2");
-
-            if (hit.transform == toCheckTransform)
-            {
-                Debug.LogError($"🟡 Raycast hit the transform of cell '{name}'");
-                return true;
-            }
-            TrackedMarkerInfo markerInfo = hit.collider.GetComponent<TrackedMarkerInfo>();
-            if (markerInfo != null)
-            {
-                //assignedMarker = markerInfo;
-                Debug.LogError($"🟡 Raycast found marker above cell '{name}': {markerInfo.name}");
-                return true;
-            }
-            
+            return hit.transform == toCheckTransform;
         }
 
         return false;
-    }
-
-    private bool IsInsideBox(Vector3 worldPoint)
-    {
-        Vector3 halfSize = Vector3.Scale(baseDetectionBoxSize, transform.lossyScale) * 0.5f;
-        Vector3 localPoint = transform.InverseTransformPoint(worldPoint);
-        return Mathf.Abs(localPoint.x) <= halfSize.x &&
-               Mathf.Abs(localPoint.y) <= halfSize.y &&
-               Mathf.Abs(localPoint.z) <= halfSize.z;
     }
 
     private void OnAssignedMarkerChanged()
@@ -228,6 +199,7 @@ public class CraftingGridCell : MonoBehaviour
             OnAssignedMarker?.Invoke(assignedMarker);
             
 
+            // DEBUG
             if (debugRaycast != null)
             {
                 debugRaycast.GetComponent<Renderer>().material.color = Color.green;
@@ -245,7 +217,8 @@ public class CraftingGridCell : MonoBehaviour
             // Make callback
             OnRemovedMarker?.Invoke();
             
-            
+
+            // DEBUG
             if (debugRaycast != null)
             {
                 debugRaycast.GetComponent<Renderer>().material.color = Color.red;
@@ -288,10 +261,6 @@ public class CraftingGridCell : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = cellType == MarkerType.Element ? Color.magenta : Color.cyan;
-        Vector3 scaledSize = Vector3.Scale(baseDetectionBoxSize, transform.lossyScale);
-        Gizmos.DrawWireCube(transform.position, scaledSize);
-
         if (assignedMarker != null)
         {
             Gizmos.color = Color.green;
@@ -300,7 +269,49 @@ public class CraftingGridCell : MonoBehaviour
         else
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position + Vector3.up * 0.05f, 0.02f);
+            Gizmos.DrawSphere(transform.position + Vector3.up * 0.05f, 0.02f);
+        }
+
+        // 🔵 Visualize Raycast Down
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * raycastLength);
+
+        // 🔵 Visualize Raycast Up
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.up * raycastLength);
+    }
+
+    
+    #region DEBUG
+    
+    private void UpdateDebugRaycastCube()
+    {
+        if (debugRaycast == null) return;
+
+        RaycastHit hit;
+        Vector3 cubeScale = new Vector3(debugCubeScaleXZ, raycastLength, debugCubeScaleXZ);
+
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, raycastLength, LayerMask.GetMask("Marker")))
+        {
+            debugRaycast.transform.position = transform.position + Vector3.down * raycastLength * 0.5f;
+            debugRaycast.transform.localScale = cubeScale;
+            debugRaycast.GetComponent<Renderer>().material.color = Color.yellow;
+        }
+        else if (Physics.Raycast(transform.position, Vector3.up, out hit, raycastLength, LayerMask.GetMask("Marker")))
+        {
+            debugRaycast.transform.position = transform.position + Vector3.up * raycastLength * 0.5f;
+            debugRaycast.transform.localScale = cubeScale;
+            debugRaycast.GetComponent<Renderer>().material.color = Color.cyan;
+        }
+        else
+        {
+            debugRaycast.transform.position = transform.position;
+            debugRaycast.transform.localScale = cubeScale;
+            debugRaycast.GetComponent<Renderer>().material.color = Color.gray;
         }
     }
+
+    
+    #endregion
+    
 }

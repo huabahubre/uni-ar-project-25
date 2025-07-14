@@ -2,31 +2,47 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using System.Collections.Generic;
-using TMPro;
 using Sirenix.OdinInspector;
+using TMPro;
 
 public class GridPlacer : MonoBehaviour
 {
-   // public GameObject gridPrefab; // Assign a 3x3 grid prefab in the inspector
-    
     private ARTrackedImageManager trackedImageManager;
-   // public GameObject spawnedGrid;
     
-   // [SerializeField] private PlayfieldManagement gridManagement;
-    [SerializeField] private GameObject cardPrefab;
+    [SerializeField, BoxGroup("Marker Prefabs")] private GameObject action_marker_prefab;
+    [SerializeField, BoxGroup("Marker Prefabs")] private GameObject element_marker_prefab;
     
     private Dictionary<string, GameObject> spawnedMarkers = new Dictionary<string, GameObject>();
     
-    public TextMeshProUGUI debugText;
-    
-    // marker names
+    // constant marker names
     private const string air = "ar_marker_air";
     private const string water = "ar_marker_water";
     private const string earth = "ar_marker_earth";
-    private const string fire = "ar_markere_fire";
-    private string anchor = "ar_marker_playfield";
+    private const string fire = "ar_marker_fire";
     
-    private string card = "ar_marker_action";
+    private string playfield = "ar_marker_playfield";
+    private string action = "ar_marker_action";
+    
+    
+
+    // DEBUG
+    [SerializeField, BoxGroup("DEBUG")]
+    public TextMeshProUGUI debugText;
+    private readonly Dictionary<string, string> markerDebugStatus = new();
+
+    #region Debug
+
+    private void SetMarkerDebug(string markerName, string status)
+    {
+        markerDebugStatus[markerName] = $"[{System.DateTime.Now:HH:mm:ss}] {markerName}: {status}";
+        debugText.text = string.Join("\n", markerDebugStatus.Values);
+    }
+
+
+
+    #endregion
+    
+    
     
     void Awake()
     {
@@ -47,28 +63,30 @@ public class GridPlacer : MonoBehaviour
     
     void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
+        // ADD MARKER PREFABS
         foreach (var trackedImage in args.added)
         {
-            if (trackedImage.referenceImage.name == anchor)
+            if (trackedImage.referenceImage.name == playfield)
             {
-                debugText.text = "Anchor detected: " + trackedImage.referenceImage.name;
-                //PlaceGrid(trackedImage);
                 PlayfieldManagement.Instance.OnPlayfieldTracked();
+                
+                // Debug text
+                SetMarkerDebug(trackedImage.referenceImage.name, "detected");
             }
-            else if (trackedImage.referenceImage.name == card)
+            else if (trackedImage.referenceImage.name == action)
             {
-                debugText.text = "Card detected: " + trackedImage.referenceImage.name;
-                GameObject cardInstance = Instantiate(cardPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
+                GameObject cardInstance = Instantiate(action_marker_prefab, trackedImage.transform.position, trackedImage.transform.rotation);
                 cardInstance.GetComponent<TrackedMarkerInfo>().markerType = MarkerType.Action;
                 spawnedMarkers[trackedImage.trackableId.ToString()] = cardInstance;
                 cardInstance.transform.SetParent(trackedImage.transform);
-                debugText.text += " Card instance created.";
-                //gridManagement.RegisterMarker(trackedImage);
+                
+                // Debug text
+                SetMarkerDebug(trackedImage.referenceImage.name, "detected");
             }
             else if (trackedImage.referenceImage.name is air or water or earth or fire)
             {
                 debugText.text = "Element detected: " + trackedImage.referenceImage.name;
-                GameObject cardInstance = Instantiate(cardPrefab, trackedImage.transform.position, trackedImage.transform.rotation);
+                GameObject cardInstance = Instantiate(element_marker_prefab, trackedImage.transform.position, trackedImage.transform.rotation);
                 cardInstance.GetComponent<TrackedMarkerInfo>().markerType = MarkerType.Element;
                 switch (trackedImage.referenceImage.name)
                 {
@@ -90,115 +108,64 @@ public class GridPlacer : MonoBehaviour
                 }
                 spawnedMarkers[trackedImage.trackableId.ToString()] = cardInstance;
                 cardInstance.transform.SetParent(trackedImage.transform);
-                //gridManagement.RegisterMarker(trackedImage);
+                
+                // Debug text
+                SetMarkerDebug("Unknown marker", "detected");
             }
             else
             {
-                debugText.text = "Unknown marker detected: " + trackedImage.referenceImage.name;
+                // Debug text
+                SetMarkerDebug("Unknown marker", "detected");
             }
         }
 
+        // UPDATE MARKER PREFABS
         foreach (var trackedImage in args.updated)
         {
             if (trackedImage.trackingState == TrackingState.Tracking)
             {
-                if (trackedImage.referenceImage.name == anchor)
+                if (trackedImage.referenceImage.name == playfield)
                 {
-                    //UpdateGridPosition(trackedImage);
                     PlayfieldManagement.Instance.UpdatePlayfieldPosition(trackedImage.transform.position, trackedImage.transform.rotation);
-                    debugText.text = "Anchor updated: " + trackedImage.referenceImage.name;
                 }
-                else if (trackedImage.referenceImage.name == card)
+                else if (trackedImage.referenceImage.name == action || trackedImage.referenceImage.name is air or water or earth or fire)
                 {
                     spawnedMarkers[trackedImage.trackableId.ToString()].transform.position = trackedImage.transform.position;
-                    debugText.text = "Card updated: " + trackedImage.referenceImage.name;
-                    //gridManagement.UpdateMarker(trackedImage);
                 }
-                else if (trackedImage.referenceImage.name is air or water or earth or fire)
-                {
-                    debugText.text = "Element updated: " + trackedImage.referenceImage.name;
-                    //gridManagement.UpdateMarker(trackedImage);
-                }
+                    
+                // Debug text
+                SetMarkerDebug(trackedImage.referenceImage.name, "tracking");
             }
             else if (trackedImage.trackingState == TrackingState.None)
             {
-                debugText.text = "Marker lost: " + trackedImage.referenceImage.name;
-                if (trackedImage.referenceImage.name == anchor)
+                if (trackedImage.referenceImage.name == playfield)
                 {
-                    debugText.text = "Anchor lost, hiding grid.";
-                    //if (spawnedGrid) spawnedGrid.SetActive(false);
                     PlayfieldManagement.Instance.OnLostPlayfieldTracking();
                 }
-                else
-                {
-                    //debugText.text = "Element or card marker lost.";
-                    //gridManagement.UnregisterMarker(trackedImage);
-                }
+                    
+                // Debug text
+                SetMarkerDebug(trackedImage.referenceImage.name, "not in sight");
             }
         }
 
+        // REMOVE MARKER PREFABS
         foreach (var trackedImage in args.removed)
         {
-            if (trackedImage.referenceImage.name == anchor)
+            if (trackedImage.referenceImage.name == playfield)
             {
-                debugText.text = "Anchor removed: " + trackedImage.referenceImage.name;
                 PlayfieldManagement.Instance.OnLostPlayfieldTracking();
             }
-            else if (trackedImage.referenceImage.name == card)
+            else if (trackedImage.referenceImage.name == action)
             {
-                debugText.text = "Card removed: " + trackedImage.referenceImage.name;
                 if (spawnedMarkers.ContainsKey(trackedImage.trackableId.ToString()))
                 {
                     Destroy(spawnedMarkers[trackedImage.trackableId.ToString()]);
                     spawnedMarkers.Remove(trackedImage.trackableId.ToString());
                 }
             }
-            else if (trackedImage.referenceImage.name is air or water or earth or fire)
-            {
-                debugText.text = "Element marker removed: " + trackedImage.referenceImage.name;
-                //gridManagement.UnregisterMarker(trackedImage);
-            }
+            
+            // Debug text
+            SetMarkerDebug(trackedImage.referenceImage.name, "lost");
         }
     }
-    //
-    // void PlaceGrid(ARTrackedImage trackedImage)
-    // {
-    //     if (spawnedGrid != null)
-    //     {
-    //         spawnedGrid.transform.position = trackedImage.transform.position;
-    //         spawnedGrid.transform.rotation = trackedImage.transform.rotation;
-    //         spawnedGrid.transform.SetParent(trackedImage.transform);
-    //         spawnedGrid.SetActive(true);
-    //         return;
-    //     }
-    //     
-    //     if (gridPrefab == null) return;
-    //     
-    //     float offset = 5f; // Adjust the offset as needed
-    //     Vector3 offsetPosition = trackedImage.transform.position + Vector3.back * offset; 
-    //
-    //     if (spawnedGrid == null)
-    //     {
-    //         spawnedGrid = Instantiate(gridPrefab, offsetPosition, trackedImage.transform.rotation);
-    //         spawnedGrid.transform.SetParent(trackedImage.transform);
-    //         debugText.text = "Grid spawned at: " + spawnedGrid.transform.position.ToString("F2");
-    //         //spawnedGrid.transform.position = offsetPosition;
-    //     }
-    //     else
-    //     {
-    //         Debug.Log("Grid already spawned, updating position.");
-    //         spawnedGrid.transform.position = offsetPosition;
-    //         spawnedGrid.transform.rotation = trackedImage.transform.rotation;
-    //         spawnedGrid.SetActive(true);
-    //     }
-    // }
-    //
-    // void UpdateGridPosition(ARTrackedImage trackedImage)
-    // {
-    //     if (spawnedGrid != null)
-    //     {
-    //         spawnedGrid.transform.position = trackedImage.transform.position;
-    //         spawnedGrid.transform.rotation = trackedImage.transform.rotation;
-    //     }
-    // }
 }
