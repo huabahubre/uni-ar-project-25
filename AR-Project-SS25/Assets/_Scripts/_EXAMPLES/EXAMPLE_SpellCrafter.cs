@@ -12,7 +12,7 @@ public class EXAMPLE_SpellCrafter : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.F6))
         {
-            ExampleCraftRecipe(0);
+            ExampleCraftRecipe(1);
         }
         
         if (Input.GetKeyDown(KeyCode.F7))

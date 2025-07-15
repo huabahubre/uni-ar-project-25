@@ -72,7 +72,7 @@ public class SpellManager : Singleton<SpellManager>
         switch (_currentSpellType)
         {
             case SpellType.GroundPound:
-                waitTime = 2f;
+                waitTime = 3.0f;
                 break;
             case SpellType.Shield:
                 waitTime = 3.0f;
@@ -163,7 +163,7 @@ public class SpellManager : Singleton<SpellManager>
         var vfxData = new VfxData(
             spawnPosition,
             targetPosition,
-            5f,
+            3f,
             radius
         );
 
