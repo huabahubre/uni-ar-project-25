@@ -1,32 +1,46 @@
+using System.Collections.Generic;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Services.Lobbies;
 using TMPro;
+using UnityEditor;
+using Unity.Netcode.Transports.UTP;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using Unity.Services.Lobbies.Models;
 
 public class HostLobbyUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text lobbyCodeText;
-    [SerializeField] private TMP_Text sessionNameText;
 
-    private async void Awake()
+    private void Start()
     {
-        await UnityServices.InitializeAsync();
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        string localIP = GetLocalIPAddress();
+        lobbyCodeText.text = $"{localIP}";
     }
 
-    public async void OnHostButtonClicked()
+    public void OnHostButtonClicked()
     {
+        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        transport.SetConnectionData("0.0.0.0", 7777);
         NetworkManager.Singleton.StartHost();
 
-        var lobby = await LobbyService.Instance.CreateLobbyAsync(
-            sessionNameText.text,
-            2
-        );
+        MainCanvasManagement.Instance.StartLoading("Hosting Game...");
 
-        lobbyCodeText.text = lobby.LobbyCode;
-        
-        FindObjectOfType<CanvasPage_Lobby>()?.OnJoinedLobby(lobby);
+        // Manually show lobby page
+        FindObjectOfType<CanvasPage_Lobby>()?.OnJoinedLobby();
+    }
+
+    private string GetLocalIPAddress()
+    {
+        foreach (var ip in System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList)
+        {
+            if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                return ip.ToString();
+        }
+        return "IP not found";
     }
 }

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1692018681911386949}
   - component: {fileID: 4379787617202144775}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: QRCode_Example
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 8951500695699765690}
   - component: {fileID: 2269532995907296857}
   - component: {fileID: 1688971845774409932}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: DEBUG_ActionMarkerExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,8 +119,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.482, y: 0, z: -1.606}
-  m_LocalScale: {x: 0.39307, y: 0.0039307, z: 0.39307}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.03, y: 0.00029999999, z: 0.03}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1692018681911386949}
   m_Father: {fileID: 0}

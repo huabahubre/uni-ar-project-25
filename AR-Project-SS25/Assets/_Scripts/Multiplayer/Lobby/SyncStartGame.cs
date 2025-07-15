@@ -67,5 +67,5 @@ public class SyncStartGame : NetworkBehaviour
         {
             Debug.LogWarning("Game state changed to has not started yet. This shouldn't happen in normal flow.");
         }
-    }   
+    }
 }

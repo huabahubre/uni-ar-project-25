@@ -13,6 +13,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: DEBUG_ElementMarkerExample_Water
       objectReference: {fileID: 0}
+    - target: {fileID: 5947819026162064920, guid: c730e6e0833b3624d9f5f2c80fc5aafa,
+        type: 3}
+      propertyPath: elementType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6659973127660822508, guid: c730e6e0833b3624d9f5f2c80fc5aafa,
         type: 3}
       propertyPath: m_Sprite
@@ -57,7 +62,7 @@ PrefabInstance:
     - target: {fileID: 7923662806837356564, guid: c730e6e0833b3624d9f5f2c80fc5aafa,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.547
+      value: -0.63100004
       objectReference: {fileID: 0}
     - target: {fileID: 7923662806837356564, guid: c730e6e0833b3624d9f5f2c80fc5aafa,
         type: 3}
@@ -67,7 +72,7 @@ PrefabInstance:
     - target: {fileID: 7923662806837356564, guid: c730e6e0833b3624d9f5f2c80fc5aafa,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.155
+      value: -4.82
       objectReference: {fileID: 0}
     - target: {fileID: 7923662806837356564, guid: c730e6e0833b3624d9f5f2c80fc5aafa,
         type: 3}

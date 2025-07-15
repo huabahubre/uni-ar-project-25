@@ -33,14 +33,15 @@ public class TestButton : MonoBehaviour
             UpdateButtonUI(newActiveClientId);
         };
         
-        GameStateManager.Instance.player1HP.OnValueChanged += (_, newHealth) =>
-        {
-            UpdateHealthUI(newHealth, healthStatusPlayer1);
-        };
-        GameStateManager.Instance.player2HP.OnValueChanged += (_, newHealth) =>
-        {
-            UpdateHealthUI(newHealth, healthStatusPlayer2);
-        };
+        // [OBSOLETE] 
+        // GameStateManager.Instance.player1HP.OnValueChanged += (_, newHealth) =>
+        // {
+        //     UpdateHealthUI(newHealth, healthStatusPlayer1);
+        // };
+        // GameStateManager.Instance.player2HP.OnValueChanged += (_, newHealth) =>
+        // {
+        //     UpdateHealthUI(newHealth, healthStatusPlayer2);
+        // };
     }
 
     void UpdateHealthUI(int newHealth, TMP_Text healthStatusText)
@@ -64,13 +65,13 @@ public class TestButton : MonoBehaviour
             turnStatusText.color = isMyTurn ? Color.green : Color.gray;
         }
     }
-
+    
     public void OnEndTurnClicked()
     {
         if (GameStateManager.Instance != null)
         {
             Debug.Log("Trying EndTurnRequestServerRpc with damage: " + damage);
-            GameStateManager.Instance.EndTurnRequestServerRpc(damage);
+            // GameStateManager.Instance.EndTurnRequestServerRpc(damage);
         }
     
         endTurnButton.interactable = false; // Prevent spam click until turn updates

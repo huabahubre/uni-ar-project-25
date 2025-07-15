@@ -18,6 +18,7 @@ public class HealthVisualPrefab : MonoBehaviour
     public float rotationSpeed = 30f; // Degrees per second
 
     private Vector3 initialPosition;
+    
     private ElementVisualData elementVisualData;
 
 

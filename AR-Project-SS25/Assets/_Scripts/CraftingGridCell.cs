@@ -1,22 +1,40 @@
+using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
+using TMPro;
 
 [ExecuteAlways]
 public class CraftingGridCell : MonoBehaviour
 {
     public MarkerType cellType;
-
-    [Header("Detection Zone (Cube, scales with transform)")]
-    public Vector3 baseDetectionBoxSize = new Vector3(0.05f, 0.05f, 0.05f);
-
+    
+    public BoxCollider detectionCollider;
+    
     [ShowInInspector, ReadOnly] public TrackedMarkerInfo assignedMarker;
+    [ShowInInspector, ReadOnly] public TrackedMarkerInfo previousMarker;
 
     public Toggle worldToggle;
-    public SpriteRenderer spriteRenderer;
+    public Image visualImage;
 
     private bool isWorldToggleOn = false;
+    private float reassignmentCooldown = 0f;
 
+
+    public Action<TrackedMarkerInfo> OnAssignedMarker;
+    public Action OnRemovedMarker;
+    
+    
+    // DEBUG TODO: Remove when ready!
+    private TextMeshProUGUI debugText;
+    private bool hasLoggedMarkers = false;
+
+    
+    private static readonly Dictionary<TrackedMarkerInfo, CraftingGridCell> markerAssignments = new();
+
+    
     private void Start()
     {
         if (worldToggle != null)
@@ -36,90 +54,114 @@ public class CraftingGridCell : MonoBehaviour
                 }
             });
         }
+
     }
 
     private void Update()
     {
         if (!Application.isPlaying) return;
 
-        TrackedMarkerInfo[] allMarkers = FindObjectsOfType<TrackedMarkerInfo>();
-
-        if (assignedMarker == null)
+        if (reassignmentCooldown > 0f)
         {
-            TrackedMarkerInfo found = FindMatchingMarkerInBox(allMarkers);
-            if (found != null)
-            {
-                assignedMarker = found;
-                OnAssignedMarkerChanged();
-            }
+            reassignmentCooldown -= Time.deltaTime;
+            return;
+        }
 
-            // Set Color of spriteRenderer to fully opaque if marker is assigned
-            Color color = spriteRenderer.color;
-            color.a = 1f;
-            spriteRenderer.color = color;
-        }
-        else
+        TrackedMarkerInfo found = FindMarkerInOverlapBox();
+
+        if (assignedMarker == null && found != null && found != previousMarker)
         {
-            // Only check if current marker is still inside
-            if (!IsInsideBox(assignedMarker.transform.position))
-            {
-                assignedMarker = null;
-                OnAssignedMarkerChanged();
-            }
-            
-            // Set Color of spriteRenderer to fully opaque if marker is assigned
-            Color color = spriteRenderer.color;
-            color.a = 0.1f;
-            spriteRenderer.color = color;
+            // Don't assign if another cell already owns this marker
+            if (markerAssignments.TryGetValue(found, out var otherCell) && otherCell != this)
+                return;
+
+            assignedMarker = found;
+            OnAssignedMarkerChanged();
         }
+        else if (assignedMarker != null && (found == null || found != assignedMarker))
+        {
+            assignedMarker = null;
+            OnAssignedMarkerChanged();
+        }
+
+        // UpdateDebugBox();
     }
 
-    private TrackedMarkerInfo FindMatchingMarkerInBox(TrackedMarkerInfo[] allMarkers)
+
+    private TrackedMarkerInfo FindMarkerInOverlapBox()
     {
-        TrackedMarkerInfo closest = null;
-        float closestDist = Mathf.Infinity;
+        if (detectionCollider == null)
+            return null;
 
-        foreach (var marker in allMarkers)
+        Vector3 center = detectionCollider.bounds.center;
+        Vector3 halfExtents = detectionCollider.bounds.extents;
+
+        Collider[] hits = Physics.OverlapBox(center, halfExtents, Quaternion.identity, LayerMask.GetMask("Marker"));
+
+        foreach (var hit in hits)
         {
-            if (marker.markerType != cellType) continue;
-            if (!IsInsideBox(marker.transform.position)) continue;
-
-            float dist = Vector3.Distance(transform.position, marker.transform.position);
-            if (dist < closestDist)
+            TrackedMarkerInfo marker = hit.GetComponent<TrackedMarkerInfo>();
+            if (marker != null && marker.markerType == cellType)
             {
-                closest = marker;
-                closestDist = dist;
+                return marker;
             }
         }
 
-        return closest;
+        return null;
     }
 
-    private bool IsInsideBox(Vector3 worldPoint)
-    {
-        Vector3 halfSize = Vector3.Scale(baseDetectionBoxSize, transform.lossyScale) * 0.5f;
-        Vector3 localPoint = transform.InverseTransformPoint(worldPoint);
-        return Mathf.Abs(localPoint.x) <= halfSize.x &&
-               Mathf.Abs(localPoint.y) <= halfSize.y &&
-               Mathf.Abs(localPoint.z) <= halfSize.z;
-    }
+
 
     private void OnAssignedMarkerChanged()
     {
+        // Remove this cell from previous assignment if needed
         if (assignedMarker != null)
         {
+            // Check if this marker is already claimed by another cell
+            if (markerAssignments.TryGetValue(assignedMarker, out var existingCell))
+            {
+                if (existingCell != this)
+                {
+                    // Another cell already has this marker — cancel assignment
+                    assignedMarker = null;
+                    return;
+                }
+            }
+
+            // Assign this marker to this cell
+            markerAssignments[assignedMarker] = this;
+
             Debug.Log($"🟢 Marker assigned to cell '{name}': {assignedMarker.name}");
+
+            // Set sprite transparency
+            Color color = visualImage.color;
+            color.a = 0f;
+            visualImage.color = color;
+
+            OnAssignedMarker?.Invoke(assignedMarker);
         }
         else
         {
+            // Clear assignment
+            if (previousMarker != null && markerAssignments.TryGetValue(previousMarker, out var owner) && owner == this)
+            {
+                markerAssignments.Remove(previousMarker);
+            }
+
             Debug.Log($"🔴 Marker removed from cell '{name}'");
+
+            Color color = visualImage.color;
+            color.a = 1f;
+            visualImage.color = color;
+
+            OnRemovedMarker?.Invoke();
         }
-        
-        
-            
-        // Checking for crafting result
-        GridManagement.Instance.CheckCraftingResult();
+
+        previousMarker = assignedMarker;
+
+        PlayfieldManagement.Instance.CheckCraftingResult();
     }
+
 
     private void SpawnMarker()
     {
@@ -145,25 +187,25 @@ public class CraftingGridCell : MonoBehaviour
         {
             Destroy(assignedMarker.gameObject);
             assignedMarker = null;
+            reassignmentCooldown = 0.1f; // Wait 1/10th second to let Unity clean up
             OnAssignedMarkerChanged();
         }
     }
 
+
     private void OnDrawGizmos()
     {
-        Gizmos.color = cellType == MarkerType.Element ? Color.magenta : Color.cyan;
-        Vector3 scaledSize = Vector3.Scale(baseDetectionBoxSize, transform.lossyScale);
-        Gizmos.DrawWireCube(transform.position, scaledSize);
-
         if (assignedMarker != null)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawSphere(transform.position + Vector3.up * 0.05f, 0.02f);
+            Gizmos.DrawSphere(transform.position, 0.005f);
         }
         else
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position + Vector3.up * 0.05f, 0.02f);
+            Gizmos.DrawSphere(transform.position, 0.005f);
         }
     }
+    
+    
 }

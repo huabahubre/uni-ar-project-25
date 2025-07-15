@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="p2_action_marker_9" size="0.055000 0.055000" />
+    <ImageTarget name="p2_action_marker_8" size="0.055000 0.055000" />
+    <ImageTarget name="p2_action_marker_7" size="0.055000 0.055000" />
+    <ImageTarget name="p2_action_marker_6" size="0.055000 0.055000" />
+    <ImageTarget name="p2_action_marker_5" size="0.055000 0.055000" />
+    <ImageTarget name="p2_action_marker_4" size="0.055000 0.055000" />
+    <ImageTarget name="p2_action_marker_3" size="0.055000 0.055000" />
+    <ImageTarget name="p2_action_marker_2" size="0.055000 0.055000" />
+    <ImageTarget name="p2_action_marker_1" size="0.055000 0.055000" />
+    <ImageTarget name="p2_ar_marker_water" size="0.060000 0.060000" />
+    <ImageTarget name="p2_ar_marker_fire" size="0.060000 0.060000" />
+    <ImageTarget name="p2_ar_marker_earth" size="0.060000 0.060000" />
+    <ImageTarget name="p2_ar_marker_air" size="0.060000 0.060000" />
+    <ImageTarget name="p1_action_marker_9" size="0.055000 0.055000" />
+    <ImageTarget name="p1_action_marker_8" size="0.055000 0.055000" />
+    <ImageTarget name="p1_action_marker_7" size="0.055000 0.055000" />
+    <ImageTarget name="p1_action_marker_5" size="0.055000 0.055000" />
+    <ImageTarget name="p1_action_marker_6" size="0.055000 0.055000" />
+    <ImageTarget name="p1_action_marker_4" size="0.055000 0.055000" />
+    <ImageTarget name="p1_action_marker_3" size="0.055000 0.055000" />
+    <ImageTarget name="p1_action_marker_2" size="0.055000 0.055000" />
+    <ImageTarget name="p1_action_marker_1" size="0.055000 0.055000" />
+    <ImageTarget name="p1_ar_marker_water" size="0.060000 0.060000" />
+    <ImageTarget name="p1_ar_marker_fire" size="0.060000 0.060000" />
+    <ImageTarget name="p1_ar_marker_earth" size="0.060000 0.060000" />
+    <ImageTarget name="p1_ar_marker_air" size="0.060000 0.060000" />
+    <ImageTarget name="ar_marker_playfield" size="0.120000 0.120000" />
+  </Tracking>
+</QCARConfig>

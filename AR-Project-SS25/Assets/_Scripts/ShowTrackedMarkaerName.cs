@@ -10,9 +10,9 @@ public class ShowTrackedMarkerName : MonoBehaviour
 
     private ARTrackedImageManager trackedImageManager;
 
-    // Keeps track of currently tracked image names
     private readonly HashSet<string> currentlyTrackedImages = new HashSet<string>();
 
+    // Keeps track of currently tracked image names
     void Awake()
     {
         trackedImageManager = GetComponent<ARTrackedImageManager>();
@@ -41,7 +41,7 @@ public class ShowTrackedMarkerName : MonoBehaviour
 
         foreach (var trackedImage in eventArgs.updated)
         {
-            Debug.Log($"[AR] Updated image: {trackedImage.referenceImage.name}, tracking: {trackedImage.trackingState}");
+            //Debug.Log($"[AR] Updated image: {trackedImage.referenceImage.name}, tracking: {trackedImage.trackingState}");
 
             if (trackedImage.trackingState == TrackingState.Tracking)
             {
