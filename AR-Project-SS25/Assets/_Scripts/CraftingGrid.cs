@@ -19,7 +19,7 @@ public class CraftingGrid : Singleton<CraftingGrid>
     {
         scalerChild.SetActive(false);
         
-        Debug.LogError("Grid Started");
+        Debug.Log("Grid Started");
         
     }
 
