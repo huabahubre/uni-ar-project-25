@@ -5,13 +5,31 @@ using UnityEngine;
 public class EXAMPLE_SpellCrafter : MonoBehaviour
 {
 
+    public TrackedMarkerInfo markerInfo;
+
+    private void Update()
+    {
+        
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            ExampleCraftRecipe(0);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            ExampleCraftRecipe(2);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            ExampleCraftRecipe(3);
+        }
+    }
+
+    [Button]
     public void ExampleCraftRecipe(int spellIdx)
     {
-        if (PlayfieldManagement.Instance.currentElementMarker == null)
-        {
-            Debug.Log("CAN'T CRAFT RECIPE: No Element Marker assigned");
-            return;
-        }
+        PlayfieldManagement.Instance.OnPlacedElementCard(markerInfo);
         
         ElementType elementType = PlayfieldManagement.Instance.currentElementMarker.elementType;
         SpellType spellType = (SpellType)spellIdx;

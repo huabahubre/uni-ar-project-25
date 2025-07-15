@@ -33,7 +33,7 @@ EditorBuildSettings:
     path: Assets/_Scenes/E_MultiplayerUiCustomAndIngame 1.unity
     guid: 4947dfbaf1cbb784d9762338c0c3a740
   - enabled: 1
-    path: Assets/_Scenes/sam.unity
+    path: Assets/_Scenes/sam_old.unity
     guid: 214424f42022f97498688689e798d52a
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6ee72d15cf39dd748a13eac57397b9af,

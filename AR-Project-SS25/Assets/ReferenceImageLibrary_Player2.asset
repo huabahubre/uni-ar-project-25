@@ -18,16 +18,6 @@ MonoBehaviour:
     m_Storage: []
   m_Images:
   - m_SerializedGuid:
-      m_GuidLow: 5032834552050500919
-      m_GuidHigh: 10280496974802052522
-    m_SerializedTextureGuid:
-      m_GuidLow: 16610507838659282364
-      m_GuidHigh: 15907951148867849673
-    m_Size: {x: 0.1, y: 0.1}
-    m_SpecifySize: 1
-    m_Name: ar_marker_action
-    m_Texture: {fileID: 0}
-  - m_SerializedGuid:
       m_GuidLow: 4698212335089311903
       m_GuidHigh: 12488459131476561852
     m_SerializedTextureGuid:

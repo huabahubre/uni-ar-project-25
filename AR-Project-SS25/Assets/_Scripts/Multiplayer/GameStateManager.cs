@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using Vuforia;
+
 
 public enum GameState
 {
@@ -33,9 +35,16 @@ public class GameStateManager : NetworkBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+        
     }
-    
-    
+
+    private void Start()
+    {
+        if(VuforiaBehaviour.Instance)
+            VuforiaBehaviour.Instance.enabled = false;
+    }
+
+
     private void OnDestroy()
     {
         CurrentGameState.OnValueChanged -= OnGameStateChanged;
@@ -122,6 +131,19 @@ public class GameStateManager : NetworkBehaviour
     private void OnGameStateChanged(GameState oldState, GameState newState)
     {
         Debug.Log($"[Client] GameState changed from {oldState} to {newState}");
+
+        switch (newState)
+        {
+            case GameState.GameOver:
+            case GameState.Lobby:
+                VuforiaBehaviour.Instance.enabled = false;
+                break;
+            
+            case GameState.Gameplay:
+                VuforiaBehaviour.Instance.enabled = true;
+                break;
+        }
+        
         GameStateChanged?.Invoke(newState);
     }
     
@@ -417,16 +439,33 @@ public class GameStateManager : NetworkBehaviour
 
         BeginTurn();
     }
+    
+    private ulong localCurrentTurnClientId = ulong.MaxValue;
+
 
     [ClientRpc]
     private void NotifyTurnClientRpc(ulong currentPlayerId)
     {
-        bool isMyTurn = (currentPlayerId == NetworkManager.Singleton.LocalClientId);
-        
+        localCurrentTurnClientId = currentPlayerId;
+
+        bool isMyTurn = IsMyTurn();  // Now uses local value
+
         OnLocalTurnChanged?.Invoke(isMyTurn);
-        
+
+        if (isMyTurn)
+            CraftingGrid.Instance.HideVisual();
+        else
+            CraftingGrid.Instance.ShowVisual();
+
         Debug.Log($"[Client] It is {(isMyTurn ? "YOUR" : "ENEMY")} turn.");
     }
+
+    
+    public bool IsMyTurn()
+    {
+        return localCurrentTurnClientId == NetworkManager.Singleton.LocalClientId;
+    }
+
     
     #endregion
     
@@ -445,6 +484,24 @@ public class GameStateManager : NetworkBehaviour
     
 
 #endregion
+
+    /// <summary>
+    /// Returns true if the local player is Player 1 (first connected client), false if Player 2.
+    /// </summary>
+    public bool IsLocalPlayerPlayerOne()
+    {
+        var ids = NetworkManager.Singleton.ConnectedClientsIds;
+
+        // Sanity check
+        if (ids.Count < 2)
+        {
+            Debug.LogWarning("[GameStateManager] Not enough clients connected to determine player index.");
+            return false;
+        }
+
+        return NetworkManager.Singleton.LocalClientId == ids[0];
+    }
+
 
     
 #region Rematch Logic --> This is not working for a second match ONLY FOR VIDEO
@@ -569,30 +626,30 @@ public class GameStateManager : NetworkBehaviour
     
     #region [OBSOLETE] OnNetworkSpawn
     
-    private void AssignFirstPlayerServer()
-    {
-        Debug.Log("Player ids: " + string.Join(", ", NetworkManager.Singleton.ConnectedClientsIds));
-        Debug.Log("Assigning first player: IsServer: " + IsServer + ", playerCount: " + NetworkManager.Singleton.ConnectedClientsIds.Count);
-        
-        if (IsServer && activePlayerClientId.Value == 0 && NetworkManager.Singleton.ConnectedClientsIds.Count > 0)
-        {
-            activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
-            Debug.Log($"Assigned Player 1 to clientId: {activePlayerClientId.Value}");
-        }
-        else if (IsServer && activePlayerClientId.Value == 0)
-        {
-            Invoke(nameof(AssignFirstPlayerServer), 2f); // Retry if not yet connected
-        }
-    }
-    
-    private void OnClientConnected(ulong clientId)
-    {
-        if (activePlayerClientId.Value == 0) // not yet set
-        {
-            activePlayerClientId.Value = clientId;
-            Debug.Log($"Assigned Active player to clientId: {clientId}");
-        }
-    }
+    // private void AssignFirstPlayerServer()
+    // {
+    //     Debug.Log("Player ids: " + string.Join(", ", NetworkManager.Singleton.ConnectedClientsIds));
+    //     Debug.Log("Assigning first player: IsServer: " + IsServer + ", playerCount: " + NetworkManager.Singleton.ConnectedClientsIds.Count);
+    //     
+    //     if (IsServer && activePlayerClientId.Value == 0 && NetworkManager.Singleton.ConnectedClientsIds.Count > 0)
+    //     {
+    //         activePlayerClientId.Value = NetworkManager.Singleton.ConnectedClientsIds[0];
+    //         Debug.Log($"Assigned Player 1 to clientId: {activePlayerClientId.Value}");
+    //     }
+    //     else if (IsServer && activePlayerClientId.Value == 0)
+    //     {
+    //         Invoke(nameof(AssignFirstPlayerServer), 2f); // Retry if not yet connected
+    //     }
+    // }
+    //
+    // private void OnClientConnected(ulong clientId)
+    // {
+    //     if (activePlayerClientId.Value == 0) // not yet set
+    //     {
+    //         activePlayerClientId.Value = clientId;
+    //         Debug.Log($"Assigned Active player to clientId: {clientId}");
+    //     }
+    // }
     
     
     

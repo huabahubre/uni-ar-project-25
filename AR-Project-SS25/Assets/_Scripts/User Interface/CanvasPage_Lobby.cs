@@ -1,5 +1,6 @@
 using Sirenix.OdinInspector;
 using TMPro;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.UI;
@@ -89,7 +90,7 @@ public class CanvasPage_Lobby : CanvasPage
 
     #region Joining Lobby
     
-    public void OnJoinedLobby(Lobby lobby)
+    public void OnJoinedLobby()
     {
         Panel_Actions.SetActive(false);
         Panel_ActiveLobby.SetActive(true);
@@ -97,7 +98,7 @@ public class CanvasPage_Lobby : CanvasPage
         RefreshAllLayoutGroups();
     
         // Check if host
-        Button_StartGame.gameObject.SetActive(lobby.HostId == AuthenticationService.Instance.PlayerId);
+        Button_StartGame.gameObject.SetActive(NetworkManager.Singleton.IsHost);
         Panel_WaitingForOtherPlayer.SetActive(true);
         
         // Subscribe to player updates

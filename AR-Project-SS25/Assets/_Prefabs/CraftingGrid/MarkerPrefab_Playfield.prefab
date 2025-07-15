@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &156440120010965244
 Transform:
   m_ObjectHideFlags: 0
@@ -162,7 +162,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3426487955477470715
 Transform:
   m_ObjectHideFlags: 0
@@ -265,11 +265,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: HealthVisualPrefab - Enemy
       objectReference: {fileID: 0}
-    - target: {fileID: 28833312064786613, guid: 72f674f78ac64114d8de0e2fcc525b93,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2312032498340306820, guid: 72f674f78ac64114d8de0e2fcc525b93,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -283,7 +278,7 @@ PrefabInstance:
     - target: {fileID: 2312032498340306820, guid: 72f674f78ac64114d8de0e2fcc525b93,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 2312032498340306820, guid: 72f674f78ac64114d8de0e2fcc525b93,
         type: 3}
@@ -344,11 +339,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: HealthVisualPrefab - Player
       objectReference: {fileID: 0}
-    - target: {fileID: 28833312064786613, guid: 72f674f78ac64114d8de0e2fcc525b93,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2312032498340306820, guid: 72f674f78ac64114d8de0e2fcc525b93,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -362,7 +352,7 @@ PrefabInstance:
     - target: {fileID: 2312032498340306820, guid: 72f674f78ac64114d8de0e2fcc525b93,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1
+      value: -0.75
       objectReference: {fileID: 0}
     - target: {fileID: 2312032498340306820, guid: 72f674f78ac64114d8de0e2fcc525b93,
         type: 3}
@@ -423,76 +413,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: GridCellPrefab - Element
       objectReference: {fileID: 0}
-    - target: {fileID: 195516922365066172, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3980402658401621865, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3980402658401621865, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5152425120483336569, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: debugRaycast
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5152425120483336569, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: baseDetectionBoxSize.x
-      value: 2.57
-      objectReference: {fileID: 0}
-    - target: {fileID: 5152425120483336569, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: baseDetectionBoxSize.y
-      value: 3.63
-      objectReference: {fileID: 0}
-    - target: {fileID: 5152425120483336569, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: baseDetectionBoxSize.z
-      value: 2.83
-      objectReference: {fileID: 0}
-    - target: {fileID: 7006654656835031271, guid: 6ad242823dbb2b949a9140989e4d75a1,
+    - target: {fileID: 4292744366544280041, guid: 6ad242823dbb2b949a9140989e4d75a1,
         type: 3}
       propertyPath: m_Size.x
-      value: 4.34
+      value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 7006654656835031271, guid: 6ad242823dbb2b949a9140989e4d75a1,
+    - target: {fileID: 4292744366544280041, guid: 6ad242823dbb2b949a9140989e4d75a1,
         type: 3}
-      propertyPath: m_Size.y
-      value: 3.48
+      propertyPath: m_Size.z
+      value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 7006654656835031271, guid: 6ad242823dbb2b949a9140989e4d75a1,
+    - target: {fileID: 4292744366544280041, guid: 6ad242823dbb2b949a9140989e4d75a1,
         type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: fcc2d994dcced4f0992ffa33f6b079fa,
-        type: 3}
-    - target: {fileID: 7006654656835031271, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: m_DrawMode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8810802754868539751, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8810802754868539751, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8810802754868539751, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
+      propertyPath: m_Center.z
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8810802754868539751, guid: 6ad242823dbb2b949a9140989e4d75a1,
         type: 3}
@@ -507,7 +441,7 @@ PrefabInstance:
     - target: {fileID: 8810802754868539751, guid: 6ad242823dbb2b949a9140989e4d75a1,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.04
+      value: -1.422
       objectReference: {fileID: 0}
     - target: {fileID: 8810802754868539751, guid: 6ad242823dbb2b949a9140989e4d75a1,
         type: 3}
@@ -543,11 +477,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8810802754868539751, guid: 6ad242823dbb2b949a9140989e4d75a1,
-        type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

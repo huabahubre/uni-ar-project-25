@@ -50,11 +50,11 @@ MonoBehaviour:
       color: {r: 0, g: 0, b: 0, a: 0}
       icon: {fileID: 0}
   spellDataList:
-  - {fileID: 11400000, guid: 811ddcce85b7b0f42b88f46ad2b1d6d2, type: 2}
-  - {fileID: 11400000, guid: c374096304895724b89295c21b36a589, type: 2}
-  - {fileID: 11400000, guid: 70cec6325b86b6446bdcf1c82f8ee6e3, type: 2}
   - {fileID: 11400000, guid: c06aa2b1a92f17e4988c27e15f39f544, type: 2}
   - {fileID: 11400000, guid: 7abda0842eea5474d8442c634c8a2d04, type: 2}
+  - {fileID: 11400000, guid: 811ddcce85b7b0f42b88f46ad2b1d6d2, type: 2}
+  - {fileID: 11400000, guid: 70cec6325b86b6446bdcf1c82f8ee6e3, type: 2}
+  - {fileID: 11400000, guid: c374096304895724b89295c21b36a589, type: 2}
   craftingRecipes:
   - {fileID: 11400000, guid: 75968ce1a7be8604dbf0745dc922f92f, type: 2}
   - {fileID: 11400000, guid: 66088b1651f92a442b065f88c8eb94e4, type: 2}
@@ -81,11 +81,11 @@ MonoBehaviour:
     CrystalPrefab: {fileID: 6681078219983434123, guid: ccb5c00fff2913a49af46bcfa86d7316,
       type: 3}
     Color: {r: 0.6509804, g: 0.76470596, b: 0.8588236, a: 1}
-    Icon: {fileID: 21300000, guid: 91177fa749063ee4f913f6ae21c4f1fc, type: 3}
+    Icon: {fileID: 21300000, guid: 381fe74b29a605f418812ee8f4f53d1f, type: 3}
   craftingGridPrefab: {fileID: 5556165510305102684, guid: 8fe9e100405b4d54cbc88b9a5283e843,
     type: 3}
   healthVisualPrefab: {fileID: 1122254143622394125, guid: 72f674f78ac64114d8de0e2fcc525b93,
     type: 3}
   actionCardPrefab: {fileID: 8951500695699765690, guid: ec6daf2d43f471c43b13b7f384c7c799,
     type: 3}
-  isWin: 1
+  isRematchLobby: 0

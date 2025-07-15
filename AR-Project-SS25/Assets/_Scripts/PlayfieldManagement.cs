@@ -53,32 +53,23 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     [Button]
     public void OnPlayfieldTracked()
     {
-        playFieldVisual.SetActive(true);
-        
-        // Hide the scan screen
-       MainCanvasManagement.Instance.StopScanScreen();
-        
         // Subscribe to element cell
         if (playerElementCell != null)
         {
             playerElementCell.OnAssignedMarker += OnPlacedElementCard;
             playerElementCell.OnRemovedMarker += OnRemovedElementCard;
         }
-        
-        // Tell the server, that we scanned the playfield for the first time
-        if (!initedPlayfield)
+
+        // If already inited, just set the position
+        if (initedPlayfield)
         {
-            initedPlayfield = true;
-            MainCanvasManagement.Instance.StartLoading("Waiting for other players to scan the playfield...");
-            // TODO: UNCOMMENT THIS WHEN READY
-            //GameStateManager.Instance.SetPlayerReadyServerRpc();
-            
-            // Init Health Visuals
-            //playerHealthVisual.Init(true, (ElementType)PlayerState.LocalPlayer.ElementIndex.Value);
-            //enemyHealthVisual.Init(false, (ElementType)PlayerState.EnemyPlayer.ElementIndex.Value);
-            
-            
-            Debug.LogError("inited playfield");
+            playFieldVisual.SetActive(true);
+            SetPlayfieldPosition();
+        }
+        else
+        {
+            MainCanvasManagement.Instance.initPlayfieldButton.SetActive(true);
+            // InitPlayfield();
         }
         
         Debug.LogError("OnPlayFieldTracked");
@@ -88,6 +79,9 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     [Button]
     public void OnLostPlayfieldTracking()
     {
+        if(!initedPlayfield)
+            return;
+        
         playFieldVisual.SetActive(false);
         
         // Unsubscribe to element cell
@@ -96,7 +90,6 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
             playerElementCell.OnAssignedMarker -= OnPlacedElementCard;
             playerElementCell.OnRemovedMarker -= OnRemovedElementCard;
         }
-        
         // Show scan screen
         MainCanvasManagement.Instance.ShowScanScreen("You lost the playfield tracking.\nPlease scan the playfield again to continue!");
         
@@ -104,39 +97,63 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
     }
     
     
+    
+    
+    
+    
     [Button]
-    public void UpdatePlayfieldPosition(Vector3 position, Quaternion rotation)
+    public void InitPlayfield()
     {
-        // Set position of PlayFieldVisual
-        playFieldVisual.transform.position = position;
-        playFieldVisual.transform.rotation = rotation;
-        
-        // Set position of PlayerElementCell
-        if (playerElementCell != null)
+        // this is when we loose track and need to rescan the playfield
+        if (!initedPlayfield)
         {
-            playerElementCell.transform.localPosition = position + rotation * playerElementCellOffset;
-            playerElementCell.transform.rotation = rotation;
+            MainCanvasManagement.Instance.StartLoading("Waiting for other players to scan the playfield...");
         }
         
-        // Set position of HealthVisuals
-        if (playerHealthVisual != null)
-        {
-            playerHealthVisual.transform.localPosition = position + rotation * playerVisualOffset;
-            playerHealthVisual.transform.rotation = rotation;
-        }
-        if (enemyHealthVisual != null)
-        {
-            Vector3 enemyOffset = -playerVisualOffset;
-            enemyHealthVisual.transform.localPosition = position + rotation * enemyOffset;
-            enemyHealthVisual.transform.rotation = rotation;
-        }
+        // This is only the very first time
+        initedPlayfield = true;
+        
+        playFieldVisual.SetActive(true);
+        MainCanvasManagement.Instance.StopScanScreen();
+
+        // Init Health Visuals
+        playerHealthVisual.Init(true, (ElementType)PlayerState.LocalPlayer.ElementIndex.Value);
+        enemyHealthVisual.Init(false, (ElementType)PlayerState.EnemyPlayer.ElementIndex.Value);
+
+        SetPlayfieldPosition();
+        
+        // tell Server that we are ready
+        GameStateManager.Instance.SetPlayerReadyServerRpc();
+        
+        Debug.LogError("Inited playfield!");
     }
+    
+    [Button]
+    public void SetPlayfieldPosition()
+    {
+        bool isPlayerOne = GameStateManager.Instance.IsLocalPlayerPlayerOne();
+    
+        playFieldVisual.SetActive(true);
+
+        // Keep current local position
+        Vector3 localPosition = playFieldVisual.transform.localPosition;
+
+        // Set local rotation based on player identity
+        Quaternion localRotation = isPlayerOne 
+            ? Quaternion.Euler(0f, 0f, 0f) 
+            : Quaternion.Euler(0f, 180f, 0f);
+
+        playFieldVisual.transform.localPosition = localPosition;
+        playFieldVisual.transform.localRotation = localRotation;
+    }
+
+    
     
     #endregion
     
     #region Element checking
 
-    void OnPlacedElementCard(TrackedMarkerInfo markerInfo)
+    public void OnPlacedElementCard(TrackedMarkerInfo markerInfo)
     {
         if (markerInfo == null)
         {
@@ -164,42 +181,6 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
 
     
     
-    #endregion
-
-    #region Spawn Grid
-    
-    
-    // [Button]
-    // public void SpawnLocalPlayer(Transform trackedMarkerObject = null)
-    // {
-    //     Vector3 markerPosition = trackedMarkerObject.position;
-    //     Quaternion markerRotation = trackedMarkerObject.rotation;
-    //
-    //     // Instantiate Player Visual
-    //     Vector3 playerPos = markerPosition + markerRotation * playerVisualOffset;
-    //     playerHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, playerPos, markerRotation);
-    //     playerHealthVisual.name = "PlayerHealthVisual";
-    //     playerHealthVisual.Init(true, ElementType.Fire);
-    //
-    //     // Instantiate Enemy Visual (opposite position)
-    //     Vector3 enemyOffset = -playerVisualOffset;
-    //     Vector3 enemyPos = markerPosition + markerRotation * enemyOffset;
-    //     enemyHealthVisual = Instantiate(DataManagement.Instance.healthVisualPrefab, enemyPos, markerRotation);
-    //     enemyHealthVisual.name = "EnemyHealthVisual";
-    //     enemyHealthVisual.Init(false, ElementType.Water);
-    //     
-    //
-    //     // Instantiate Player Grid
-    //     Vector3 gridPos = markerPosition + markerRotation * gridOffset;
-    //     CraftingGrid playerGrid = Instantiate(DataManagement.Instance.craftingGridPrefab, gridPos, markerRotation);
-    //     playerGrid.gameObject.name = "PlayerCraftingGrid";
-    //     
-    //     // TODO: ONLY FOR DEBUGGING
-    //     // playerGrid.currentMarkers = trackedMarkers.ToArray();
-    // }
-
-
-
     #endregion
     
     #region Check for Recipe
@@ -259,9 +240,18 @@ public class PlayfieldManagement : Singleton<PlayfieldManagement>
 
     
     #endregion
-    
-    
-    
+
+
+    private void OnDisable()
+    {
+        if (playerElementCell != null)
+        {
+            playerElementCell.OnAssignedMarker -= OnPlacedElementCard;
+            playerElementCell.OnRemovedMarker -= OnRemovedElementCard;
+        }
+    }
+
+
     #region OBSOLETE --> Use maybe later?
     
     // /// <summary>

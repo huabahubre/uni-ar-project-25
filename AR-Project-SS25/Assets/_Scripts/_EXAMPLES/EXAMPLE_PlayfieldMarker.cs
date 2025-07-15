@@ -23,8 +23,8 @@ public class EXAMPLE_PlayfieldMarker : MonoBehaviour
 
     private void Update()
     {
-        if(updateMyPosition)
-            PlayfieldManagement.Instance.UpdatePlayfieldPosition(transform.position,
-            transform.rotation);
+        // if(updateMyPosition)
+        //     PlayfieldManagement.Instance.UpdatePlayfieldPosition(transform.position,
+        //     transform.rotation);
     }
 }

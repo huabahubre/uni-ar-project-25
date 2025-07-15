@@ -126,7 +126,7 @@ public class GridPlacer : MonoBehaviour
             {
                 if (trackedImage.referenceImage.name == playfield)
                 {
-                    PlayfieldManagement.Instance.UpdatePlayfieldPosition(trackedImage.transform.position, trackedImage.transform.rotation);
+                    // PlayfieldManagement.Instance.UpdatePlayfieldPosition(trackedImage.transform.position, trackedImage.transform.rotation);
                 }
                 else if (trackedImage.referenceImage.name == action || trackedImage.referenceImage.name is air or water or earth or fire)
                 {

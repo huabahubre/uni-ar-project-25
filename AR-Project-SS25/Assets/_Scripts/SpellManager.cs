@@ -72,13 +72,13 @@ public class SpellManager : Singleton<SpellManager>
         switch (_currentSpellType)
         {
             case SpellType.GroundPound:
-                waitTime = 1.5f;
+                waitTime = 2f;
                 break;
             case SpellType.Shield:
-                waitTime = 2.0f;
+                waitTime = 3.0f;
                 break;
             default:
-                waitTime = 1.0f;
+                waitTime = 3.0f;
                 break;
         }
         
@@ -157,6 +157,8 @@ public class SpellManager : Singleton<SpellManager>
         
         // Instantiate the spell visual prefab
         var spellInstance = Instantiate(visualData.VisualPrefab, spawnPosition, spawnRotation);
+        spellInstance.transform.localScale = visualData.VisualPrefab.transform.localScale;
+
 
         var vfxData = new VfxData(
             spawnPosition,

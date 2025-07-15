@@ -196,12 +196,17 @@ public class CanvasPage_Gameplay : CanvasPage
         Panel_YourTurn.SetActive(false);
         Panel_OpponentTurn.SetActive(true);
 
+        if(currentSpellData == null)
+        {
+            Debug.LogError("[UI] Cannot cast spell, currentSpellData is null.");
+            return;
+        }
+        
         // Debug.Log("Player trying to cast spell: " + currentSpellData);
 
         // Try to cast spell with Action
         onCastSpell?.Invoke(currentSpellData);
-
-
+        
         GameStateManager.Instance.ConfirmSpellCastServerRpc((int)currentSpellData.Item2, (int)currentSpellData.Item1);
 
         // StartCoroutine(WaitOpponentTurn());

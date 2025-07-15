@@ -48,9 +48,13 @@ public class CraftingGrid : Singleton<CraftingGrid>
 
     public void ShowVisual()
     {
-        if (scalerChild != null)
+        if (scalerChild != null && GameStateManager.Instance.IsMyTurn())
         {
             scalerChild.SetActive(true);
+        }
+        else
+        {
+            scalerChild.SetActive(false);
         }
     }
     

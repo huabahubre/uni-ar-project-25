@@ -23,6 +23,9 @@ public class MainCanvasManagement : Singleton<MainCanvasManagement>
     public GameObject scanScreen;
     
     [ShowInInspector, BoxGroup("References")]
+    public GameObject initPlayfieldButton;
+    
+    [ShowInInspector, BoxGroup("References")]
     public TextMeshProUGUI scanMessageText;
 
     
